@@ -1,6 +1,6 @@
-/* [router-logic.js] - 가입, 방 관리 및 슬라이딩 UI 제어 */
+/* [router-logic.js] - UI 컨트롤 및 엔진 브릿지 */
 
-// 1. DOM 요소 캐싱 (HTML ID와 정확히 매칭)
+// 1. DOM 요소 캐싱
 const authScreen = document.getElementById('auth-screen');
 const unlockScreen = document.getElementById('unlock');
 const joinBtn = document.getElementById('join-btn');
@@ -10,105 +10,89 @@ const fill = document.getElementById('slide-fill');
 const statusSub = document.getElementById('status-sub');
 const mainStatus = document.getElementById('status');
 
-let currentRoom = 'Lobby';
-
-// [가입 로직]
+// 2. 가입 및 시스템 시작 (중복 로직 통합)
 joinBtn.onclick = () => {
-    const idVal = document.getElementById('join-id').value;
-    if(idVal.trim() === "") return alert("ID를 입력하세요!");
+    const roomId = document.getElementById('join-room-id').value;
+    const userId = document.getElementById('join-id').value;
     
-    authScreen.style.display = 'none';
-    unlockScreen.style.display = 'flex';
+    if(!roomId || !userId) {
+        alert("ROOM 이름과 ID를 모두 입력해주세요!");
+        return;
+    }
 
-    // 🍎 비밀방 배정 및 서버 통지
-    currentRoom = 'Secret_Lab_01';
-    socket.emit('join-room', currentRoom);
-    mainStatus.innerText = `💎 ROOM: ${currentRoom}`;
+    // [Core 엔진 호출] 실제 입력값 전달
+    if(typeof joinRoom === 'function') {
+        joinRoom(roomId, userId);
+        
+        // UI 레이어 전환
+        authScreen.style.display = 'none';
+        unlockScreen.style.display = 'flex';
+        mainStatus.innerText = `💎 ROOM: ${roomId}`;
+    }
 };
 
-// [언락 화면]
+// 3. 언락 화면 (오디오 엔진 가동)
 unlockScreen.onclick = function() {
     this.style.display = 'none';
-    mainStatus.innerText = `💎 ROOM: ${currentRoom}`;
+    // 브라우저 오디오 컨텍스트 재개 (필요 시 core에서 처리)
+    console.log("🍎 WIKI-ROUTER UI UNLOCKED");
 };
 
-/* --- 🍎 핵심: 슬라이딩 스위치 & 전화 종료 핸들링 --- */
+// 4. 슬라이딩 마스터 스위치 (Bear 통화 권한 제어)
 masterSwitch.onclick = () => {
     if (isBearActive) {
-        // [1] 스위치 OFF (비활성화)
+        // [OFF 상태로 전환]
         isBearActive = false;
         
-        // 🚨 통화 중이었다면 즉시 종료 (Core의 함수 호출)
-        if(isBusy) {
-            stopBear(); // router-core.js에 정의된 종료 함수
-        }
+        if(isBusy) stopBear(); // 통화 중이면 즉시 강제 종료
 
-        // [2] 슬라이딩 애니메이션 및 아이콘 변경
-        handle.style.left = '5px';           // 왼쪽으로 이동
-        handle.innerText = "🔌";             // 플러그 아이콘으로 변경
-        fill.style.width = '0%';             // 초록색 게이지 제거
-        fill.style.background = '#ff4757';   // 배경색 빨강으로 준비
+        handle.style.left = '5px';
+        handle.innerText = "🔌";
+        fill.style.width = '0%';
+        fill.style.background = '#ff4757';
         
-        // [3] 텍스트 및 버튼 상태 변경
         statusSub.innerText = "BEAR-OFFLINE";
         statusSub.style.color = "#ff4757";
         bStat.innerText = "OFF";
         
-        // 버튼 잠금 (실수로 눌리지 않게)
         bTrig.style.opacity = "0.3";
         bTrig.style.pointerEvents = "none";
-
     } else {
-        // [1] 스위치 ON (활성화)
+        // [ON 상태로 전환]
         isBearActive = true;
 
-        // [2] 슬라이딩 애니메이션 및 아이콘 변경
-        handle.style.left = '70px';          // 오른쪽으로 이동 (기존 70px 유지)
-        handle.innerText = "📞";             // 전화기 아이콘으로 변경
-        fill.style.width = '100%';           // 게이지 꽉 채우기
-        fill.style.background = '#2ecc71';   // 초록색 활성화
+        handle.style.left = '70px';
+        handle.innerText = "📞";
+        fill.style.width = '100%';
+        fill.style.background = '#2ecc71';
         
-        // [3] 텍스트 및 버튼 상태 변경
         statusSub.innerText = "💎 ONLINE";
         statusSub.style.color = "#00ff00";
         bStat.innerText = "READY";
         
-        // 버튼 잠금 해제
         bTrig.style.opacity = "1";
         bTrig.style.pointerEvents = "auto";
     }
 };
 
+// 5. 무전기(Peng) PTT 안전장치
+const handleStop = () => { if (typeof stopPeng === "function") stopPeng(); };
+window.addEventListener('mouseup', handleStop);
+window.addEventListener('touchend', handleStop);
 
-/* [router-logic.js 맨 아래에 추가하면 좋은 안전장치] */
+// 6. 버튼 이벤트 최종 연결
+bTrig.onclick = () => { if(typeof toggleBear === 'function') toggleBear(); };
 
-// 마우스가 버튼 밖에서 떼져도 무전기 녹음이 멈추도록 보장
-window.addEventListener('mouseup', () => {
-    if (typeof stopPeng === "function") stopPeng();
-});
+pTrig.onmousedown = () => { if(typeof startPeng === 'function') startPeng(); };
+pTrig.onmouseup = handleStop;
 
-// 모바일에서 화면을 벗어나면 종료
-window.addEventListener('touchend', () => {
-    if (typeof stopPeng === "function") stopPeng();
-});
+pTrig.ontouchstart = (e) => { e.preventDefault(); if(typeof startPeng === 'function') startPeng(); };
+pTrig.ontouchend = (e) => { e.preventDefault(); handleStop(); };
 
-
-
-/* --- [버튼 이벤트 연결] --- */
-
-// Bear: 토글식 전화기 (클릭)
-bTrig.onclick = toggleBear; 
-
-// Peng: PTT 무전기 (누르고 떼기)
-pTrig.onmousedown = startPeng;
-pTrig.onmouseup = stopPeng;
-
-// 터치 대응
-pTrig.ontouchstart = (e) => { e.preventDefault(); startPeng(); };
-pTrig.ontouchend = (e) => { e.preventDefault(); stopPeng(); };
-
-// 로그 삭제
+// 7. 로그 전체 삭제 (동기화 신호 포함)
 document.getElementById('clear-btn').onclick = () => {
-    socket.emit('clear-logs-signal');
-    lBox.innerHTML = '';
+    if(confirm("모든 로그와 파일을 삭제하시겠습니까?")) {
+        socket.emit('clear-logs-signal');
+        lBox.innerHTML = '';
+    }
 };

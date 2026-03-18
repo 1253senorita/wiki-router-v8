@@ -1,4 +1,4 @@
-/* [SRV(🏗️🏗️🏗️)] WIKI-ROUTER v5.2 CORE ENGINE */
+/* [SRV(🏗️🏗️🏗️)] WIKI-ROUTER v5.2 CORE ENGINE (Room & ID Upgraded) */
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -16,13 +16,10 @@ const recDir = path.join(__dirname, 'recordings');
 
 if (!fs.existsSync(recDir)) fs.mkdirSync(recDir);
 
-/* [RUT(🛣️🛣️🛣️)] 라우팅 및 정적 파일 경로 강제 지정 */
 app.use('/peerjs', peerServer);
 app.use(express.static(path.join(__dirname, 'public')));
 
-let peerList = new Set();
-
-/* [RUT(🛣️🛣️🛣️)] 파일 순환 시스템 (100개 제한) */
+/* --- [파일 순환 시스템 유지] --- */
 function rotateLogs() {
     try {
         const files = fs.readdirSync(recDir).map(f => ({ 
@@ -36,54 +33,70 @@ function rotateLogs() {
 
 /* [SIO_S(📡📡📡)] 소켓 서버 로직 */
 io.on('connection', (socket) => {
-    const penguinId = socket.id.substring(0, 5);
-
-    // 💎 SIO_S: 통합 ID 등록
-    socket.on('register-peer', (id) => {
-        socket.myPeerId = id;
-        peerList.add(id);
-        console.log(`📡 [SIO_S] 입성: ${penguinId} (Peer: ${id})`);
-        // 새로운 유저 입장을 모두에게 알림 (필요시)
-        io.emit('peer-joined', id);
-    });
-
-    // 🐻 BEAR: 실시간 타겟 리스트 요청 응답
-    socket.on('get-peers', () => {
-        socket.emit('peer-list', Array.from(peerList));
-    });
-
-    // 🐧 PENG: 무전기 음성 파일 동기화
-    socket.on('sync-audio-file', (data) => {
-        if (!data || !data.blob) return;
+    
+    // 💎 [SIO_S] 룸 진입 및 사용자 등록
+    socket.on('join-room', (data) => {
+        const { roomId, userId, peerId } = data;
         
-        socket.broadcast.emit('receive-sync-audio', { 
-            blob: data.blob, 
-            id: penguinId 
+        socket.join(roomId); // 소켓을 특정 방에 할당
+        socket.myRoom = roomId;
+        socket.myUserId = userId;
+        socket.myPeerId = peerId;
+
+        console.log(`📡 [JOIN] 룸: ${roomId} | 아이디: ${userId} | Peer: ${peerId}`);
+        
+        // 해당 방에 있는 다른 유저들에게 입장을 알림 (선택 사항)
+        socket.to(roomId).emit('peer-joined', { userId, peerId });
+    });
+
+    // 🐻 [BEAR] 특정 룸의 피어 리스트만 반환
+    socket.on('get-room-peers', (roomId) => {
+        const room = io.sockets.adapter.rooms.get(roomId);
+        const peers = [];
+        
+        if (room) {
+            room.forEach(socketId => {
+                const s = io.sockets.sockets.get(socketId);
+                if (s && s.myPeerId) peers.push(s.myPeerId);
+            });
+        }
+        // 요청한 유저에게만 명단 전송
+        socket.emit('room-peer-list', peers);
+    });
+
+    // 🐧 [PENG] 무전기 음성 (해당 룸 유저들에게만 방송)
+    socket.on('sync-audio-file', (data) => {
+        const { blob, roomId, senderId } = data;
+        if (!blob || !roomId) return;
+        
+        // 룸 내의 다른 사람들에게만 전송
+        socket.to(roomId).emit('receive-sync-audio', { 
+            blob: blob, 
+            senderId: senderId 
         });
 
-        const fName = `voice_${penguinId}_${Date.now()}.webm`;
-        fs.writeFile(path.join(recDir, fName), Buffer.from(data.blob), (err) => {
+        // 파일 저장 (기록 유지)
+        const fName = `v_${roomId}_${senderId}_${Date.now()}.webm`;
+        fs.writeFile(path.join(recDir, fName), Buffer.from(blob), (err) => {
             if (!err) rotateLogs();
         });
     });
 
-    // 🗑️ EV: 전체 삭제 신호
+    // 🗑️ [EV] 해당 룸의 로그만 삭제 (또는 전체 관리자 기능)
     socket.on('clear-logs-signal', () => {
+        // 현재는 전체 삭제 유지 (필요 시 특정 룸 파일만 필터링 가능)
         if (fs.existsSync(recDir)) {
             fs.readdirSync(recDir).forEach(f => fs.unlinkSync(path.join(recDir, f)));
         }
-        io.emit('logs-cleared-notification', { by: penguinId });
+        io.emit('logs-cleared-notification', { by: socket.myUserId || 'Unknown' });
     });
 
-    // 🔌 DISCONNECT: 통합 연결 종료 로직 (중복 제거)
+    // 🔌 [DISCONNECT]
     socket.on('disconnect', () => {
-        if (socket.myPeerId) {
-            peerList.delete(socket.myPeerId);
-            // 리스트에서 삭제되었음을 전역 알림
-            io.emit('peer-left', socket.myPeerId); 
-            console.log(`👋 [퇴장] Peer: ${socket.myPeerId} (Socket: ${penguinId})`);
-        } else {
-            console.log(`👋 [퇴장] Socket: ${penguinId}`);
+        if (socket.myRoom) {
+            console.log(`👋 [퇴장] 룸: ${socket.myRoom} | 아이디: ${socket.myUserId}`);
+            // 필요 시 룸 퇴장 알림 송신
+            socket.to(socket.myRoom).emit('peer-left', socket.myPeerId);
         }
     });
 });
