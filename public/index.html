@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
+      <link rel="manifest" href="/manifest.json">
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
@@ -46,6 +48,14 @@
         #join-btn { width: 100%; padding: 15px; margin-top: 20px; border: none; border-radius: 20px; background: var(--bear); color: white; font-weight: bold; cursor: pointer; box-shadow: 4px 4px 10px rgba(0,0,0,0.2); }
     </style>
 </head>
+
+
+
+
+
+
+
+
 <body>
 
 <div id="auth-screen">
@@ -71,6 +81,17 @@
             <span>👥 ACTIVE USERS</span>
             <span id="user-count" style="color:var(--peng);">0</span>
         </div>
+
+
+<div style="margin-top: 30px; border-top: 2px solid #eee; padding: 20px;">
+    <h3>🔌 원격 전원 관리</h3>
+    <button onclick="location.href='/power-on'" style="background: red; color: white; padding: 10px;">즉시 켜기</button>
+    <button onclick="location.href='/power-timer'" style="background: orange; color: white; padding: 10px;">13분 뒤 켜기</button>
+</div>
+
+
+
+
         <div id="user-list-box">
             </div>
     </section>
@@ -97,10 +118,21 @@
         </div>
         <div class="p-btn-zone" style="height: 180px; display: flex; justify-content: center; align-items: center;">
             <button id="p-trig"><span style="font-size:4rem;">🐧</span></button>
+
         </div>
         <div class="logs" id="l-box"></div>
     </section>
 </main>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log("WIKI-ROUTER: PWA 서비스 워커 등록 완료!"))
+      .catch((err) => console.log("PWA 등록 실패:", err));
+  }
+</script>
+
 
 <script src="router-core.js"></script>
 <script src="router-logic.js"></script>
