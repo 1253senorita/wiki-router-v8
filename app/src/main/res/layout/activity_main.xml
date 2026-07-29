@@ -8,32 +8,46 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- 첫 번째 텍스트: ID 추가 및 화면 중앙 기준 배치 -->
-
-    <!-- 두 번째 텍스트: 첫 번째 텍스트 바로 아래에 배치 -->
-
-    <TextView
-        android:id="@+id/tv_hello_one"
-        android:layout_width="138dp"
-        android:layout_height="115dp"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toTopOf="@+id/tv_hello_two"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.54"
-        app:layout_constraintStart_toStartOf="parent"
+    <!-- 상단 컨트롤 버튼 바 -->
+    <LinearLayout
+        android:id="@+id/layout_button_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="#F0F0F0"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
-    <TextView
-        android:id="@+id/tv_hello_two"
-        android:layout_width="134dp"
-        android:layout_height="131dp"
-        android:layout_marginTop="16dp"
-        android:text="Hello Worlda!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.571"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_hello_one" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 분기 버튼 1: 플러터 웹 재요청/새로그침 -->
+        <Button
+            android:id="@+id/btn_reload_web"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="웹 새로고침" />
+
+        <!-- 분기 버튼 2: 로그아웃 (다시 인증화면으로 이동) -->
+        <Button
+            android:id="@+id/btn_logout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="로그아웃" />
+
+    </LinearLayout>
+
+    <!-- 플러터 웹 앱이 탑재될 메인 WebView -->
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/layout_button_bar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
