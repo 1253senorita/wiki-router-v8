@@ -31,7 +31,8 @@ class MainActivity : AppCompatActivity() {
         setupWebView()
 
         // 2. 테스트용 URL 로드 (정상 동작 확인)
-        binding.webView.loadUrl("https://flutter.dev")
+        // MainActivity.kt
+        binding.webView.loadUrl("https://penguin-walkie.vercel.app")
 
         // 3. 새로고침 버튼
         binding.btnReloadWeb.setOnClickListener {
