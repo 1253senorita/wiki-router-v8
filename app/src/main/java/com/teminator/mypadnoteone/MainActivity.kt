@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         // 2. 테스트용 URL 로드 (정상 동작 확인)
         // MainActivity.kt
         // MainActivity.kt (35번째 줄 부근)
-        binding.webView.loadUrl("https://wiki-router-test.asia")
+        binding.webView.loadUrl("https://penguin-walkie.vercel.app")
 
         // 3. 새로고침 버튼
         binding.btnReloadWeb.setOnClickListener {
