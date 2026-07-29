@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "469157320114",
+    "project_id": "mypadnoteone-a7ca4",
+    "storage_bucket": "mypadnoteone-a7ca4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:469157320114:android:7237cb5ab58a9bc48e40ab",
+        "android_client_info": {
+          "package_name": "com.teminator.mypadnoteone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD53erHlzmLOJn10vx0ojlh2y4UEQSsF5Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
