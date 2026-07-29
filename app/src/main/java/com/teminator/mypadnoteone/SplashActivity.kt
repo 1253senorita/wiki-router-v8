@@ -5,13 +5,19 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.teminator.mypadnoteone.databinding.ActivitySplashBinding
+
+
 
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySplashBinding
+    private lateinit var auth: FirebaseAuth
 
-    // ★ 개발 우회 스위치: true로 두면 로그인 화면을 패스하고 바로 MainActivity로 직행합니다!
+    // ★ 개발 중에는 true로 세팅하면 파이어베이스 체크 패스하고 직행 가능!
     private val isBypassAuth = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,21 +25,21 @@ class SplashActivity : AppCompatActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1.5초(1500ms) 동안 스플래시 화면을 보여준 뒤 분기 처리
+        auth = Firebase.auth
+
         Handler(Looper.getMainLooper()).postDelayed({
             checkAuthAndNavigate()
         }, 1500)
     }
 
     private fun checkAuthAndNavigate() {
-        if (isBypassAuth) {
-            // 메인 화면으로 이동
-            startActivity(Intent(this, MainActivity::class.java))
+        val intent = if (isBypassAuth || auth.currentUser != null) {
+            Intent(this, MainActivity::class.java)
         } else {
-            // 인증/로그인 화면으로 이동
-            startActivity(Intent(this, AuthActivity::class.java))
+            Intent(this, AuthActivity::class.java)
         }
-        // 스플래시 화면 종료 (뒤로가기 스택에서 제거)
+
+        startActivity(intent)
         finish()
     }
 }

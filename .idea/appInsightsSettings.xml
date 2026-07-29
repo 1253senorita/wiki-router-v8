@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.teminator.mypadnoteone" />
+                  <option name="mobileSdkAppId" value="1:469157320114:android:7237cb5ab58a9bc48e40ab" />
+                  <option name="projectId" value="mypadnoteone-a7ca4" />
+                  <option name="projectNumber" value="469157320114" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
