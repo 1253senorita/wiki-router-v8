@@ -34,12 +34,13 @@
         }
 
         private fun checkAuthAndNavigate() {
-            val intent = if (isBypassAuth || auth.currentUser != null) {
-                Intent(this, MainActivity::class.java)
+            val targetActivity = if (isBypassAuth || auth.currentUser != null) {
+                "com.teminator.mypadnoteone.MainActivity"
             } else {
-                Intent(this, AuthActivity::class.java)
+                "com.teminator.mypadnoteone.AuthActivity"
             }
-    
+
+            val intent = Intent().setClassName(this, targetActivity)
             startActivity(intent)
             finish()
         }

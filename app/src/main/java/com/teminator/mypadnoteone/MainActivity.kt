@@ -51,12 +51,17 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "웹 화면을 다시 불러옵니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // 5. 로그아웃 버튼
+        // 5. 로그아웃 버튼 (안전한 Intent 생성 방식 적용)
         binding.btnLogout.setOnClickListener {
             auth.signOut()
             Toast.makeText(this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
 
-            val intent = Intent(this, AuthActivity::class.java)
+            // 방법 A: Intent 생성 시 명시적 ComponentName 지정
+            val intent = Intent().setClassName(this, "com.teminator.mypadnoteone.AuthActivity")
+
+            // 또는 방법 B: KClass 확장 구문 활용
+            // val intent = Intent(this, AuthActivity::class.javaObjectType)
+
             startActivity(intent)
             finish()
         }
