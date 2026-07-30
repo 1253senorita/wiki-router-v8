@@ -14,9 +14,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.auth
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 최신 Firebase Auth 초기화 방식
         auth = Firebase.auth
 
         // 1. 마이크 OS 런타임 권한 확인 및 요청
@@ -84,7 +85,6 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
-            // isNotEmpty() 대신 .size > 0 로 체크하면 에러가 안 납니다!
             if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "마이크 권한이 승인되었습니다.", Toast.LENGTH_SHORT).show()
                 binding.webView.reload() // 권한 승인 후 웹뷰 새로고침
@@ -93,7 +93,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun setupWebView() {
         val webView: WebView = binding.webView
