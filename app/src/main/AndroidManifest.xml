@@ -9,14 +9,13 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
 
-
-
     <uses-feature
         android:name="android.hardware.microphone"
         android:required="false" />
 
-    <!-- ★ application 태그 안에 usesCleartextTraffic="true" 추가 ★ -->
+    <!-- ★ android:name=".MyPadNoteApplication" 추가 ★ -->
     <application
+        android:name=".MyPadNoteApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -28,7 +27,7 @@
         android:theme="@style/Theme.MyPadNoteOne">
 
         <activity
-            android:name=".SplashActivity"
+            android:name=".presentation.splash.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,11 +36,11 @@
         </activity>
 
         <activity
-            android:name=".AuthActivity"
+            android:name=".presentation.auth.AuthActivity"
             android:exported="false" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.main.MainActivity"
             android:exported="false" />
 
     </application>

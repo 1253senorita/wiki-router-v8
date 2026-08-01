@@ -1,18 +1,22 @@
 [versions]
 agp = "8.12.3"
-kotlin = "2.4.10"
-coreKtx = "1.15.0"
+kotlin = "2.1.0"   # --- [의존성 맞춤]
+coreKtx = "1.15.0"  # --- # --- [추가]
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 appcompat = "1.7.1"
-kotlinStdlib = "2.4.10"
+kotlinStdlib = "2.1.0"  # ---# --- [추가]
 material = "1.14.0"
 activity = "1.13.0"
 constraintlayout = "2.2.2"
 # --- [추가] Firebase & Google Services 버전 ---
 googleServices = "4.5.0"
-firebaseBom = "34.16.0"
+firebaseBom = "33.7.0"  # ---# --- [추가]
+splashscreen = "1.2.0"
+hilt = "2.51.1"          # --- # --- [추가]
+
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,8 +36,16 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
+
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 # --- [추가] Google Services 플러그인 ---
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

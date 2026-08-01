@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.hilt)
+    kotlin("kapt") // 또는 ksp를 사용 중이시라면 ksp 적용
+
 }
 
 android {
@@ -61,5 +64,14 @@ dependencies {
     implementation(libs.firebase.firestore)
 
     implementation(libs.kotlin.stdlib)
+
+    implementation(libs.androidx.core.splashscreen)
+
+    implementation(libs.hilt.android)
+
+    // ★ Hilt가 Kotlin 2.4+ 메타데이터를 정상 해석하도록 추가 ★
+
+    kapt(libs.hilt.compiler)
+
 
 }

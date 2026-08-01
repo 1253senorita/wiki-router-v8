@@ -1,4 +1,4 @@
-package com.teminator.mypadnoteone
+package com.teminator.mypadnoteone.presentation.main
 
 import android.Manifest
 import android.content.Intent
@@ -14,11 +14,12 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
+import com.teminator.mypadnoteone.presentation.auth.AuthActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint // ★ Hilt 의존성 주입 어노테이션
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -33,8 +34,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 최신 Firebase Auth 초기화 방식
-        auth = Firebase.auth
+        // FirebaseAuth 표준 초기화 방식
+        auth = FirebaseAuth.getInstance()
 
         // 1. 마이크 OS 런타임 권한 확인 및 요청
         checkAudioPermission()
@@ -51,17 +52,12 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "웹 화면을 다시 불러옵니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // 5. 로그아웃 버튼 (안전한 Intent 생성 방식 적용)
+        // 5. 로그아웃 버튼
         binding.btnLogout.setOnClickListener {
             auth.signOut()
             Toast.makeText(this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
 
-            // 방법 A: Intent 생성 시 명시적 ComponentName 지정
-            val intent = Intent().setClassName(this, "com.teminator.mypadnoteone.AuthActivity")
-
-            // 또는 방법 B: KClass 확장 구문 활용
-            // val intent = Intent(this, AuthActivity::class.javaObjectType)
-
+            val intent = Intent(this, AuthActivity::class.java)
             startActivity(intent)
             finish()
         }
@@ -90,7 +86,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
-            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "마이크 권한이 승인되었습니다.", Toast.LENGTH_SHORT).show()
                 binding.webView.reload() // 권한 승인 후 웹뷰 새로고침
             } else {
