@@ -13,7 +13,6 @@
         android:name="android.hardware.microphone"
         android:required="false" />
 
-    <!-- ★ android:name=".MyPadNoteApplication" 추가 ★ -->
     <application
         android:name=".MyPadNoteApplication"
         android:allowBackup="true"
@@ -42,6 +41,13 @@
         <activity
             android:name=".presentation.main.MainActivity"
             android:exported="false" />
+
+        <!-- ★ WIKI-ROUTER PTT 백그라운드 무전 포그라운드 서비스 추가 ★ -->
+        <service
+            android:name=".service.PttService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
 
     </application>
 

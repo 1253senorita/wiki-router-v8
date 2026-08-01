@@ -16,8 +16,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
 import com.teminator.mypadnoteone.presentation.auth.AuthActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    // ★ Hilt를 통한 ViewModel 주입
+    // Hilt를 통한 ViewModel 주입
     private val viewModel: MainViewModel by viewModels()
 
     companion object {
@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         checkAudioPermission()
         setupWebView()
-        setupObserve() // ViewModel 이벤트 구독
+        setupObserve()
 
         binding.webView.loadUrl("http://10.0.2.2:8080")
 
@@ -51,7 +51,6 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "웹 화면을 다시 불러옵니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // ★ 버튼 클릭 시 ViewModel로 로그아웃 비즈니스 로직 위임
         binding.btnLogout.setOnClickListener {
             viewModel.signOut()
         }
@@ -59,11 +58,11 @@ class MainActivity : AppCompatActivity() {
         setupOnBackPressed()
     }
 
-    // ViewModel 이벤트 관찰
     private fun setupObserve() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiEvent.collect { event ->
+            viewModel.uiEvent
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { event ->
                     when (event) {
                         is MainUiEvent.NavigateToAuth -> {
                             Toast.makeText(this@MainActivity, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
@@ -73,7 +72,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-            }
         }
     }
 
@@ -120,9 +118,18 @@ class MainActivity : AppCompatActivity() {
         val webSettings: WebSettings = webView.settings
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
+        @Suppress("DEPRECATION")
         webSettings.databaseEnabled = true
         webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         webSettings.mediaPlaybackRequiresUserGesture = false
+
+        // ★ WIKI-ROUTER PTT 웹뷰 자바스크립트 인터페이스 연결 (window.AndroidPTT)
+        webView.addJavascriptInterface(
+            PttJavascriptInterface(this) { isActive ->
+                // 필요시 무전 상태(눌림/떼어짐)에 따른 네이티브 동작 처리
+            },
+            "AndroidPTT"
+        )
     }
 
     private fun setupOnBackPressed() {
