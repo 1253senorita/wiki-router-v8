@@ -73,5 +73,11 @@ dependencies {
 
     kapt(libs.hilt.compiler)
 
+    // ★ AndroidX Lifecycle & Activity KTX (repeatOnLifecycle 및 viewModels() 지원) ★
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.activity.ktx)
+
+
 
 }

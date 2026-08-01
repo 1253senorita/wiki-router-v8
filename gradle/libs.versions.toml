@@ -16,6 +16,10 @@ firebaseBom = "33.7.0"  # ---# --- [추가]
 splashscreen = "1.2.0"
 hilt = "2.51.1"          # --- # --- [추가]
 
+lifecycle = "2.8.7"
+activityKtx = "1.9.3"
+
+
 
 
 [libraries]
@@ -41,6 +45,9 @@ androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscree
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
 
 
 [plugins]

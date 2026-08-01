@@ -11,19 +11,25 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
 import com.teminator.mypadnoteone.presentation.auth.AuthActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
-@AndroidEntryPoint // ★ Hilt 의존성 주입 어노테이션
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var auth: FirebaseAuth
+
+    // ★ Hilt를 통한 ViewModel 주입
+    private val viewModel: MainViewModel by viewModels()
 
     companion object {
         private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
@@ -34,39 +40,43 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // FirebaseAuth 표준 초기화 방식
-        auth = FirebaseAuth.getInstance()
-
-        // 1. 마이크 OS 런타임 권한 확인 및 요청
         checkAudioPermission()
-
-        // 2. 웹뷰 기본 설정
         setupWebView()
+        setupObserve() // ViewModel 이벤트 구독
 
-        // 3. 테스트용 URL 로드
         binding.webView.loadUrl("http://10.0.2.2:8080")
 
-        // 4. 새로고침 버튼
         binding.btnReloadWeb.setOnClickListener {
             binding.webView.reload()
             Toast.makeText(this, "웹 화면을 다시 불러옵니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // 5. 로그아웃 버튼
+        // ★ 버튼 클릭 시 ViewModel로 로그아웃 비즈니스 로직 위임
         binding.btnLogout.setOnClickListener {
-            auth.signOut()
-            Toast.makeText(this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
-
-            val intent = Intent(this, AuthActivity::class.java)
-            startActivity(intent)
-            finish()
+            viewModel.signOut()
         }
 
-        // 6. 최신 안드로이드 뒤로가기 핸들러 설정
         setupOnBackPressed()
     }
 
-    // OS 레벨 마이크 권한 요청
+    // ViewModel 이벤트 관찰
+    private fun setupObserve() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        is MainUiEvent.NavigateToAuth -> {
+                            Toast.makeText(this@MainActivity, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(this@MainActivity, AuthActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun checkAudioPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
             != PackageManager.PERMISSION_GRANTED
@@ -88,7 +98,7 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "마이크 권한이 승인되었습니다.", Toast.LENGTH_SHORT).show()
-                binding.webView.reload() // 권한 승인 후 웹뷰 새로고침
+                binding.webView.reload()
             } else {
                 Toast.makeText(this, "무전기 기능을 사용하려면 마이크 권한이 필요합니다.", Toast.LENGTH_LONG).show()
             }
@@ -101,7 +111,6 @@ class MainActivity : AppCompatActivity() {
         webView.webViewClient = WebViewClient()
         webView.webChromeClient = object : WebChromeClient() {
             override fun onPermissionRequest(request: PermissionRequest?) {
-                // 웹뷰 내부에서 마이크/카메라 등의 권한을 요청할 때 자동으로 승인
                 runOnUiThread {
                     request?.grant(request.resources)
                 }
@@ -112,8 +121,6 @@ class MainActivity : AppCompatActivity() {
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
         webSettings.databaseEnabled = true
-
-        // HTTP/HTTPS 혼합 콘텐츠 및 미디어 자동 재생 허용
         webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         webSettings.mediaPlaybackRequiresUserGesture = false
     }
