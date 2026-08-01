@@ -1,18 +1,18 @@
 package com.teminator.mypadnoteone.data.repository
 
-import com.google.firebase.auth.FirebaseAuth
+import com.teminator.mypadnoteone.data.datasource.remote.FirebaseAuthDataSource
 import com.teminator.mypadnoteone.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuthDataSource: FirebaseAuthDataSource
 ) : AuthRepository {
 
     override fun signOut() {
-        firebaseAuth.signOut()
+        firebaseAuthDataSource.signOut()
     }
 
     override fun isUserLoggedIn(): Boolean {
-        return firebaseAuth.currentUser != null
+        return firebaseAuthDataSource.isUserLoggedIn()
     }
 }
