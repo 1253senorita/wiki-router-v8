@@ -3,70 +3,60 @@ package com.teminator.mypadnoteone.presentation.auth
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.teminator.mypadnoteone.databinding.ActivityAuthBinding
 import com.teminator.mypadnoteone.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
-@AndroidEntryPoint // ★ Hilt 의존성 주입 어노테이션
+@AndroidEntryPoint
 class AuthActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAuthBinding
-    private lateinit var auth: FirebaseAuth
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // FirebaseAuth.getInstance()로 직접 객체 가져오기
-        auth = FirebaseAuth.getInstance()
+        setupObserve()
 
         // 로그인 버튼
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "이메일과 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        navigateToMain()
-                    } else {
-                        Toast.makeText(this, "로그인 실패: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            viewModel.signIn(email, password)
         }
 
         // 회원가입 버튼
         binding.btnSignUp.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
-
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "이메일과 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(this, "회원가입 성공!", Toast.LENGTH_SHORT).show()
-                        navigateToMain()
-                    } else {
-                        Toast.makeText(this, "회원가입 실패: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            viewModel.signUp(email, password)
         }
     }
 
-    private fun navigateToMain() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
+    private fun setupObserve() {
+        lifecycleScope.launch {
+            viewModel.uiEvent
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { event ->
+                    when (event) {
+                        is AuthUiEvent.NavigateToMain -> {
+                            val intent = Intent(this@AuthActivity, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+                        is AuthUiEvent.ShowToast -> {
+                            Toast.makeText(this@AuthActivity, event.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+        }
     }
 }
