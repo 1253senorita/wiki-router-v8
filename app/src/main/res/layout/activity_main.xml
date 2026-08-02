@@ -6,48 +6,199 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F8F9FA"
     tools:context=".presentation.main.MainActivity">
 
-    <!-- 상단 컨트롤 버튼 바 -->
-    <LinearLayout
-        android:id="@+id/layout_button_bar"
+    <!-- 🌟 [상단 툴바 영역] 앱 타이틀 및 설정/로그아웃 버튼 배치 -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/top_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:background="#F0F0F0"
+        android:background="@android:color/white"
+        app:elevation="2dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 분기 버튼 1: 플러터 웹 재요청/새로그침 -->
-        <Button
-            android:id="@+id/btn_reload_web"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            android:text="웹 새로고침" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingEnd="16dp">
 
-        <!-- 분기 버튼 2: 로그아웃 (다시 인증화면으로 이동) -->
-        <Button
-            android:id="@+id/btn_logout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:text="로그아웃" />
+            <!-- 앱 로고 또는 타이틀 -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="WIKI-ROUTER"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A1A" />
 
-    </LinearLayout>
+            <!-- 설정 버튼 (표준 아이콘 스타일) -->
+            <!-- 설정 버튼 (표준 아이콘 스타일) -->
+            <Button
+                android:id="@+id/btn_settings"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="설정"
+                app:icon="@android:drawable/ic_menu_manage"
+                app:iconTint="#757575" />
 
-    <!-- 플러터 웹 앱이 탑재될 메인 WebView -->
-    <WebView
-        android:id="@+id/web_view"
+            <!-- 로그아웃 버튼 -->
+            <Button
+                android:id="@+id/btn_logout"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="로그아웃"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!-- 🚀 [중앙 콘텐츠 영역] 대시보드 및 PTT 카드 -->
+    <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/layout_button_bar"
+        android:fillViewport="true"
+        android:padding="20dp"
+        app:layout_constraintTop_toBottomOf="@id/top_toolbar"
+        app:layout_constraintBottom_toTopOf="@id/bottom_app_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 서브타이틀 및 환영 텍스트 (밋밋함 해소) -->
+            <TextView
+                android:id="@+id/tv_welcome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="울럴러~ 울라랄~! 👋"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/tv_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clean Architecture &amp; Hilt Control Panel"
+                android:textSize="14sp"
+                android:textColor="#757575"
+                android:layout_marginTop="4dp" />
+
+            <!-- 🚀 WIKI-ROUTER PTT 섹션 열기 메인 카드 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_open_ptt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E0E0E0">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🚀 WIKI-ROUTER PTT Engine"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#0D47A1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="독립된 Flutter PTT 웹 무전기 섹션으로 이동합니다."
+                        android:textSize="13sp"
+                        android:textColor="#616161"
+                        android:layout_marginTop="8dp"
+                        android:textAlignment="center" />
+
+                    <Button
+                        android:id="@+id/btn_open_ptt"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="20dp"
+                        android:text="PTT 섹션 열기"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 💡 차후 확장용 추가 카드 요소 예시 (밋밋함 방지용) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E0E0E0">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="📌 시스템 상태: 정상 작동 중"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#2E7D32" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="v1.0.0"
+                        android:textSize="12sp"
+                        android:textColor="#9E9E9E" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- ⚓ [하단 앱바 영역] 차후 여러 기능 요소를 배치하거나 네비게이션으로 확장할 공간 -->
+    <LinearLayout
+        android:id="@+id/bottom_app_bar"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WIKI-ROUTER Control Center v1.0"
+            android:textSize="12sp"
+            android:textColor="#9E9E9E" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

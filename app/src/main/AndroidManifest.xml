@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <!-- Android 13 이상 포그라운드 서비스 알림 표시 권한 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-feature
         android:name="android.hardware.microphone"
@@ -42,7 +44,12 @@
             android:name=".presentation.main.MainActivity"
             android:exported="false" />
 
-        <!-- ★ WIKI-ROUTER PTT 백그라운드 무전 포그라운드 서비스 추가 ★ -->
+        <activity
+            android:name=".presentation.ptt.PttSectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- WIKI-ROUTER PTT 백그라운드 무전 포그라운드 서비스 -->
         <service
             android:name=".service.PttService"
             android:enabled="true"
