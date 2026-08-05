@@ -116,4 +116,10 @@ class AeroSocketManager {
         socket = null
         Log.d(TAG, "Socket Disconnected.")
     }
+    fun sendAudio(buffer: ByteArray, length: Int) {
+        // Socket.io 또는 WebSocket을 통해 바이트 배열 스트리밍 전송 로직
+        // 예: socket.emit("audio_stream", buffer)
+    }
+
+
 }

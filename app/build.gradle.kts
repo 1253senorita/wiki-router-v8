@@ -3,13 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     alias(libs.plugins.hilt)
-<<<<<<< Updated upstream
-    kotlin("kapt") // 또는 ksp를 사용 중이시라면 ksp 적용
-
-=======
     kotlin("kapt")
-    id("com.google.firebase.appdistribution")
->>>>>>> Stashed changes
 }
 
 android {
@@ -29,7 +23,6 @@ android {
     buildFeatures {
         viewBinding = true
     }
-
 
     buildTypes {
         release {
@@ -52,16 +45,7 @@ android {
     }
 }
 
-<<<<<<< Updated upstream
-=======
-firebaseAppDistribution {
-    appId = "1:469157320114:android:7237cb5ab58a9bc48e40ab"
-    releaseNotes = "WIKI-ROUTER v5.2 Native-WebView Bridge & Barcode Scan Update"
-}
->>>>>>> Stashed changes
-
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -76,36 +60,25 @@ dependencies {
     implementation(libs.firebase.firestore)
 
     implementation(libs.kotlin.stdlib)
-
     implementation(libs.androidx.core.splashscreen)
-
     implementation(libs.hilt.android)
-
-    // ★ Hilt가 Kotlin 2.4+ 메타데이터를 정상 해석하도록 추가 ★
-
     kapt(libs.hilt.compiler)
 
-    // ★ AndroidX Lifecycle & Activity KTX (repeatOnLifecycle 및 viewModels() 지원) ★
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.ktx)
 
-
-<<<<<<< Updated upstream
-
-=======
     // --- 동시성 처리 및 바코드(ZXing) 라이브러리 ---
     implementation(libs.guava.android)
     implementation(libs.androidx.concurrent.futures.ktx)
     implementation(libs.google.zxing.core)
     implementation(libs.journeyapps.zxing)
 
-    // --- [최신 DSL 적용] Socket.io Client (JSON 모듈 exclude 처리 포함) ---
+    // --- Socket.io Client ---
     implementation(libs.socket.io.client) {
         exclude(group = "org.json", module = "json")
     }
 
-    // --- [최신 DSL 적용] 코루틴 비동기 처리 ---
+    // --- 코루틴 비동기 처리 ---
     implementation(libs.kotlinx.coroutines.android)
->>>>>>> Stashed changes
 }

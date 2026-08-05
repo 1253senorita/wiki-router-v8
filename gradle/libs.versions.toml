@@ -1,31 +1,31 @@
 [versions]
 agp = "8.12.3"
-kotlin = "2.1.0"   # --- [의존성 맞춤]
-coreKtx = "1.15.0"  # --- # --- [추가]
+kotlin = "2.1.0"
+coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 appcompat = "1.7.1"
-kotlinStdlib = "2.1.0"  # ---# --- [추가]
+kotlinStdlib = "2.1.0"
 material = "1.14.0"
 activity = "1.13.0"
 constraintlayout = "2.2.2"
-# --- [추가] Firebase & Google Services 버전 ---
 googleServices = "4.5.0"
-firebaseBom = "33.7.0"  # ---# --- [추가]
+firebaseBom = "33.7.0"
 splashscreen = "1.2.0"
-hilt = "2.51.1"          # --- # --- [추가]
-
+hilt = "2.51.1"
 lifecycle = "2.8.7"
 activityKtx = "1.9.3"
-
-
 socketIo = "2.1.0"
 coroutines = "1.7.3"
 
-
-
-
+# --- [추가] CameraX 및 외부 라이브러리 버전 정의 ---
+camerax = "1.4.1"
+mlkitBarcode = "17.3.0"
+guava = "33.3.1-android"
+concurrentFutures = "1.2.0"
+zxingAndroidEmbedded = "4.3.0"
+zxingCore = "3.5.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,7 +40,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 
-# --- [추가] Firebase 관련 라이브러리 ---
+# --- Firebase 관련 라이브러리 ---
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
@@ -54,9 +54,7 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
 
-<<<<<<< Updated upstream
-=======
-# --- [추가] CameraX 라이브러리 ---
+# --- CameraX 라이브러리 ---
 androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }
 androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
@@ -64,24 +62,17 @@ androidx-camera-view = { group = "androidx.camera", name = "camera-view", versio
 
 google-mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
 
-# --- [추가] CameraX ListenableFuture 에러 방지용 라이브러리 ---
+# --- CameraX ListenableFuture 에러 방지용 라이브러리 ---
 guava-android = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 androidx-concurrent-futures-ktx = { group = "androidx.concurrent", name = "concurrent-futures-ktx", version.ref = "concurrentFutures" }
 journeyapps-zxing = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
 google-zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxingCore" }
 
-# ... 기존 라이브러리들 ...
 socket-io-client = { group = "io.socket", name = "socket.io-client", version.ref = "socketIo" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
-
-
-
-
->>>>>>> Stashed changes
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-# --- [추가] Google Services 플러그인 ---
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

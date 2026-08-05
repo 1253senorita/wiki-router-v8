@@ -40,9 +40,13 @@ class AeroRouterActivity : AppCompatActivity() {
     }
 
     private fun initEngineAndSocket() {
-        // 오디오 엔진 초기화: 마이크 데이터가 잡히면 소켓이나 서버로 전송할 위치
+        // 오디오 엔진 초기화: 마이크 버퍼 데이터를 실시간으로 socketManager의 sendAudioData와 연동
         audioEngine = AeroAudioEngine { buffer, length ->
-            // TODO: 송신 상태일 때 socketManager를 통해 실시간 바이너리/데이터 스트리밍 전송
+            if (isConnected) {
+                // 정확한 크기만큼의 바이트 배열로 잘라서 소켓 전송 함수 호출
+                val actualData = if (length == buffer.size) buffer else buffer.copyOfRange(0, length)
+                socketManager.sendAudioData(actualData)
+            }
         }
 
         socketManager = AeroSocketManager()
@@ -53,13 +57,14 @@ class AeroRouterActivity : AppCompatActivity() {
                 runOnUiThread {
                     isConnected = true
                     binding.tvStatus.text = "CONNECTED (STANDBY)"
-                    Toast.makeText(this, "AeroRouter 서버 연결 성공!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AeroRouterActivity, "AeroRouter 서버 연결 성공!", Toast.LENGTH_SHORT).show()
                 }
             },
             onError = { error ->
                 runOnUiThread {
                     isConnected = false
                     binding.tvStatus.text = "DISCONNECTED"
+                    Toast.makeText(this@AeroRouterActivity, "서버 연결 실패: $error", Toast.LENGTH_SHORT).show()
                 }
             }
         )
