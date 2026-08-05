@@ -49,8 +49,21 @@ class MainActivity : AppCompatActivity() {
         binding.webView.loadUrl("http://10.0.2.2:8080")
     }
     private fun setupUI() {
-        // XML 레이아웃과 충돌나지 않도록 안전하게 버튼 로직 분기
-        // (필요한 버튼 ID가 XML에 추가되면 주석을 풀거나 연결하면 됩니다)
+        // TODO: 내일 같이 수정할 버튼 분기 로직 (XML 아이디 확인 후 연동 필요)
+        /*
+        runCatching {
+            binding.root.findViewById<android.view.View>(com.teminator.mypadnoteone.R.id.btnOpenPtt)?.setOnClickListener {
+                val intent = Intent(this, AeroRouterEntryActivity::class.java)
+                startActivity(intent)
+            }
+        }
+
+        runCatching {
+            binding.root.findViewById<android.view.View>(com.teminator.mypadnoteone.R.id.btnLogout)?.setOnClickListener {
+                viewModel.signOut()
+            }
+        }
+        */
 
         setupOnBackPressed()
     }
