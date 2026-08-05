@@ -20,6 +20,11 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
 import com.teminator.mypadnoteone.presentation.auth.AuthActivity
+<<<<<<< Updated upstream
+=======
+// ✅ AeroRouterActivity 대신 방 입장 진입 화면으로 교체
+import com.teminator.mypadnoteone.presentation.aerorouter.AeroRouterEntryActivity
+>>>>>>> Stashed changes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -46,9 +51,21 @@ class MainActivity : AppCompatActivity() {
 
         binding.webView.loadUrl("http://10.0.2.2:8080")
 
+<<<<<<< Updated upstream
         binding.btnReloadWeb.setOnClickListener {
             binding.webView.reload()
             Toast.makeText(this, "웹 화면을 다시 불러옵니다.", Toast.LENGTH_SHORT).show()
+=======
+    private fun setupUI() {
+        // ✅ PTT 버튼을 누르면 직접 AeroRouter로 가는 대신 방/모드 선택 화면(EntryActivity)으로 이동
+        binding.btnOpenPtt.setOnClickListener {
+            val intent = Intent(this, AeroRouterEntryActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.btnCameraScanner.setOnClickListener {
+            Toast.makeText(this, "카메라 스캐너로 이동합니다.", Toast.LENGTH_SHORT).show()
+>>>>>>> Stashed changes
         }
 
         binding.btnLogout.setOnClickListener {
@@ -70,6 +87,20 @@ class MainActivity : AppCompatActivity() {
                             startActivity(intent)
                             finish()
                         }
+<<<<<<< Updated upstream
+=======
+                        is MainUiEvent.NavigateToPttSection -> {
+                            // ✅ ViewModel 이벤트로 진입할 때도 방/모드 선택 화면으로 연결
+                            val intent = Intent(this@MainActivity, AeroRouterEntryActivity::class.java)
+                            startActivity(intent)
+                        }
+                        is MainUiEvent.NavigateToCameraScanner -> {
+                            Toast.makeText(this@MainActivity, "카메라 스캐너 모드 전환", Toast.LENGTH_SHORT).show()
+                        }
+                        is MainUiEvent.ShowToast -> {
+                            Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT).show()
+                        }
+>>>>>>> Stashed changes
                     }
                 }
         }
@@ -86,6 +117,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+<<<<<<< Updated upstream
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -144,4 +176,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+=======
+>>>>>>> Stashed changes
 }

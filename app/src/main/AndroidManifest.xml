@@ -42,7 +42,27 @@
             android:name=".presentation.main.MainActivity"
             android:exported="false" />
 
+<<<<<<< Updated upstream
         <!-- ★ WIKI-ROUTER PTT 백그라운드 무전 포그라운드 서비스 추가 ★ -->
+=======
+        <activity
+            android:name=".presentation.aerorouter.AeroRouterEntryActivity"
+            android:exported="false" />
+
+
+        <activity
+            android:name=".presentation.aerorouter.AeroRouterActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+
+        <activity
+            android:name=".presentation.ptt.PttSectionActivity"
+            android:exported="false"
+             />
+
+        <!-- StellarNote PTT 백그라운드 무전 포그라운드 서비스 -->
+>>>>>>> Stashed changes
         <service
             android:name=".service.PttService"
             android:enabled="true"

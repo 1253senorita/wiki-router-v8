@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 어두운 그림자 (우측 하단) -->
+    <item android:left="4dp" android:top="4dp">
+        <shape android:shape="oval">
+            <solid android:color="#bec8de"/>
+        </shape>
+    </item>
+    <!-- 밝은 그림자 (좌측 상단) -->
+    <item android:right="4dp" android:bottom="4dp">
+        <shape android:shape="oval">
+            <solid android:color="#ffffff"/>
+        </shape>
+    </item>
+    <!-- 버튼 본체 -->
+    <item android:left="6dp" android:top="6dp" android:right="6dp" android:bottom="6dp">
+        <shape android:shape="oval">
+            <solid android:color="#e0e5ec"/>
+        </shape>
+    </item>
+</layer-list>
