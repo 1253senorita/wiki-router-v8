@@ -8,6 +8,8 @@
     android:layout_height="match_parent"
     tools:context=".presentation.main.MainActivity">
 
+    <!-- 상단 컨트롤 버튼 바 (elevation을 주어 웹뷰보다 위에 뜨도록 설정) -->
+    <!-- 상단 컨트롤 버튼 바 -->
     <!-- 상단 컨트롤 버튼 바 -->
     <LinearLayout
         android:id="@+id/layout_button_bar"
@@ -15,31 +17,44 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="8dp"
+        android:layout_marginTop="36dp"
         android:background="#F0F0F0"
+        android:elevation="10dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 분기 버튼 1: 플러터 웹 재요청/새로그침 -->
+        <!-- 버튼 1: 무전기 이동 -->
         <Button
-            android:id="@+id/btn_reload_web"
+            android:id="@+id/btnOpenPtt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            android:text="웹 새로고침" />
+            android:layout_marginEnd="2dp"
+            android:text="무전기 이동"
+            android:textSize="12sp" />
 
-        <!-- 분기 버튼 2: 로그아웃 (다시 인증화면으로 이동) -->
+        <!-- 버튼 2: 웹 새로고침 -->
         <Button
-            android:id="@+id/btn_logout"
+            android:id="@+id/btnReloadWeb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:text="로그아웃" />
+            android:layout_marginHorizontal="2dp"
+            android:text="새로고침"
+            android:textSize="12sp" />
+
+        <!-- 버튼 3: 로그아웃 -->
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:text="로그아웃"
+            android:textSize="12sp" />
 
     </LinearLayout>
-
     <!-- 플러터 웹 앱이 탑재될 메인 WebView -->
     <WebView
         android:id="@+id/web_view"

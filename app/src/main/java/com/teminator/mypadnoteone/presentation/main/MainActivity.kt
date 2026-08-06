@@ -48,25 +48,32 @@ class MainActivity : AppCompatActivity() {
 
         binding.webView.loadUrl("http://10.0.2.2:8080")
     }
+
+
+
     private fun setupUI() {
-        // TODO: 내일 같이 수정할 버튼 분기 로직 (XML 아이디 확인 후 연동 필요)
-        /*
-        runCatching {
-            binding.root.findViewById<android.view.View>(com.teminator.mypadnoteone.R.id.btnOpenPtt)?.setOnClickListener {
-                val intent = Intent(this, AeroRouterEntryActivity::class.java)
-                startActivity(intent)
-            }
+        // 1. 무전기 진입 화면(AeroRouterEntryActivity)으로 이동
+        binding.btnOpenPtt.setOnClickListener {
+            val intent = Intent(this, AeroRouterEntryActivity::class.java)
+            startActivity(intent)
         }
 
-        runCatching {
-            binding.root.findViewById<android.view.View>(com.teminator.mypadnoteone.R.id.btnLogout)?.setOnClickListener {
-                viewModel.signOut()
-            }
+        // 2. 웹 새로고침
+        binding.btnReloadWeb.setOnClickListener {
+            binding.webView.reload()
         }
-        */
+
+        // 3. 로그아웃 (스탤라 인증 화면으로 이동)
+        binding.btnLogout.setOnClickListener {
+            viewModel.signOut()
+        }
 
         setupOnBackPressed()
     }
+
+
+
+
     private fun setupObserve() {
         lifecycleScope.launch {
             viewModel.uiEvent
