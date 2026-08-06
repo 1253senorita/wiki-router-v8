@@ -1,4 +1,4 @@
-package com.teminator.mypadnoteone.presentation.aerorouter
+package com.teminator.mypadnoteone.presentation.aerorouter.audio
 
 import android.annotation.SuppressLint
 import android.media.AudioAttributes

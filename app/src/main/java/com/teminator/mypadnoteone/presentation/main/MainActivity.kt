@@ -20,7 +20,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
 import com.teminator.mypadnoteone.presentation.auth.AuthActivity
-import com.teminator.mypadnoteone.presentation.aerorouter.AeroRouterEntryActivity
+import com.teminator.mypadnoteone.presentation.aerorouter.ui.AeroRouterEntryActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

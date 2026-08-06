@@ -1,11 +1,12 @@
-package com.teminator.mypadnoteone.presentation.aerorouter
+package com.teminator.mypadnoteone.presentation.aerorouter.ui
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.teminator.mypadnoteone.databinding.ActivityAerorouterEntryBinding
-// 만약 바인딩 클래스명이 다르면 프로젝트에 맞게 자동완성 활용!
+import com.teminator.mypadnoteone.presentation.aerorouter.ui.AeroRouterActivity
+import com.teminator.mypadnoteone.presentation.aerorouter.socket.AeroSocketManager
 
 class AeroRouterEntryActivity : AppCompatActivity() {
 

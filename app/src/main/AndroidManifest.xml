@@ -50,13 +50,13 @@
 
         <!-- 4. AeroRouter 방/모드 선택 진입 화면 (메인에서 버튼을 눌러야 진입) -->
         <activity
-            android:name=".presentation.aerorouter.AeroRouterEntryActivity"
+            android:name=".presentation.aerorouter.ui.AeroRouterEntryActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
         <!-- 실시간 PTT 무전기 메인 액티비티 -->
         <activity
-            android:name=".presentation.aerorouter.AeroRouterActivity"
+            android:name=".presentation.aerorouter.ui.AeroRouterActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 

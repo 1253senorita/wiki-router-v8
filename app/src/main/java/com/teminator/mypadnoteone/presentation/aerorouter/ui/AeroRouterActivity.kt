@@ -1,13 +1,17 @@
-package com.teminator.mypadnoteone.presentation.aerorouter
+package com.teminator.mypadnoteone.presentation.aerorouter.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.teminator.mypadnoteone.R
 import com.teminator.mypadnoteone.databinding.ActivityAerorouterBinding
+import com.teminator.mypadnoteone.presentation.aerorouter.audio.AeroAudioEngine
+import com.teminator.mypadnoteone.presentation.aerorouter.socket.AeroSocketManager
 
 class AeroRouterActivity : AppCompatActivity() {
 
@@ -44,7 +48,8 @@ class AeroRouterActivity : AppCompatActivity() {
         audioEngine = AeroAudioEngine { buffer, length ->
             if (isConnected) {
                 // 정확한 크기만큼의 바이트 배열로 잘라서 소켓 전송 함수 호출
-                val actualData = if (length == buffer.size) buffer else buffer.copyOfRange(0, length)
+                val actualData =
+                    if (length == buffer.size) buffer else buffer.copyOfRange(0, length)
                 socketManager.sendAudioData(actualData)
             }
         }
@@ -74,20 +79,20 @@ class AeroRouterActivity : AppCompatActivity() {
         // PTT 버튼 터치 이벤트 (누를 때 송신, 뗄 때 정지)
         binding.btnPtt.setOnTouchListener { _, event ->
             when (event.action) {
-                android.view.MotionEvent.ACTION_DOWN -> {
+                MotionEvent.ACTION_DOWN -> {
                     if (!isConnected) {
                         Toast.makeText(this, "서버가 연결되지 않았습니다.", Toast.LENGTH_SHORT).show()
                         return@setOnTouchListener true
                     }
                     // 눌렸을 때 디자인 변경 및 녹음 시작
-                    binding.btnPtt.setBackgroundResource(com.teminator.mypadnoteone.R.drawable.neumorphic_button_pressed)
+                    binding.btnPtt.setBackgroundResource(R.drawable.neumorphic_button_pressed)
                     binding.tvStatus.text = "TALKING (송신 중...)"
                     audioEngine.startRecording()
                     true
                 }
-                android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // 뗄 때 원상복구 및 녹음 정지
-                    binding.btnPtt.setBackgroundResource(com.teminator.mypadnoteone.R.drawable.neumorphic_button_normal)
+                    binding.btnPtt.setBackgroundResource(R.drawable.neumorphic_button_normal)
                     binding.tvStatus.text = "CONNECTED (STANDBY)"
                     audioEngine.stopRecording()
                     true

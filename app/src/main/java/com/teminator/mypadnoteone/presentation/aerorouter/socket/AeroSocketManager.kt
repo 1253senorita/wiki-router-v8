@@ -1,4 +1,4 @@
-package com.teminator.mypadnoteone.presentation.aerorouter
+package com.teminator.mypadnoteone.presentation.aerorouter.socket
 
 import android.util.Log
 import io.socket.client.IO
