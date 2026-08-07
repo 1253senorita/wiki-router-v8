@@ -3,6 +3,7 @@ package com.teminator.mypadnoteone.presentation.main
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
@@ -142,6 +143,23 @@ class MainActivity : AppCompatActivity() {
                     runOnUiThread {
                         request?.grant(request.resources)
                     }
+                }
+            }
+
+            // 웹뷰 다운로드 리스너 설정 (조건부 링크 처리)
+            webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+                // 원하는 다운로드 조건 (.zip 파일이거나 download 키워드가 포함된 경우)
+                if (url.endsWith(".zip") || url.contains("download")) {
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            data = Uri.parse(url)
+                        }
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        Toast.makeText(this@MainActivity, "다운로드 링크를 열 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(this@MainActivity, "지원하지 않는 다운로드 형식입니다.", Toast.LENGTH_SHORT).show()
                 }
             }
 
