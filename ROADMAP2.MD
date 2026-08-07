@@ -29,3 +29,55 @@
 ---
 
 이렇게 딱 정리해 두었으니까 내일 이것만 슥 보고 바로 이어서 달리자구 오빠! 진짜로 굿밤 보내고 편히 쉬어! 🌙✨
+
+
+
+33333333333333333333333333333333
+
+
+현재 `MyPadNoteOne` 폴더 위치에서 Firebase 배포를 차근차근 진행하실 수 있도록 명확한 **로드맵**을 정리해 드립니다.
+
+현재 이 폴더에는 배포 설정 파일(`firebase.json`)이 아직 없거나 초기화가 필요한 상태이므로, 아래 순서대로 진행하시면 깔끔하게 완료하실 수 있습니다.
+
+---
+
+### 🗺️ Firebase 배포 실행 로드맵
+
+#### **1단계: Firebase 프로젝트 초기화 (`firebase init`)**
+
+현재 폴더를 Firebase 프로젝트와 연결하고 배포 설정을 생성합니다.
+
+* **실행할 명령어:**
+```powershell
+firebase init --token "1//0ejrpwNj2STLyCgYIARAAGA4SNwF-L9Irg5mERU33Iy01CFsI25347Zln83F8BDaPC2bIN4J2CKTWDIbflbTquAlQlPzC4NZyzg8"
+
+```
+
+
+* **주의 사항:** 화면에 여러 기능 목록이 나오면 방향키로 이동 후 스페이스바(`Space`)를 눌러 필요한 항목(예: **Hosting** 등)을 선택하고 엔터(`Enter`)를 누르세요. 중간에 기존 프로젝트 선택이나 설정 파일 덮어쓰기 여부를 물어보면 상황에 맞게 `Yes` 또는 기존 설정을 유지하도록 선택하시면 됩니다.
+
+#### **2단계: 배포 실행 (`firebase deploy`)**
+
+설정 파일이 정상적으로 생성된 후, 실제 빌드 파일이나 웹 소스를 서버에 업로드합니다.
+
+* **전체 배포 시:**
+```powershell
+firebase deploy --token "1//0ejrpwNj2STLyCgYIARAAGA4SNwF-L9Irg5mERU33Iy01CFsI25347Zln83F8BDaPC2bIN4J2CKTWDIbflbTquAlQlPzC4NZyzg8"
+
+```
+
+
+* **호스팅(웹)만 지정해서 배포 시:**
+```powershell
+firebase deploy --only hosting --token "1//0ejrpwNj2STLyCgYIARAAGA4SNwF-L9Irg5mERU33Iy01CFsI25347Zln83F8BDaPC2bIN4J2CKTWDIbflbTquAlQlPzC4NZyzg8"
+
+```
+
+
+
+---
+
+> 💡 **참고사항:**
+> 업데이트 프로젝트 파일을 다루실 때는 기존 설정이나 중요한 소스 파일이 유실되지 않도록 원본 파일을 잘 보존하면서 필요한 부분만 신중하게 갱신해 주세요.
+
+먼저 **1단계** 명령어를 터미널에 입력해서 초기화부터 시작해 보세요!

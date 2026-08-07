@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.hilt)
     kotlin("kapt")
+    kotlin("plugin.serialization") version "2.1.0"
+
 }
 
 android {
@@ -81,4 +83,7 @@ dependencies {
 
     // --- 코루틴 비동기 처리 ---
     implementation(libs.kotlinx.coroutines.android)
+
+    implementation(libs.firebase.dataconnect)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 }
