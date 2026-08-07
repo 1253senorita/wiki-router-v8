@@ -33,6 +33,15 @@
             android:textSize="12sp" />
 
         <Button
+            android:id="@+id/btnWIKIPtt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="2dp"
+            android:text="wiki라우터 이동"
+            android:textSize="12sp" />
+
+        <Button
             android:id="@+id/btnReloadWeb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -75,7 +84,7 @@
             android:textColor="#333333" />
     </LinearLayout>
 
-    <!-- 📌 경고가 나지 않도록 높이 구조를 최적화한 스크롤 영역 -->
+    <!-- 스크롤 영역 -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -91,10 +100,10 @@
             android:orientation="vertical"
             android:paddingBottom="24dp">
 
-            <!-- 1번 메인 웹뷰 영역 -->
+            <!-- 1번 메인 웹뷰 영역 (부모 높이를 wrap_content 대신 match_parent 또는 고정값 지정) -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="460dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -110,7 +119,8 @@
                 <WebView
                     android:id="@+id/web_view"
                     android:layout_width="match_parent"
-                    android:layout_height="420dp" />
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <!-- 구분선 -->
@@ -122,7 +132,7 @@
             <!-- 2번 세컨드 웹뷰 영역 -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="460dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -138,7 +148,8 @@
                 <WebView
                     android:id="@+id/web_view_secondary"
                     android:layout_width="match_parent"
-                    android:layout_height="420dp" />
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
             </LinearLayout>
 
         </LinearLayout>

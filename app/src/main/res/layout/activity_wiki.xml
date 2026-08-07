@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- 상단 타이틀 또는 뒤로가기 바 (선택 사항) -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#DDDDDD"
+        android:padding="12dp"
+        android:text="▼ Wiki Router 서비스 화면"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#444444" />
+
+    <!-- 전용 웹뷰 -->
+    <WebView
+        android:id="@+id/webViewWiki"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

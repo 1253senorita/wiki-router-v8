@@ -49,6 +49,11 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".presentation.wiki.ui.WikiActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- 4. AeroRouter 방/모드 선택 진입 화면 (메인에서 버튼을 눌러야 진입) -->
         <activity
             android:name=".presentation.aerorouter.ui.AeroRouterEntryActivity"

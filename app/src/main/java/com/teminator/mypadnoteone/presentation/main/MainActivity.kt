@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
 import com.teminator.mypadnoteone.presentation.auth.AuthActivity
 import com.teminator.mypadnoteone.presentation.aerorouter.ui.AeroRouterEntryActivity
+import com.teminator.mypadnoteone.presentation.wiki.ui.WikiActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -72,6 +73,13 @@ class MainActivity : AppCompatActivity() {
         binding.btnLogout.setOnClickListener {
             viewModel.signOut()
         }
+
+        // Wiki 라우터 화면으로 이동
+        binding.btnWIKIPtt.setOnClickListener {
+            val intent = Intent(this, WikiActivity::class.java)
+            startActivity(intent)
+        }
+
 
         setupOnBackPressed()
     }
