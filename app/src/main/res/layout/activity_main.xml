@@ -85,7 +85,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="AeroRouter PTT Service and WebView Integration Ready."
+            android:text="AeroRouter PTT Service and Dual WebView Integration Ready."
             android:textSize="11sp"
             android:textColor="#666666" />
 
@@ -117,14 +117,60 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 플러터 웹 앱이 탑재될 메인 WebView -->
-    <WebView
-        android:id="@+id/web_view"
+    <!-- 📌 두 개의 WebView를 리스트 형식으로 배치하기 위한 수직 컨테이너 (스크롤 가능) -->
+    <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@+id/layout_test_metadata"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 1번 메인 WebView (기존 로컬 서버 8080) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#DDDDDD"
+                android:padding="6dp"
+                android:text="▼ 메인 서비스 WebView (10.0.2.2:8080)"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#444444" />
+
+            <WebView
+                android:id="@+id/web_view"
+                android:layout_width="match_parent"
+                android:layout_height="300dp" />
+
+            <!-- 구분선 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:background="#CCCCCC" />
+
+            <!-- 2번 추가된 웹 페이지 리스트/뷰 영역 (MyPadNoteOne 파이어베이스 호스팅 주소) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#DDDDDD"
+                android:padding="6dp"
+                android:text="▼ 다운로드 / 호스팅 안내 WebView (MyPadNoteOne)"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#444444" />
+
+            <WebView
+                android:id="@+id/web_view_secondary"
+                android:layout_width="match_parent"
+                android:layout_height="300dp" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

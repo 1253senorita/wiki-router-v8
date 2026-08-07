@@ -3,93 +3,32 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
-
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/12.17.1/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/12.17.1/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/12.17.1/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/12.17.1/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/12.17.1/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/12.17.1/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/12.17.1/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/12.17.1/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/12.17.1/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/12.17.1/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
+    <title>MyPadNoteOne - App Download</title>
+    <style>
+      body { background: #ECEFF1; font-family: Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+      .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); text-align: center; max-width: 420px; width: 100%; }
+      h1 { color: #333; font-size: 26px; margin-bottom: 8px; }
+      .version { display: inline-block; background: #e0f2f1; color: #00796b; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 15px; }
+      p { color: #666; font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+      .btn { display: block; background: #4CAF50; color: white; padding: 15px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px; box-shadow: 0 3px 6px rgba(0,0,0,0.15); transition: background 0.2s; margin-bottom: 15px; }
+      .btn:hover { background: #43A047; }
+      .links { display: flex; justify-content: center; gap: 15px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+      .links a { color: #039be5; text-decoration: none; font-size: 13px; }
+      .links a:hover { text-decoration: underline; }
     </style>
   </head>
   <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+    <div class="card">
+      <h1>MyPadNoteOne</h1>
+      <div class="version">v1.0 Debug Release</div>
+      <p>버튼을 눌러 최신 앱 디버그 압축 파일을 다운로드하고 간편하게 설치해 보세요.</p>
+      
+      <a class="btn" href="app-debug.zip" download="MyPadNoteOne-debug.zip">Download MyPadNoteOne ZIP</a>
+      
+      <div class="links">
+        <a href="https://github.com" target="_blank">GitHub Repository</a>
+        <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a>
+      </div>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
-
-    <script>
-      // ==========================================
-      // 📌 [오빠의 프로젝트 정보 및 배포용 메모장]
-      // - Hosting URL : https://mypadnoteone-a7ca4.web.app
-      // - Deploy Token: 1//0ejrpwNj2STLyCgYIARAAGA4SNwF-L9Irg5mERU33Iy01CFsI25347Zln83F8BDaPC2bIN4J2CKTWDIbflbTquAlQlPzC4NZyzg8
-      // ==========================================
-
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
-    </script>
   </body>
 </html>
