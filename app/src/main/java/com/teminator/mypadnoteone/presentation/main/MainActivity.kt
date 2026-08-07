@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         setupUI()
         setupObserve()
 
-        binding.webView.loadUrl("http://10.0.2.2:8080")
+        binding.webView.loadUrl("https://10.0.2.2:8080")
     }
 
 
@@ -125,7 +125,18 @@ class MainActivity : AppCompatActivity() {
     private fun setupWebView() {
         val webView: WebView = binding.webView
 
-        webView.webViewClient = WebViewClient()
+        // 🔒 사설 인증서(mkcert) 에러 무시 및 HTTPS 연결 허용 설정
+        webView.webViewClient = object : WebViewClient() {
+            override fun onReceivedSslError(
+                view: WebView?,
+                handler: android.webkit.SslErrorHandler?,
+                error: android.net.http.SslError?
+            ) {
+                // 개발 환경에서 mkcert 사설 인증서 허용 처리
+                handler?.proceed()
+            }
+        }
+
         webView.webChromeClient = object : WebChromeClient() {
             override fun onPermissionRequest(request: PermissionRequest?) {
                 runOnUiThread {

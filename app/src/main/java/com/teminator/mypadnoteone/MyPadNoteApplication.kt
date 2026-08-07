@@ -7,8 +7,5 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class MyPadNoteApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        // 앱 초기화 로직 필요시 구현
-    }
+    // 비워두거나 onCreate를 아예 안 적어도 됩니다.
 }
