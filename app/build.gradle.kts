@@ -91,4 +91,13 @@ dependencies {
     // --- [추가] KotlinX Serialization (드론 패킷 모델링용) ---
     implementation(libs.kotlinx.serialization.json)
 
+
+    // --- [추가] TensorFlow Lite 온디바이스 AI 라이브러리 ---
+    implementation(libs.tensorflow.lite)
+    implementation(libs.tensorflow.lite.support)
+
+
+
+
+
 }
