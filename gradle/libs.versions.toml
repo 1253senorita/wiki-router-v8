@@ -30,7 +30,7 @@ zxingCore = "3.5.3"
 # --- 드론 코어 및 직렬화 버전 정의 ---
 serialization = "1.7.3"
 
-# --- 온디바이스 AI 버전 정의 [추가 및 수정 완료] ---
+# --- 온디바이스 AI 버전 정의 ---
 tflite = "2.14.0"
 tfliteSupport = "0.4.4"
 
@@ -52,6 +52,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+firebase-dataconnect = { group = "com.google.firebase", name = "firebase-dataconnect", version = "16.0.0" }
 
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 
@@ -78,8 +79,6 @@ google-zxing-core = { group = "com.google.zxing", name = "core", version.ref = "
 
 socket-io-client = { group = "io.socket", name = "socket.io-client", version.ref = "socketIo" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
-
-firebase-dataconnect = { group = "com.google.firebase", name = "firebase-dataconnect", version = "16.0.0" }
 
 # --- 드론 코어 통신 및 데이터 직렬화 ---
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }

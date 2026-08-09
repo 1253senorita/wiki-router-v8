@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.hilt)
     kotlin("kapt")
     kotlin("plugin.serialization") version "2.1.0"
-
 }
 
 android {
@@ -60,6 +59,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.dataconnect)
 
     implementation(libs.kotlin.stdlib)
     implementation(libs.androidx.core.splashscreen)
@@ -81,23 +81,19 @@ dependencies {
         exclude(group = "org.json", module = "json")
     }
 
-    // --- 코루틴 비동기 처리 ---
+    // --- 코루틴 비동기 처리 및 직렬화 ---
     implementation(libs.kotlinx.coroutines.android)
-
-    implementation(libs.firebase.dataconnect)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-
-
-    // --- [추가] KotlinX Serialization (드론 패킷 모델링용) ---
     implementation(libs.kotlinx.serialization.json)
 
-
-    // --- [추가] TensorFlow Lite 온디바이스 AI 라이브러리 ---
+    // --- TensorFlow Lite (온디바이스 AI 추론 엔진) ---
     implementation(libs.tensorflow.lite)
     implementation(libs.tensorflow.lite.support)
 
-
-
-
+    // --- CameraX 라이브러리 (직접 버전 명시 방식) ---
+    val cameraxVersion = "1.4.1"
+    implementation("androidx.camera:camera-core:$cameraxVersion")
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+    implementation("androidx.camera:camera-view:$cameraxVersion")
 
 }
