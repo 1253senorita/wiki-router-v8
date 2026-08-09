@@ -32,6 +32,16 @@
             android:text="무전기 이동"
             android:textSize="12sp" />
 
+        <!-- 🔥 [추가] 드론 코어 진입 버튼 -->
+        <Button
+            android:id="@+id/btnOpenDroneCore"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="2dp"
+            android:text="드론코어 이동"
+            android:textSize="12sp" />
+
         <Button
             android:id="@+id/btnWIKIPtt"
             android:layout_width="0dp"

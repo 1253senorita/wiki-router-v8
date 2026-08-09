@@ -86,4 +86,9 @@ dependencies {
 
     implementation(libs.firebase.dataconnect)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+
+    // --- [추가] KotlinX Serialization (드론 패킷 모델링용) ---
+    implementation(libs.kotlinx.serialization.json)
+
 }

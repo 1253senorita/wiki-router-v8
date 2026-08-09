@@ -27,6 +27,13 @@ concurrentFutures = "1.2.0"
 zxingAndroidEmbedded = "4.3.0"
 zxingCore = "3.5.3"
 
+# --- [추가] 드론 코어 및 소켓/위치 통신용 버전 정의 ---
+
+serialization = "1.7.3"
+
+
+
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -75,6 +82,11 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 # 기존 코드: firebase-dataconnect = { group = "com.google.firebase", name = "firebase-dataconnect" }
 # 수정된 코드 (버전 명시):
 firebase-dataconnect = { group = "com.google.firebase", name = "firebase-dataconnect", version = "16.0.0" }
+
+
+# --- 드론 코어 통신 및 데이터 직렬화 ---
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+
 
 
 

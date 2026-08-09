@@ -80,6 +80,14 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // 🔥 [해제 완료] 드론 코어 화면으로 이동하는 인텐트 버튼 연동
+        binding.btnOpenDroneCore.setOnClickListener {
+            val intent = Intent(this, com.teminator.mypadnoteone.presentation.dronecore.ui.DroneCoreActivity::class.java)
+            startActivity(intent)
+        }
+
+
+
 
         setupOnBackPressed()
     }
