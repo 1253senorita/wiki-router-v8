@@ -10,6 +10,17 @@
     android:background="#FAFAFA"
     tools:context=".presentation.main.MainActivity">
 
+    <!-- 🔥 바로바로 배차 프래그먼트가 쏙 들어갈 빈 방(컨테이너) 영역 (평소에는 gone으로 숨김) -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- 1. 상단 앱바 -->
     <LinearLayout
         android:id="@+id/layout_top_bar"
@@ -123,6 +134,7 @@
 
     <!-- 4. 메뉴 카드들이 들어갈 대시보드 영역 (ScrollView) -->
     <ScrollView
+        android:id="@+id/scrollViewMain"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
@@ -242,7 +254,7 @@
 
             <!-- 서비스 바로가기 카드 4 (바로바로 화물 배차) -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardBaroBaro"
+                android:id="@+id/cardBaroBaroBOTT"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:layout_marginBottom="12dp"
@@ -250,12 +262,14 @@
                 app:cardElevation="2dp"
                 android:clickable="true"
                 android:focusable="true">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="#F0F8FF">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -264,6 +278,7 @@
                         android:textStyle="bold"
                         android:textColor="#0066CC"
                         android:layout_marginBottom="4dp"/>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

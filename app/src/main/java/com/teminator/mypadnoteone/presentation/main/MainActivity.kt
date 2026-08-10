@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -73,11 +74,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 4. 바로바로 화물 배차 프래그먼트로 교체하여 진입
-        // (만약 메인 액티비티에 프래그먼트를 담을 FrameLayout(예: fragment_container)이 있다면 아래처럼 띄우시면 됩니다)
-        binding.cardBaroBaro.setOnClickListener {
+        binding.cardBaroBaroBOTT.setOnClickListener {
+            // 1. 프래그먼트 방을 보이게 켭니다.
+            binding.fragmentContainer.visibility = View.VISIBLE
+
+            // 🌟 2. 메인 식탁의 대시보드(스크롤뷰)와 상단/하단 바를 싹 숨깁니다!
+            binding.layoutTopBar.visibility = View.GONE
+            binding.layoutCategoryScroll.visibility = View.GONE
+            binding.layoutTestMetadata.visibility = View.GONE
+            binding.dividerTop.visibility = View.GONE
+            binding.scrollViewMain.visibility = View.GONE // 🔥 대시보드 카드 영역 숨기기!
+            binding.layoutBottomNav.visibility = View.GONE
+
+            // 3. 프래그먼트를 띄웁니다.
             val fragment = BaroBaroFragment()
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment) // 메인 XML의 레이아웃 아이디에 맞게 조절 가능합니다
+                .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit()
         }
