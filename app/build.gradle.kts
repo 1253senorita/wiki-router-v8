@@ -3,9 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     alias(libs.plugins.hilt)
-    kotlin("kapt")
+    alias(libs.plugins.ksp) // 👈 ksp 유지
     kotlin("plugin.serialization") version "2.1.0"
-
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -24,6 +24,8 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
+
     }
 
     buildTypes {
@@ -38,6 +40,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+
+
     }
 
     kotlin {
@@ -45,6 +49,8 @@ android {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
         }
     }
+
+
 }
 
 dependencies {
@@ -53,6 +59,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -64,7 +71,7 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -86,4 +93,19 @@ dependencies {
 
     implementation(libs.firebase.dataconnect)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    // Jetpack Compose 관련 의존성들은 이렇게 정확한 alias나 BOM 형태로 선언되어야 합니다.
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.foundation)
+
+    // 기존 kapt(libs.hilt.compiler) 부분을 아래처럼 ksp로 변경합니다.
+    //kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
+    // 🔥 톰이 버전 관리를 통한 프래그먼트 KTX 의존성 추가
+    implementation(libs.androidx.fragment.ktx)
 }

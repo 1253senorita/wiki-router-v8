@@ -73,5 +73,12 @@
             android:exported="false"
             android:foregroundServiceType="microphone" />
 
+
+
+
+
+
+
+
     </application>
 </manifest>
