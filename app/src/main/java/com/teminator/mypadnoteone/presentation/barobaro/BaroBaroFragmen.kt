@@ -25,6 +25,9 @@ class BaroBaroFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // 전달받은 인자(Bundle)에서 모드 값 읽기 (기본값은 false: 목록 모드)
+        val initialRegisterMode = arguments?.getBoolean("IS_REGISTER_MODE", false) ?: false
+
         return ComposeView(requireContext()).apply {
             setContent {
                 MaterialTheme {
@@ -34,25 +37,26 @@ class BaroBaroFragment : Fragment() {
                     ) {
                         val selectedOrder = viewModel.selectedOrder
 
-                        // 🔥 오더 등록 화면 상태 관리 변수 (필요에 따라 모드 전환 가능)
-                        var isRegisterMode by remember { mutableStateOf(false) }
+                        // 네이게이터에서 넘겨받은 모드로 초기 상태 설정
+                        var isRegisterMode by remember { mutableStateOf(initialRegisterMode) }
 
                         Column(modifier = Modifier.fillMaxSize()) {
-
-                            // 상단에 모드 전환용 탭이나 뒤로가기 버튼을 둘 수 있습니다.
                             if (isRegisterMode) {
-                                // --- [새 화물 오더 등록 화면 뷰] ---
                                 BaroBaroRegisterScreen(
                                     onRegister = { route, cargo, price, desc ->
                                         viewModel.addOrder(route, cargo, price, desc)
-                                        isRegisterMode = false // 등록 후 목록 화면으로 복귀
+                                        isRegisterMode = false // 등록 완료 후 목록으로 전환
                                     },
                                     onCancel = {
-                                        isRegisterMode = false
+                                        // 취소 시 뒤로 가기 또는 목록으로 전환
+                                        if (arguments?.containsKey("IS_REGISTER_MODE") == true) {
+                                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                                        } else {
+                                            isRegisterMode = false
+                                        }
                                     }
                                 )
                             } else {
-                                // --- [기존 배차 목록 화면 뷰] ---
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -92,7 +96,7 @@ class BaroBaroFragment : Fragment() {
     }
 }
 
-// 📝 [추가] 오더 직접 입력 폼 컴포저블 화면
+// 오더 직접 입력 폼 컴포저블 화면
 @Composable
 fun BaroBaroRegisterScreen(
     onRegister: (String, String, String, String) -> Unit,
@@ -109,13 +113,13 @@ fun BaroBaroRegisterScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "새 화물 오더 등록", style = MaterialTheme.typography.titleLarge)
+        Text(text = "새새새새 화물 오더 등록", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = route,
             onValueChange = { route = it },
-            label = { Text("운행 구간 (예: 인천 ➔ 대구)") },
+            label = { Text("운행 구간 (예: 인만천 ➔ 대구)") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))

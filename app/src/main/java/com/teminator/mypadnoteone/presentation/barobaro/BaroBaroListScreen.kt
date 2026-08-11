@@ -19,7 +19,7 @@ fun BaroBaroManageScreen(
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
 
         // --- [오직 배차 목록만 보여주는 창] ---
-        Text(text = "실시간 화물 쿨 대기 목록", style = MaterialTheme.typography.titleMedium)
+        Text(text = "스크린 리스트 쿨 갱신 화면 ", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(

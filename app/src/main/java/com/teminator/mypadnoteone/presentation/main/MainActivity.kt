@@ -82,6 +82,11 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "웹페이지를 열 수 없습니다.", Toast.LENGTH_SHORT).show()
             }
         }
+        // 🔥 위에는  메인의 다른  버튼
+
+
+
+
 
         // 🔥 바로바로 배차 목록 화면 띄우기 (뚜껑 덮기: 목록 모드)
         binding.cardBaroBaroBOTT.setOnClickListener {
