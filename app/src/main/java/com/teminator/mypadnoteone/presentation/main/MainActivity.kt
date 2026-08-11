@@ -75,26 +75,39 @@ class MainActivity : AppCompatActivity() {
 
         // 4. 바로바로 화물 배차 프래그먼트로 교체하여 진입
         binding.cardBaroBaroBOTT.setOnClickListener {
-            // 1. 프래그먼트 방을 보이게 켭니다.
-            binding.fragmentContainer.visibility = View.VISIBLE
-
-            // 🌟 2. 메인 식탁의 대시보드(스크롤뷰)와 상단/하단 바를 싹 숨깁니다!
-            binding.layoutTopBar.visibility = View.GONE
-            binding.layoutCategoryScroll.visibility = View.GONE
-            binding.layoutTestMetadata.visibility = View.GONE
-            binding.dividerTop.visibility = View.GONE
-            binding.scrollViewMain.visibility = View.GONE // 🔥 대시보드 카드 영역 숨기기!
-            binding.layoutBottomNav.visibility = View.GONE
-
-            // 3. 프래그먼트를 띄웁니다.
-            val fragment = BaroBaroFragment()
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
-                .commit()
+            showBaroBaroFragment()
         }
 
         setupOnBackPressed()
+    }
+
+    private fun showBaroBaroFragment() {
+        // 메인 대시보드 UI 숨기기
+        binding.fragmentContainer.visibility = View.VISIBLE
+        binding.layoutTopBar.visibility = View.GONE
+        binding.layoutCategoryScroll.visibility = View.GONE
+        binding.layoutTestMetadata.visibility = View.GONE
+        binding.dividerTop.visibility = View.GONE
+        binding.scrollViewMain.visibility = View.GONE
+        binding.layoutBottomNav.visibility = View.GONE
+
+        // 프래그먼트 추가
+        val fragment = BaroBaroFragment()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack("BAROBARO")
+            .commit()
+    }
+
+    fun restoreMainUI() {
+        // 프래그먼트 영역 숨기기 및 메인 대시보드 복구
+        binding.fragmentContainer.visibility = View.GONE
+        binding.layoutTopBar.visibility = View.VISIBLE
+        binding.layoutCategoryScroll.visibility = View.VISIBLE
+        binding.layoutTestMetadata.visibility = View.VISIBLE
+        binding.dividerTop.visibility = View.VISIBLE
+        binding.scrollViewMain.visibility = View.VISIBLE
+        binding.layoutBottomNav.visibility = View.VISIBLE
     }
 
     private fun setupObserve() {
@@ -145,8 +158,13 @@ class MainActivity : AppCompatActivity() {
     private fun setupOnBackPressed() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                isEnabled = false
-                onBackPressedDispatcher.onBackPressed()
+                if (supportFragmentManager.backStackEntryCount > 0) {
+                    supportFragmentManager.popBackStack()
+                    restoreMainUI()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
             }
         })
     }

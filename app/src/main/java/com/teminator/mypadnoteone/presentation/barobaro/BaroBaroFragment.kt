@@ -10,9 +10,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels // 🔥 이 임포트가 핵심입니다!
+import androidx.fragment.app.viewModels
 import com.terminator.mypadnoteone.presentation.barobaro.detail.BaroBaroDetailScreen
 import com.terminator.mypadnoteone.presentation.barobaro.list.BaroBaroListScreen
+import com.teminator.mypadnoteone.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -43,12 +44,21 @@ class BaroBaroFragment : Fragment() {
                             BaroBaroDetailScreen(
                                 order = selectedOrder,
                                 onAccept = { viewModel.acceptOrder(selectedOrder.id) },
-                                onBack = { viewModel.selectOrder(null) }
+                                onBack = {
+                                    // 상세 화면에서 뒤로 갈 때 주문 선택 해제
+                                    viewModel.selectOrder(null)
+                                }
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // 프래그먼트가 파괴될 때 액티비티의 메인 UI 복구 호출
+        (activity as? MainActivity)?.restoreMainUI()
     }
 }
