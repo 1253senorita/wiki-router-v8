@@ -21,6 +21,7 @@ import com.teminator.mypadnoteone.presentation.auth.AuthActivity
 import com.teminator.mypadnoteone.presentation.aerorouter.ui.AeroRouterEntryActivity
 import com.teminator.mypadnoteone.presentation.wiki.ui.WikiActivity
 import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroFragment
+import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -91,14 +92,13 @@ class MainActivity : AppCompatActivity() {
         binding.scrollViewMain.visibility = View.GONE
         binding.layoutBottomNav.visibility = View.GONE
 
-        // 프래그먼트 추가
+        // 프래그먼트 추가 (괄호 짝 완벽히 맞춤)
         val fragment = BaroBaroFragment()
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .addToBackStack("BAROBARO")
             .commit()
     }
-
     fun restoreMainUI() {
         // 프래그먼트 영역 숨기기 및 메인 대시보드 복구
         binding.fragmentContainer.visibility = View.GONE

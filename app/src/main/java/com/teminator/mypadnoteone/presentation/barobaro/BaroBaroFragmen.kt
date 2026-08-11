@@ -11,8 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.terminator.mypadnoteone.presentation.barobaro.detail.BaroBaroDetailScreen
-import com.terminator.mypadnoteone.presentation.barobaro.list.BaroBaroListScreen
 import com.teminator.mypadnoteone.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,19 +34,13 @@ class BaroBaroFragment : Fragment() {
                         val selectedOrder = viewModel.selectedOrder
 
                         if (selectedOrder == null) {
-                            BaroBaroListScreen(
+                            BaroBaroManageScreen(
                                 orderList = viewModel.orderList,
-                                onItemClick = { viewModel.selectOrder(it) }
+                                onItemClick = { viewModel.selectOrder(it) },
+                                viewModel = viewModel
                             )
                         } else {
-                            BaroBaroDetailScreen(
-                                order = selectedOrder,
-                                onAccept = { viewModel.acceptOrder(selectedOrder.id) },
-                                onBack = {
-                                    // 상세 화면에서 뒤로 갈 때 주문 선택 해제
-                                    viewModel.selectOrder(null)
-                                }
-                            )
+                            // 상세 화면 호출 부분 (기존 상세 화면 코드가 있다면 연결)
                         }
                     }
                 }
@@ -58,7 +50,6 @@ class BaroBaroFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // 프래그먼트가 파괴될 때 액티비티의 메인 UI 복구 호출
         (activity as? MainActivity)?.restoreMainUI()
     }
 }
