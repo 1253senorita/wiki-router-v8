@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -15,21 +14,25 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.teminator.mypadnoteone.R
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
-import com.teminator.mypadnoteone.presentation.auth.AuthActivity
 import com.teminator.mypadnoteone.presentation.aerorouter.ui.AeroRouterEntryActivity
+import com.teminator.mypadnoteone.presentation.auth.AuthActivity
 import com.teminator.mypadnoteone.presentation.wiki.ui.WikiActivity
-import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroFragment
-import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+/**
+ * 앱의 메인 화면을 담당하는 Activity입니다.
+ * 대시보드 형태의 UI를 제공하며, 각 기능별 화면(Activity/Fragment)으로 이동하는 진입점 역할을 합니다.
+ */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
+
+    // 🔥 내비게이터(뚜껑 관리자) 선언: 메인 대시보드와 프래그먼트 간의 UI 전환을 관리합니다.
+    private lateinit var navigator: MainNavigator
 
     companion object {
         private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
@@ -40,30 +43,36 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 내비게이터 초기화 (Activity와 ViewBinding 전달)
+        navigator = MainNavigator(this, binding)
+
         checkAudioPermission()
         setupUI()
         setupObserve()
     }
 
+    /**
+     * UI 컴포넌트의 리스너 및 클릭 이벤트를 초기화합니다.
+     */
     private fun setupUI() {
-        // 1. 무전기 진입 화면으로 이동
+        // PTT(무전기) 화면으로 이동
         binding.btnOpenPtt.setOnClickListener {
             val intent = Intent(this, AeroRouterEntryActivity::class.java)
             startActivity(intent)
         }
 
-        // 2. 로그아웃
+        // 로그아웃 버튼 클릭 시 ViewModel을 통해 로그아웃 처리 요청
         binding.btnLogout.setOnClickListener {
             viewModel.signOut()
         }
 
-        // 3. Wiki 라우터 화면으로 이동
+        // WIKI 화면으로 이동
         binding.btnWIKIPtt.setOnClickListener {
             val intent = Intent(this, WikiActivity::class.java)
             startActivity(intent)
         }
 
-        // 파이어베이스 다운로드 호스팅 주소로 이동
+        // 파이어베이스 웹 다운로드 페이지 링크 열기
         binding.cardFirebaseDownload.setOnClickListener {
             val url = "https://mypadnoteone-a7ca4.web.app"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -74,42 +83,30 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 4. 바로바로 화물 배차 프래그먼트로 교체하여 진입
+        // 🔥 바로바로 배차 목록 화면 띄우기 (뚜껑 덮기: 목록 모드)
         binding.cardBaroBaroBOTT.setOnClickListener {
-            showBaroBaroFragment()
+            navigator.navigateToBaroBaro(isRegisterMode = false)
+        }
+
+        // 🔥 새 화물 오더 등록 화면 띄우기 (뚜껑 덮기: 등록 모드)
+        binding.cardRegisterOrder.setOnClickListener {
+            navigator.navigateToBaroBaro(isRegisterMode = true)
+            Toast.makeText(this, "화물 오더 등록 화면으로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 
         setupOnBackPressed()
     }
 
-    private fun showBaroBaroFragment() {
-        // 메인 대시보드 UI 숨기기
-        binding.fragmentContainer.visibility = View.VISIBLE
-        binding.layoutTopBar.visibility = View.GONE
-        binding.layoutCategoryScroll.visibility = View.GONE
-        binding.layoutTestMetadata.visibility = View.GONE
-        binding.dividerTop.visibility = View.GONE
-        binding.scrollViewMain.visibility = View.GONE
-        binding.layoutBottomNav.visibility = View.GONE
-
-        // 프래그먼트 추가 (괄호 짝 완벽히 맞춤)
-        val fragment = BaroBaroFragment()
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .addToBackStack("BAROBARO")
-            .commit()
-    }
+    /**
+     * 뚜껑을 열고(메인 대시보드 UI 복구), 원래 대시보드 화면을 다시 보여줍니다.
+     */
     fun restoreMainUI() {
-        // 프래그먼트 영역 숨기기 및 메인 대시보드 복구
-        binding.fragmentContainer.visibility = View.GONE
-        binding.layoutTopBar.visibility = View.VISIBLE
-        binding.layoutCategoryScroll.visibility = View.VISIBLE
-        binding.layoutTestMetadata.visibility = View.VISIBLE
-        binding.dividerTop.visibility = View.VISIBLE
-        binding.scrollViewMain.visibility = View.VISIBLE
-        binding.layoutBottomNav.visibility = View.VISIBLE
+        navigator.restoreMainUI()
     }
 
+    /**
+     * ViewModel의 UI 이벤트(상태 변화)를 감지하고 처리합니다.
+     */
     private fun setupObserve() {
         lifecycleScope.launch {
             viewModel.uiEvent
@@ -128,6 +125,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 무전기 기능 사용을 위한 마이크(오디오 녹음) 권한을 확인합니다.
+     */
     private fun checkAudioPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
             != PackageManager.PERMISSION_GRANTED
@@ -140,6 +140,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 권한 요청 결과에 따른 처리를 수행합니다.
+     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -155,6 +158,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 뒤로가기 버튼(HW Back Button) 동작을 정의합니다.
+     * 프래그먼트가 백스택에 쌓여있다면 프래그먼트를 닫고 메인 UI를 복구합니다.
+     */
     private fun setupOnBackPressed() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

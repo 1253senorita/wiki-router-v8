@@ -189,36 +189,41 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- 서비스 바로가기 카드 2 (wiki라우터) -->
+            <!-- 서비스 바로가기 카드 2 (화물 오더 등록 바로가기) -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardRegisterOrder"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:layout_marginBottom="12dp"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                app:cardElevation="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:background="#FFFFFF">
+                    android:background="#F9F5FF">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🌐 WIKI-ROUTER 엔진"
+                        android:text="📝 새 화물 오더 직접 등록"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="#6200EE"
                         android:layout_marginBottom="4dp"/>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="라우터 및 스트리밍 컨트롤 패널로 이동합니다."
+                        android:text="새로운 운행 구간 및 화물 정보를 등록합니다."
                         android:textSize="12sp"
                         android:textColor="#666666"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
             <!-- 서비스 바로가기 카드 3 (파이어베이스 다운로드 및 호스팅 안내) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardFirebaseDownload"
