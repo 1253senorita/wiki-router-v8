@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 
 // Fragment와 호환되도록 orderList와 onItemClick을 받도록 수정
 @Composable
-fun BaroBaroManageScreen(
+fun BaroBaroListScreen(
     orderList: List<DispatchOrder>,
     onItemClick: (DispatchOrder) -> Unit,
     viewModel: BaroBaroViewModel
@@ -19,7 +19,7 @@ fun BaroBaroManageScreen(
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
 
         // --- [오직 배차 목록만 보여주는 창] ---
-        Text(text = "스크린 리스트 쿨 갱신 화면 ", style = MaterialTheme.typography.titleMedium)
+        Text(text = "스크린 리스트 쿨 --ls22--화면 ", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(
@@ -33,8 +33,8 @@ fun BaroBaroManageScreen(
                     onClick = { onItemClick(order) }
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = "구간: ${order.route}", style = MaterialTheme.typography.titleSmall)
-                        Text(text = "화물: ${order.cargoInfo}", style = MaterialTheme.typography.bodyMedium)
+                        Text(text = "구간--ls36--: ${order.route}", style = MaterialTheme.typography.titleSmall)
+                        Text(text = "--메니저 데이타셋이 VM 에서 인자받은--: ${order.cargoInfo}", style = MaterialTheme.typography.bodyMedium)
                         Text(text = "운임: ${order.price}", style = MaterialTheme.typography.bodyMedium)
                         Text(text = "상태: ${order.status}", color = MaterialTheme.colorScheme.primary)
 

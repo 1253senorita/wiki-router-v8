@@ -64,17 +64,17 @@ class BaroBaroFragment : Fragment() {
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Text(
-                                        text = "실시간 화물 콜 대기 목록",
+                                        text = "실시간 화물 --프레그먼트47--대기 목록",
                                         style = MaterialTheme.typography.titleMedium,
                                         modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
                                     )
                                     Button(onClick = { isRegisterMode = true }) {
-                                        Text("오더 등록하기")
+                                        Text("오더등록--PRg72-")
                                     }
                                 }
 
                                 if (selectedOrder == null) {
-                                    BaroBaroManageScreen(
+                                    BaroBaroListScreen(
                                         orderList = viewModel.orderList,
                                         onItemClick = { viewModel.selectOrder(it) },
                                         viewModel = viewModel
@@ -113,13 +113,13 @@ fun BaroBaroRegisterScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "새새새새 화물 오더 등록", style = MaterialTheme.typography.titleLarge)
+        Text(text = "프래그먼트 아래 등록 --함수116--화물 오더 등록", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = route,
             onValueChange = { route = it },
-            label = { Text("운행 구간 (예: 인만천 ➔ 대구)") },
+            label = { Text("운행 프래그먼트 아래 등록 --함수122--구간 (예: 인만천 ➔ 대구)") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))

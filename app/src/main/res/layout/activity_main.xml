@@ -153,7 +153,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="원하시는 메뉴를 선택해 주세요."
+                android:text="원하시는 메뉴를 --메인XML156--선택해 주세요."
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="#333333"
@@ -210,7 +210,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📝 새 화물 오더 직접 등록"
+                        android:text="📝 새 화물 오더 직접 등록 메인xml213"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#6200EE"
@@ -219,7 +219,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="새로운 운행 구간 및 화물 정보를 등록합니다."
+                        android:text="카드등록메인 콤토넌트와 메인엑티비티97 라인 ."
                         android:textSize="12sp"
                         android:textColor="#666666"/>
                 </LinearLayout>
@@ -278,7 +278,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🚚 바로바로 화물 배차 서비스"
+                        android:text="🚚 --바로바로 메인XML281--화물 배차 서비스"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#0066CC"
