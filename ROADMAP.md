@@ -200,3 +200,72 @@ repository.addOrder(order)
 
 
 
+
+
+
+@@@@@@@@@@@@@@
+
+
+
+가상 룸 ID(ROOM_TEST_X)와 함께 매칭 룸 화면으로 전환되도록 네비게이션을 연결했던 핵심 로직 코드는 다음과 같습니다.
+
+
+
+1. 상세 화면 (BaroBaroDetailScreen.kt)에서 네비게이션 호출부
+   상세 화면에서 콜 수락 버튼이나 테스트 버튼을 눌렀을 때, MainNavigator를 통해 가상 룸 ID를 담아 프래그먼트 전환(내비게이션)을 트리거하는 핵심 로직입니다.
+
+Kotlin
+// BaroBaroDetailScreen.kt (예시 핵심 로직)
+Button(
+onClick = {
+val testRoomId = "ROOM_TEST_X"
+// 네비게이터를 통해 가상 룸 ID를 전달하며 매칭 룸 화면으로 이동
+navigator.navigateToMatchingRoom(testRoomId)
+}
+) {
+Text("강제 세컨드 룸 통신 테스트")
+}
+2. 네비게이터 (MainNavigator.kt)에서의 화면 전환 라우팅 처리
+   전달받은 룸 ID를 인자로 하여 MatchingRoomFragment를 생성하고, 프래그먼트 트랜잭션을 통해 화면을 교체하는 로직입니다.
+
+Kotlin
+// MainNavigator.kt (예시 핵심 로직)
+fun navigateToMatchingRoom(roomId: String) {
+val fragment = MatchingRoomFragment.newInstance(roomId)
+
+    fragmentManager.beginTransaction()
+        .replace(R.id.fragment_container, fragment)
+        .addToBackStack(null)
+        .commit()
+}
+3. 매칭 룸 프래그먼트 (MatchingRoomFragment.kt)에서 룸 ID 수신부
+   전달받은 ROOM_TEST_X 값을 Arguments를 통해 안전하게 꺼내어 뷰모델 초기화 및 통신에 사용하는 로직입니다.
+
+Kotlin
+// MatchingRoomFragment.kt (예시 핵심 로직)
+class MatchingRoomFragment : Fragment() {
+
+    private val viewModel: MatchingRoomViewModel by viewModels()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        
+        // 전달된 가상 룸 ID 받기
+        val roomId = arguments?.getString(ARG_ROOM_ID) ?: "DEFAULT_ROOM"
+        
+        // 뷰모델에 룸 ID 전달하여 통신/소켓 연결 초기화
+        viewModel.joinMatchingRoom(roomId)
+    }
+
+    companion object {
+        private const val ARG_ROOM_ID = "arg_room_id"
+
+        fun newInstance(roomId: String): MatchingRoomFragment {
+            return MatchingRoomFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_ROOM_ID, roomId)
+                }
+            }
+        }
+    }
+}
