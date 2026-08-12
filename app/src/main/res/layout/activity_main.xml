@@ -219,7 +219,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="카드등록메인 콤토넌트와 메인엑티비티97 라인 ."
+                        android:text="카드등록메인 콤토넌트와 메인ATB 97 라인 버튼 이덴트 ."
                         android:textSize="12sp"
                         android:textColor="#666666"/>
                 </LinearLayout>
@@ -278,7 +278,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🚚 --바로바로 메인XML281--화물 배차 서비스"
+                        android:text="🚚 --바로바로 메인XML261--화물 배차 서비스연결 호출은 메인a92"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#0066CC"

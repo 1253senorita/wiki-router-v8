@@ -12,13 +12,16 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.teminator.mypadnoteone.presentation.main.MainActivity
+import com.terminator.mypadnoteone.presentation.barobaro.detail.BaroBaroDetailScreen
+import com.terminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
+import com.terminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class BaroBaroFragment : Fragment() {
 
     private val viewModel: BaroBaroViewModel by viewModels()
+    private val roomViewModel: MatchingRoomViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,13 +35,14 @@ class BaroBaroFragment : Fragment() {
                 MaterialTheme {
                     val snackbarHostState = remember { SnackbarHostState() }
 
-                    // ViewModel의 에러 메시지 감지 및 스낵바 출력
                     LaunchedEffect(viewModel.errorMessage) {
                         viewModel.errorMessage?.let { error ->
                             snackbarHostState.showSnackbar(error)
                             viewModel.clearError()
                         }
                     }
+
+                    val activeRoomId = viewModel.mockMatchingRoomId
 
                     Scaffold(
                         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -53,49 +57,70 @@ class BaroBaroFragment : Fragment() {
                             val selectedOrder = viewModel.selectedOrder
                             var isRegisterMode by remember { mutableStateOf(initialRegisterMode) }
 
-                            Column(modifier = Modifier.fillMaxSize()) {
-                                if (isRegisterMode) {
-                                    BaroBaroRegisterScreen(
-                                        // 💡 파라미터에 명시적 타입(String) 추가하여 타입 추론 에러 해결
-                                        onRegister = { route: String, cargo: String, price: String, desc: String ->
-                                            viewModel.addOrder(route, cargo, price, desc)
-                                            if (viewModel.errorMessage == null) {
-                                                isRegisterMode = false
-                                            }
-                                        },
-                                        onCancel = {
-                                            if (arguments?.containsKey("IS_REGISTER_MODE") == true) {
-                                                requireActivity().onBackPressedDispatcher.onBackPressed()
-                                            } else {
-                                                isRegisterMode = false
-                                            }
-                                        }
-                                    )
-                                } else {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Text(
-                                            text = "실시간 화물 --프레그먼트47--대기 목록",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
-                                        )
-                                        Button(onClick = { isRegisterMode = true }) {
-                                            Text("오더등록--PRg72-")
-                                        }
+                            if (activeRoomId != null) {
+                                MatchingRoomScreen(
+                                    roomId = activeRoomId,
+                                    viewModel = roomViewModel,
+                                    onBackClick = {
+                                        viewModel.clearMockRoomId()
                                     }
-
-                                    if (selectedOrder == null) {
-                                        BaroBaroListScreen(
-                                            orderList = viewModel.orderList,
-                                            onItemClick = { viewModel.selectOrder(it) },
-                                            viewModel = viewModel
+                                )
+                            } else {
+                                Column(modifier = Modifier.fillMaxSize()) {
+                                    if (isRegisterMode) {
+                                        BaroBaroRegisterScreen(
+                                            onRegister = { route: String, cargo: String, price: String, desc: String ->
+                                                viewModel.addOrder(route, cargo, price, desc)
+                                                if (viewModel.errorMessage == null) {
+                                                    isRegisterMode = false
+                                                }
+                                            },
+                                            onCancel = {
+                                                if (arguments?.containsKey("IS_REGISTER_MODE") == true) {
+                                                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                                                } else {
+                                                    isRegisterMode = false
+                                                }
+                                            }
                                         )
                                     } else {
-                                        // 상세 화면 호출 부분
+                                        if (selectedOrder == null) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ) {
+                                                Text(
+                                                    text = "실시간 화물 --프레그먼트47--대기 목록",
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
+                                                )
+                                                Button(onClick = { isRegisterMode = true }) {
+                                                    Text("오더등록--PRg72-")
+                                                }
+                                            }
+
+                                            BaroBaroListScreen(
+                                                orderList = viewModel.filteredOrderList,
+                                                onItemClick = { viewModel.selectOrder(it) },
+                                                viewModel = viewModel
+                                            )
+                                        } else {
+                                            BaroBaroDetailScreen(
+                                                order = selectedOrder,
+                                                onAccept = {
+                                                    viewModel.acceptOrder(selectedOrder.id)
+                                                    viewModel.forceCreateTestMatchRoom(selectedOrder.id)
+                                                },
+                                                onBack = {
+                                                    viewModel.selectOrder(null)
+                                                },
+                                                onForceTestRoomOpen = { orderId ->
+                                                    viewModel.forceCreateTestMatchRoom(orderId)
+                                                }
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -108,11 +133,18 @@ class BaroBaroFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        (activity as? MainActivity)?.restoreMainUI()
+        // 안전한 형변환을 통해 MainActivity 의존성 에러 원천 차단
+        try {
+            val mainActivityClass = Class.forName("com.terminator.mypadnoteone.presentation.main.MainActivity")
+            if (mainActivityClass.isInstance(activity)) {
+                val method = mainActivityClass.getMethod("restoreMainUI")
+                method.invoke(activity)
+            }
+        } catch (_: Exception) {
+        }
     }
 }
 
-// 오더 직접 입력 폼 컴포저블 화면 (중복 선언 방지용 단일 정의)
 @Composable
 fun BaroBaroRegisterScreen(
     onRegister: (String, String, String, String) -> Unit,

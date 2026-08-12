@@ -127,3 +127,76 @@
 
 * **회로 부품:** 타이머 인터럽트 및 상시 대기 릴레이(`PttService`)
 * **회로 동작:** 앱이 화면 뒤로 넘어가거나 메인 UI가 꺼져 있어도, 마이크 센서 신호와 실시간 통신을 끊기지 않게 유지하는 상시 구동(Foreground) 하부 릴레이 회로입니다.
+
+
+
+
+**********
+
+
+
+[학습 자료] 
+
+
+
+BaroBaro 데이터 흐름 및 상태 관리 전략
+
+
+1. 개요
+   본 문서는 BaroBaroRepository 인터페이스를 통해 데이터를 저장하고, ViewModel이 이를 StateFlow로 관리하여 UI(Compose)에 반영하는 데이터 파이프라인을 다룹니다.
+
+2. 데이터 흐름도
+   사용자의 입력이 데이터베이스/서버에 저장되고, 화면에 반영되는 순서는 다음과 같습니다:
+
+UI Layer: 사용자가 데이터를 입력하고 버튼을 클릭합니다.
+
+ViewModel: addOrder 명령을 실행합니다.
+
+Repository: 실제 비즈니스 로직 및 데이터 저장(DB/Network)을 수행합니다.
+
+State Update: ViewModel이 최신 데이터를 다시 fetch하여 _orderList를 갱신합니다.
+
+UI Recomposition: collectAsState 중인 Compose 화면이 변경된 데이터를 감지하여 리스트를 재구성합니다.
+
+3. 핵심 코드 구조
+   Repository Interface
+   데이터 접근 계층의 규약입니다.
+
+Kotlin
+interface BaroBaroRepository {
+suspend fun getOrders(): List<DispatchOrder>
+suspend fun addOrder(order: DispatchOrder)
+suspend fun updateOrderStatus(orderId: String, status: String)
+}
+ViewModel Logic
+상태 관리를 담당하는 핵심부입니다.
+
+Kotlin
+// 1. 상태 선언
+private val _orderList = MutableStateFlow<List<DispatchOrder>>(emptyList())
+val orderList: StateFlow<List<DispatchOrder>> = _orderList.asStateFlow()
+
+// 2. 데이터 추가 및 갱신 흐름
+fun addNewOrder(order: DispatchOrder) {
+viewModelScope.launch {
+// 비동기 작업 수행
+repository.addOrder(order)
+
+        // 데이터 저장 후 최신 리스트 동기화
+        val updatedList = repository.getOrders()
+        _orderList.value = updatedList
+    }
+}
+4. 학습 포인트
+   단일 진실 공급원(Single Source of Truth): _orderList를 MutableStateFlow로 관리함으로써 데이터의 변경 지점을 단일화하여 유지보수성을 높였습니다.
+
+비동기 처리: suspend 키워드와 viewModelScope.launch를 사용하여 UI 스레드 차단 없이 네트워크/DB 작업을 안전하게 처리합니다.
+
+반응형 UI: 데이터가 변경될 때마다 UI가 별도의 조작 없이 자동으로 업데이트되는 Compose의 핵심 원리가 이 흐름에 녹아있습니다.
+
+이 내용을 바탕으로 작성하신 코드를 검토해 보시면 데이터 흐름이 더 명확하게 보이실 겁니다. 학습하시다가 궁금한 점이 생기면 언제든 "보미"를 불러주세요!
+
+(문서 생성이 완료되었습니다. 이 내용은 추후 개발 참고 자료로 활용하세요.)
+
+
+
