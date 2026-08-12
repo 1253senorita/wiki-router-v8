@@ -14,9 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.teminator.mypadnoteone.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
-import com.teminator.mypadnoteone.domain.model.DispatchOrder
-
-
 
 @AndroidEntryPoint
 class BaroBaroFragment : Fragment() {
@@ -28,62 +25,78 @@ class BaroBaroFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // 전달받은 인자(Bundle)에서 모드 값 읽기 (기본값은 false: 목록 모드)
         val initialRegisterMode = arguments?.getBoolean("IS_REGISTER_MODE", false) ?: false
 
         return ComposeView(requireContext()).apply {
             setContent {
                 MaterialTheme {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        val selectedOrder = viewModel.selectedOrder
+                    val snackbarHostState = remember { SnackbarHostState() }
 
-                        // 네이게이터에서 넘겨받은 모드로 초기 상태 설정
-                        var isRegisterMode by remember { mutableStateOf(initialRegisterMode) }
+                    // ViewModel의 에러 메시지 감지 및 스낵바 출력
+                    LaunchedEffect(viewModel.errorMessage) {
+                        viewModel.errorMessage?.let { error ->
+                            snackbarHostState.showSnackbar(error)
+                            viewModel.clearError()
+                        }
+                    }
 
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            if (isRegisterMode) {
-                                BaroBaroRegisterScreen(
-                                    onRegister = { route, cargo, price, desc ->
-                                        viewModel.addOrder(route, cargo, price, desc)
-                                        isRegisterMode = false // 등록 완료 후 목록으로 전환
-                                    },
-                                    onCancel = {
-                                        // 취소 시 뒤로 가기 또는 목록으로 전환
-                                        if (arguments?.containsKey("IS_REGISTER_MODE") == true) {
-                                            requireActivity().onBackPressedDispatcher.onBackPressed()
-                                        } else {
-                                            isRegisterMode = false
+                    Scaffold(
+                        snackbarHost = { SnackbarHost(snackbarHostState) },
+                        modifier = Modifier.fillMaxSize()
+                    ) { innerPadding ->
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            val selectedOrder = viewModel.selectedOrder
+                            var isRegisterMode by remember { mutableStateOf(initialRegisterMode) }
+
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                if (isRegisterMode) {
+                                    BaroBaroRegisterScreen(
+                                        // 💡 파라미터에 명시적 타입(String) 추가하여 타입 추론 에러 해결
+                                        onRegister = { route: String, cargo: String, price: String, desc: String ->
+                                            viewModel.addOrder(route, cargo, price, desc)
+                                            if (viewModel.errorMessage == null) {
+                                                isRegisterMode = false
+                                            }
+                                        },
+                                        onCancel = {
+                                            if (arguments?.containsKey("IS_REGISTER_MODE") == true) {
+                                                requireActivity().onBackPressedDispatcher.onBackPressed()
+                                            } else {
+                                                isRegisterMode = false
+                                            }
                                         }
-                                    }
-                                )
-                            } else {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "실시간 화물 --프레그먼트47--대기 목록",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
-                                    )
-                                    Button(onClick = { isRegisterMode = true }) {
-                                        Text("오더등록--PRg72-")
-                                    }
-                                }
-
-                                if (selectedOrder == null) {
-                                    BaroBaroListScreen(
-                                        orderList = viewModel.orderList,
-                                        onItemClick = { viewModel.selectOrder(it) },
-                                        viewModel = viewModel
                                     )
                                 } else {
-                                    // 상세 화면 호출 부분
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = "실시간 화물 --프레그먼트47--대기 목록",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
+                                        )
+                                        Button(onClick = { isRegisterMode = true }) {
+                                            Text("오더등록--PRg72-")
+                                        }
+                                    }
+
+                                    if (selectedOrder == null) {
+                                        BaroBaroListScreen(
+                                            orderList = viewModel.orderList,
+                                            onItemClick = { viewModel.selectOrder(it) },
+                                            viewModel = viewModel
+                                        )
+                                    } else {
+                                        // 상세 화면 호출 부분
+                                    }
                                 }
                             }
                         }
@@ -99,7 +112,7 @@ class BaroBaroFragment : Fragment() {
     }
 }
 
-// 오더 직접 입력 폼 컴포저블 화면
+// 오더 직접 입력 폼 컴포저블 화면 (중복 선언 방지용 단일 정의)
 @Composable
 fun BaroBaroRegisterScreen(
     onRegister: (String, String, String, String) -> Unit,
@@ -122,7 +135,7 @@ fun BaroBaroRegisterScreen(
         OutlinedTextField(
             value = route,
             onValueChange = { route = it },
-            label = { Text("운행 프래그먼트 아래 등록 --함수122--구간 (예: 인만천 ➔ 대구)") },
+            label = { Text("운행 구간 (예: 인천 ➔ 대구)") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
