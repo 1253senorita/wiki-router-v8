@@ -8,6 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.teminator.mypadnoteone.domain.model.DispatchOrder
+
+
 
 // Fragment와 호환되도록 orderList와 onItemClick을 받도록 수정
 @Composable

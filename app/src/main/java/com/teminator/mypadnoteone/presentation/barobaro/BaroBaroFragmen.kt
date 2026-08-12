@@ -14,6 +14,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.teminator.mypadnoteone.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+import com.teminator.mypadnoteone.domain.model.DispatchOrder
+
+
 
 @AndroidEntryPoint
 class BaroBaroFragment : Fragment() {
