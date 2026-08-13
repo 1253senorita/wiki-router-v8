@@ -5,10 +5,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.teminator.mypadnoteone.R
 import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroFragment
-
-
-
-
+import com.terminator.mypadnoteone.presentation.client.AiFragment
+import com.terminator.mypadnoteone.presentation.client.ClientFragment
 
 class MainNavigator(
     private val activity: AppCompatActivity,
@@ -18,7 +16,6 @@ class MainNavigator(
     /**
      * 바로바로 화면으로 이동 (목록 모드 또는 등록 모드 인자 전달)
      */
-    // 🔥 [추가] 버튼 2 클릭 믈리언  주입
     fun navigateToBaroBaro(isRegisterMode: Boolean) {
         hideMainUI()
 
@@ -33,36 +30,65 @@ class MainNavigator(
             .addToBackStack("BAROBARO")
             .commit()
     }
-    // 🔥 [추가]   식탁에 식착보를     메니져 아줌마가  갈아주고  그리고  세  식착보를  깔아 서  하이드
 
 
 
 
 
 
-    // 🔥 [추가] 상단바의 고객페이지 버튼 클릭 리스너 연결
-    fun navigateToClient() {
+
+
+    /**
+     * 🔥 [통합] 고객 및 AI 보미 관제 페이지로 이동 (진입 모드 타입 인자 전달)
+     */
+    fun navigateToClientUnified(viewType: String) {
         hideMainUI()
-        val fragment = com.terminator.mypadnoteone.presentation.client.ClientFragment()
+
+        val fragment = AiFragment().apply {
+            arguments = Bundle().apply {
+                putString("VIEW_TYPE", viewType)
+            }
+        }
 
         activity.supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
-            .addToBackStack("CLIENT")
+            .addToBackStack("CLIENT_UNIFIED")
             .commit()
     }
-    // 🔥 [추가]
+
+
+
+    /**
+     * 🔥 [통합] 고객 및 AI 보미 관제 페이지로 이동 (진입 모드 타입 인자 전달)
+     */
+    fun navigateToClientAI(viewType: String) {
+        hideMainUI()
+
+        val fragment = ClientFragment().apply {
+            arguments = Bundle().apply {
+                putString("VIEW_TYPE", viewType)
+            }
+        }
+
+        activity.supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack("CLIENT_UNIFIED")
+            .commit()
+    }
+
+
 
     /**
      * 메인 대시보드 UI 숨기기 (뚜껑 닫기)
      */
     private fun hideMainUI() {
         binding.fragmentContainer.visibility = View.VISIBLE
-        binding.layoutTopBar.visibility = View.GONE         //  이 부분때문에 상단바 전체가 통째로 숨겨집니다!
-        binding.layoutCategoryScroll.visibility = View.GONE // 카테고리 탭 바 숨김
-        binding.layoutTestMetadata.visibility = View.GONE   // 시스템 상태 패널 숨김
-        binding.dividerTop.visibility = View.GONE           // 구분선 숨김
-        binding.scrollViewMain.visibility = View.GONE       // 메인 카드 스크롤뷰 숨김
-        binding.layoutBottomNav.visibility = View.GONE      // 하단 네비게이션바 숨김
+        binding.layoutTopBar.visibility = View.GONE
+        binding.layoutCategoryScroll.visibility = View.GONE
+        binding.layoutTestMetadata.visibility = View.GONE
+        binding.dividerTop.visibility = View.GONE
+        binding.scrollViewMain.visibility = View.GONE
+        binding.layoutBottomNav.visibility = View.GONE
     }
 
     /**

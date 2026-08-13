@@ -83,11 +83,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
-
-
-
-
         // 🔥 바로바로 배차 목록 화면 띄우기 (뚜껑 덮기: 목록 모드)
         binding.cardBaroBaroBOTT.setOnClickListener {
             navigator.navigateToBaroBaro(isRegisterMode = false)
@@ -98,24 +93,18 @@ class MainActivity : AppCompatActivity() {
             navigator.navigateToBaroBaro(isRegisterMode = true)
             Toast.makeText(this, "화물 오더 등록 화면으로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
-        // 🔥 위에는  메인의 다른  버튼
 
-
-
-
-        // 🔥 [추가] 상단바의 고객페이지 버튼 클릭 리스너 연결
+        // 🔥 [수정] 상단바 고객 페이지 버튼 -> 뚜껑 닫고 "CLIENT_PAGE" 모드로 진입
         binding.btnOpenClient.setOnClickListener {
-            navigator.navigateToClient()
+            navigator.navigateToClientUnified("CLIENT_PAGE")
             Toast.makeText(this, "고객(클라이언트) 페이지로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // AI 보미 & 위키 라우터 관제 카드 클릭 시 고객/클라이언트 페이지로 진입 (뚜껑 덮기)
+        // 🔥 [수정] AI 보미 관제 카드 -> 뚜껑 닫고 "AI_BOMI_MONITOR" 모드로 진입
         binding.cardWikiRouterClient.setOnClickListener {
-            navigator.navigateToClient()
+            navigator.navigateToClientAI("AI_BOMI_MONITOR")
             Toast.makeText(this, "AI 보미 관제 페이지로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
-
-
 
         setupOnBackPressed()
     }
