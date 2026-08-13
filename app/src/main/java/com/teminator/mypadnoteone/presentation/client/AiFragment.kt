@@ -12,12 +12,12 @@ import androidx.fragment.app.viewModels
 import com.teminator.mypadnoteone.presentation.main.MainActivity
 //import com.terminator.mypadnoteone.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
-import com.teminator.mypadnoteone.presentation.client.ClientViewModel
+import com.teminator.mypadnoteone.presentation.client.AIClientViewModel
 
 @AndroidEntryPoint
 class AiFragment : Fragment() {
 
-    private val viewModel: ClientViewModel by viewModels()
+    private val viewModel: AIClientViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

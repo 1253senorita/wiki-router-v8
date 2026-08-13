@@ -12,33 +12,30 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ClientViewModel @Inject constructor(
-    private val interceptAndHoldOrderUseCase: WikiInterceptAndHoldOrderUseCase // ⭐ AI 보미 유즈케이스 주입!
+    private val interceptAndHoldOrderUseCase: WikiInterceptAndHoldOrderUseCase
 ) : ViewModel() {
 
-    // 고객이 요청한 내역이나 상태를 관리할 수 있는 변수
-    var clientStatusText by mutableStateOf("고객님, 환영합니다. -- AI-보미 시스템 대기 중...")
+    // 일반 고객 페이지 전용 상태 메시지
+    var clientStatusText by mutableStateOf("📦 [고객 대시보드] 환영합니다. 오더 요청 대기 중...")
         private set
 
     init {
-        // 뷰모델이 생성되자마자 AI 보미의 인터셉트 통로를 가동합니다!
-        startListeningToBomiAgent()
+        startListeningToClientOrders()
     }
 
-    private fun startListeningToBomiAgent() {
+    private fun startListeningToClientOrders() {
         viewModelScope.launch {
-            // 유즈케이스를 통해 위키 라우터 메시지 및 보미의 필터링 결과 관찰
             interceptAndHoldOrderUseCase { isAllowed, statusMessage ->
-                // AI 보미가 판별한 상태 메시지를 UI 상태에 실시간 반영
                 clientStatusText = if (isAllowed) {
-                    "[하이패스 통과] $statusMessage"
+                    "[고객 승인됨] $statusMessage"
                 } else {
-                    "[보미 홀드 중] $statusMessage"
+                    "[고객 대기/보류] $statusMessage"
                 }
             }
         }
     }
 
-    fun updateStatus(newText: String) {
+    fun updateClientStatus(newText: String) {
         clientStatusText = newText
     }
 }
