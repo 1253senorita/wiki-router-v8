@@ -3,6 +3,7 @@ package com.terminator.mypadnoteone.presentation.client
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
@@ -19,15 +20,17 @@ fun AIScreen(
     viewModel: AIClientViewModel,
     onBack: () -> Unit
 ) {
-    // 사용자가 입력 중인 텍스트 상태 관리 (채팅/명령어 입력용)
+    // 사용자가 입력 중인 텍스트 상태 관리
     var userInputText by remember { mutableStateOf("") }
 
-    // 예시 대화 내역 리스트 (나중에 ViewModel의 실제 대화 StateFlow와 연동하면 돼!)
-    val chatMessages = remember {
-        mutableStateListOf(
-            "🤖 [AI 보미]: 안녕하세요 오빠! AI 관제 시스템 대기 중입니다.",
-            "📡 [시스템]: 위키 라우터 연결 완료. 실시간 오더 모니터링 중..."
-        )
+    // 🔥 1. 채팅창 자동 스크롤을 위한 리스트 상태 선언
+    val listState = rememberLazyListState()
+
+    // 🔥 2. ViewModel의 chatMessages에 새로운 대화가 추가될 때마다 가장 아래(최신 대화)로 자동 스크롤 이동
+    LaunchedEffect(viewModel.chatMessages.size) {
+        if (viewModel.chatMessages.isNotEmpty()) {
+            listState.animateScrollToItem(viewModel.chatMessages.size - 1)
+        }
     }
 
     Column(
@@ -67,7 +70,7 @@ fun AIScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // --- 3. AI와 소통하는 채팅 / 메시지 로그창 (말하고 띄우는 공간) ---
+        // --- 3. AI와 소통하는 채팅 / 메시지 로그창 (ViewModel의 chatMessages와 연동) ---
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -75,12 +78,14 @@ fun AIScreen(
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
         ) {
             LazyColumn(
+                state = listState, // 👈 자동 스크롤 상태 연결 완료!
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(chatMessages) { message ->
+                // 🔥 화면 자체 변수 대신 ViewModel의 chatMessages 리스트를 직접 바라봅니다.
+                items(viewModel.chatMessages) { message ->
                     Surface(
                         color = MaterialTheme.colorScheme.surface,
                         shape = MaterialTheme.shapes.medium,
@@ -119,14 +124,8 @@ fun AIScreen(
             IconButton(
                 onClick = {
                     if (userInputText.isNotBlank()) {
-                        // 사용자가 입력한 메시지를 대화창에 추가
-                        chatMessages.add("👤 [오빠]: $userInputText")
-
-                        // AI 보미가 대답하는 시뮬레이션 (나중에 ViewModel 연동)
-                        chatMessages.add("🤖 [AI 보미]: \"$userInputText\" 지시를 접수했어요! 처리 중입니다.")
-
-                        // 뷰모델 상태도 함께 갱신
-                        viewModel.updateAiStatus("진행 중인 작업: $userInputText")
+                        // 🔥 뷰모델의 전용 함수 호출로 사용자 메시지 전달 및 보미 응답 처리 일원화
+                        viewModel.sendUserMessage(userInputText)
 
                         userInputText = "" // 입력창 초기화
                     }
@@ -152,7 +151,7 @@ fun AIScreen(
             Button(
                 onClick = {
                     viewModel.updateAiStatus("🤖 AI 관제 시스템 신규 오더 상태가 갱신되었습니다!")
-                    chatMessages.add("📡 [시스템]: 새로운 화물 오더 데이터가 연동되었습니다.")
+                    // 필요하다면 뷰모델 상태나 메시지 추가 연동 가능
                 },
                 modifier = Modifier.weight(1f)
             ) {
@@ -163,7 +162,7 @@ fun AIScreen(
                 onClick = onBack,
                 modifier = Modifier.weight(1f)
             ) {
-                Text("메인으로 돌아가기")
+                Text("메인 화면으로 돌아가기")
             }
         }
     }
