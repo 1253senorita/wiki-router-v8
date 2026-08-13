@@ -171,6 +171,43 @@
                 android:textColor="#333333"
                 android:layout_marginBottom="16dp"/>
 
+
+            <!-- 서비스 바로가기 카드 5 (AI 보미 / 위키 라우터 관제 센터) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardWikiRouterClient"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="#E8F5E9">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🤖 AI 보미 &amp; 위키 라우터 관제"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#2E7D32"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="실시간 오더 필터링 및 소켓 통신 상태 확인"
+                        android:textSize="12sp"
+                        android:textColor="#666666"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
             <!-- 서비스 바로가기 카드 1 (무전기) -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -200,6 +237,9 @@
                         android:textColor="#666666"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+
+
 
             <!-- 서비스 바로가기 카드 2 (화물 오더 등록 바로가기) -->
             <androidx.cardview.widget.CardView

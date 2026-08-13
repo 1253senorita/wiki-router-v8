@@ -109,6 +109,14 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "고객(클라이언트) 페이지로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 
+        // AI 보미 & 위키 라우터 관제 카드 클릭 시 고객/클라이언트 페이지로 진입 (뚜껑 덮기)
+        binding.cardWikiRouterClient.setOnClickListener {
+            navigator.navigateToClient()
+            Toast.makeText(this, "AI 보미 관제 페이지로 진입합니다.", Toast.LENGTH_SHORT).show()
+        }
+
+
+
         setupOnBackPressed()
     }
 
