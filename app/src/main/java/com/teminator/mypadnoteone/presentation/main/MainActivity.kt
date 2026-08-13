@@ -99,6 +99,12 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "화물 오더 등록 화면으로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 
+        // 🔥 [추가] 상단바의 고객페이지 버튼 클릭 리스너 연결
+        binding.btnOpenClient.setOnClickListener {
+            navigator.navigateToClient()
+            Toast.makeText(this, "고객(클라이언트) 페이지로 진입합니다.", Toast.LENGTH_SHORT).show()
+        }
+
         setupOnBackPressed()
     }
 

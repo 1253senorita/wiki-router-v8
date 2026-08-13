@@ -6,6 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.teminator.mypadnoteone.R
 import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroFragment
 
+
+
+
+
 class MainNavigator(
     private val activity: AppCompatActivity,
     private val binding: com.teminator.mypadnoteone.databinding.ActivityMainBinding
@@ -22,29 +26,39 @@ class MainNavigator(
                 putBoolean("IS_REGISTER_MODE", isRegisterMode)
             }
         }
-
-
         /**
          *   제일 중요  뚜껑작업
          */
-
         activity.supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .addToBackStack("BAROBARO")
             .commit()
     }
 
+
+
+    fun navigateToClient() {
+        hideMainUI()
+        val fragment = com.terminator.mypadnoteone.presentation.client.ClientFragment()
+
+        activity.supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack("CLIENT")
+            .commit()
+    }
+
+
     /**
      * 메인 대시보드 UI 숨기기 (뚜껑 닫기)
      */
     private fun hideMainUI() {
         binding.fragmentContainer.visibility = View.VISIBLE
-        binding.layoutTopBar.visibility = View.GONE
-        binding.layoutCategoryScroll.visibility = View.GONE
-        binding.layoutTestMetadata.visibility = View.GONE
-        binding.dividerTop.visibility = View.GONE
-        binding.scrollViewMain.visibility = View.GONE
-        binding.layoutBottomNav.visibility = View.GONE
+        binding.layoutTopBar.visibility = View.GONE         //  이 부분때문에 상단바 전체가 통째로 숨겨집니다!
+        binding.layoutCategoryScroll.visibility = View.GONE // 카테고리 탭 바 숨김
+        binding.layoutTestMetadata.visibility = View.GONE   // 시스템 상태 패널 숨김
+        binding.dividerTop.visibility = View.GONE           // 구분선 숨김
+        binding.scrollViewMain.visibility = View.GONE       // 메인 카드 스크롤뷰 숨김
+        binding.layoutBottomNav.visibility = View.GONE      // 하단 네비게이션바 숨김
     }
 
     /**

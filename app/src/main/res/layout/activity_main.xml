@@ -49,6 +49,18 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+        <!-- 🔥 [신규 추가] 고객(클라이언트) 페이지 진입 버튼 (로그아웃 버튼 왼쪽) -->
+        <Button
+            android:id="@+id/btnOpenClient"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="고객페이지"
+            android:textSize="11sp"
+            android:backgroundTint="#F9F5FF"
+            android:textColor="#6200EE"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- 기존 로그아웃 버튼 -->
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="wrap_content"
@@ -312,7 +324,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="홈"
+            text="홈"
             android:gravity="center"
             android:textSize="11sp"
             android:textColor="#FF0000"
