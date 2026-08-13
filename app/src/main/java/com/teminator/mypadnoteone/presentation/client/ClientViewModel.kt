@@ -11,7 +11,7 @@ import javax.inject.Inject
 class ClientViewModel @Inject constructor() : ViewModel() {
 
     // 고객이 요청한 내역이나 상태를 관리할 수 있는 변수 예시
-    var clientStatusText by mutableStateOf("고객님, 환영합니다. 화물을 의뢰해 주세요.")
+    var clientStatusText by mutableStateOf("고객님, 환영합니다.-- C-VM파일 34--0화물을 의뢰해 주세요.")
         private set
 
     fun updateStatus(newText: String) {

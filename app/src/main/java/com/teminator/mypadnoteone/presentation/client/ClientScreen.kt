@@ -22,7 +22,7 @@ onBack: () -> Unit
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "📦 고객(클라이언트) 대시보드",
+            text = "📦 고객(클라이언트) =CS스크린파일 25--대시보드",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -42,7 +42,7 @@ onBack: () -> Unit
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { viewModel.updateStatus("새로운 화물 배차 요청이 등록되었습니다!") },
+            onClick = { viewModel.updateStatus("새로운 화물 배차 요청이 -CS스크린파일 45-등록되었습니다!") },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("화물 오더 신규 등록 테스트")

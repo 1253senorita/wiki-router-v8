@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "웹페이지를 열 수 없습니다.", Toast.LENGTH_SHORT).show()
             }
         }
-        // 🔥 위에는  메인의 다른  버튼
+
 
 
 
@@ -98,6 +98,10 @@ class MainActivity : AppCompatActivity() {
             navigator.navigateToBaroBaro(isRegisterMode = true)
             Toast.makeText(this, "화물 오더 등록 화면으로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
+        // 🔥 위에는  메인의 다른  버튼
+
+
+
 
         // 🔥 [추가] 상단바의 고객페이지 버튼 클릭 리스너 연결
         binding.btnOpenClient.setOnClickListener {
