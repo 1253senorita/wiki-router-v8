@@ -44,10 +44,10 @@ fun AIScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { viewModel.updateStatus("새로운 화물 배차 요청이 -CS스크린파일 45-등록되었습니다!") },
+            onClick = { viewModel.updateStatus(" 요청이 AI스크린파일 45-등록되었습니다!") },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("화물 오더 신규 등록 테스트")
+            Text("AI화물 오더 신규 등록 테스트")
         }
 
         Spacer(modifier = Modifier.height(8.dp))
