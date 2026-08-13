@@ -108,4 +108,9 @@ dependencies {
 
     // 🔥 톰이 버전 관리를 통한 프래그먼트 KTX 의존성 추가
     implementation(libs.androidx.fragment.ktx)
+
+    // 🔥 버전 카탈로그 방식으로 MediaPipe LLM Inference 라이브러리 추가
+    implementation(libs.mediapipe.tasks.genai)
+
+
 }

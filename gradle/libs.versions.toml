@@ -33,6 +33,11 @@ ksp = "2.1.0-1.0.29"
 
 fragmentKtx = "1.8.5" # 👈 버전 정의
 
+# 🔥 MediaPipe GenAI 버전 정의
+mediapipe-tasks-genai = "0.10.14"
+
+
+
 
 
 [libraries]
@@ -94,6 +99,11 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" } # 👈 라이브러리 매핑
+
+# 🔥 MediaPipe 라이브러리 등록
+mediapipe-tasks-genai = { module = "com.google.mediapipe:tasks-genai", version.ref = "mediapipe-tasks-genai" }
+
+
 
 
 [plugins]
