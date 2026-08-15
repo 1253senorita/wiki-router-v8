@@ -22,17 +22,17 @@ fun BaroBaroDetailScreen(
     val context = LocalContext.current
 
     Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
-        Text("화물 상세 정보", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("디테일  스크린 화물 상세 정보", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(10.dp)) {
                 Text("경로: ${order.route}", fontWeight = FontWeight.Bold)
                 Text("정보: ${order.cargoInfo}")
                 Text("요금: ${order.price}", color = Color(0xFF2E7D32))
                 if (!order.description.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("요청사항: ${order.description}", fontSize = 14.sp, color = Color.Gray)
+                    Text("요청사항: ${order.description}", fontSize = 10.sp, color = Color.Gray)
                 }
             }
         }

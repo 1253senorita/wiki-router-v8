@@ -85,19 +85,33 @@ class BaroBaroFragment : Fragment() {
                                         )
                                     } else {
                                         if (selectedOrder == null) {
+                                            // 상단 영역: 타이틀, 검색창, 오더등록 버튼을 가로(Row)로 배치
                                             Row(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                                                horizontalArrangement = Arrangement.SpaceBetween
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                                             ) {
-                                                Text(
-                                                    text = "실시간 화물 --프레그먼트47--대기 목록",
-                                                    style = MaterialTheme.typography.titleMedium,
-                                                    modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
+                                                // 1. 검색창을 Row 안에서 빈 공간을 채우도록 배치
+                                                OutlinedTextField(
+                                                    value = viewModel.searchQuery,
+                                                    onValueChange = { viewModel.updateSearchQuery(it) },
+                                                    label = { Text("운행 구간 또는 화물 검색...") },
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .height(50.dp),
+                                                    singleLine = true,
+                                                    textStyle = MaterialTheme.typography.bodySmall
                                                 )
-                                                Button(onClick = { isRegisterMode = true }) {
-                                                    Text("오더등록--PRg72-")
+
+                                                // 2. 오더등록 버튼
+                                                Button(
+                                                    onClick = { isRegisterMode = true },
+                                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                                                    modifier = Modifier.height(40.dp)
+                                                ) {
+                                                    Text("오더등록", style = MaterialTheme.typography.labelMedium)
                                                 }
                                             }
 
@@ -133,7 +147,6 @@ class BaroBaroFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // 안전한 형변환을 통해 MainActivity 의존성 에러 원천 차단
         try {
             val mainActivityClass = Class.forName("com.terminator.mypadnoteone.presentation.main.MainActivity")
             if (mainActivityClass.isInstance(activity)) {
