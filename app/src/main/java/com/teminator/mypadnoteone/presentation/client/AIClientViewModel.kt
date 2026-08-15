@@ -18,6 +18,8 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.net.URL
 import javax.inject.Inject
+import java.net.HttpURLConnection
+
 
 @HiltViewModel
 class AIClientViewModel @Inject constructor(
@@ -165,27 +167,61 @@ class AIClientViewModel @Inject constructor(
         }
     }
 
+
+
+
+
+
     /**
      * 🔥 [안전한 다운로드 함수] 임시 파일(.tmp)로 먼저 받은 뒤, 100% 성공 시에만 정식 파일명으로 교체
      * 중간에 끊기거나 실패하면 찌꺼기 임시 파일은 스스로 청소합니다.
      */
-    private fun downloadFileSafely(urlString: String, tempFile: File, targetFile: File) {
-        try {
-            val url = URL(urlString)
-            val connection = url.openConnection()
-            connection.connect()
 
-            connection.getInputStream().use { input ->
-                FileOutputStream(tempFile).use { output ->
-                    val buffer = ByteArray(8192)
-                    var bytesRead: Int
-                    while (input.read(buffer).also { bytesRead = it } != -1) {
-                        output.write(buffer, 0, bytesRead)
+    private fun downloadFileSafely(urlString: String, tempFile: File, targetFile: File) {
+        var connection: HttpURLConnection? = null
+        try {
+            var currentUrl = urlString
+            var redirectCount = 0
+
+            // 🔥 허깅페이스 등 리다이렉트를 추적하기 위한 루프
+            while (redirectCount < 5) {
+                val url = URL(currentUrl)
+                connection = url.openConnection() as HttpURLConnection
+                connection.instanceFollowRedirects = false // 수동으로 리다이렉트 추적
+                connection.connect()
+
+                val responseCode = connection.responseCode
+                if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP ||
+                    responseCode == HttpURLConnection.HTTP_MOVED_PERM ||
+                    responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
+                    val newUrl = connection.getHeaderField("Location")
+                    if (newUrl != null) {
+                        currentUrl = newUrl
+                        redirectCount++
+                        connection.disconnect()
+                        continue
+                    }
+                }
+                break
+            }
+
+            connection?.let { conn ->
+                if (conn.responseCode != HttpURLConnection.HTTP_OK) {
+                    throw IOException("서버 응답 코드 오류: ${conn.responseCode}")
+                }
+
+                conn.inputStream.use { input ->
+                    FileOutputStream(tempFile).use { output ->
+                        val buffer = ByteArray(8192)
+                        var bytesRead: Int
+                        while (input.read(buffer).also { bytesRead = it } != -1) {
+                            output.write(buffer, 0, bytesRead)
+                        }
                     }
                 }
             }
 
-            // 다운로드가 정상 완료되면 기존 정식 파일을 삭제하고 임시 파일을 정식 파일명으로 변경
+            // 정상 완료 시 정식 파일로 교체
             if (targetFile.exists()) {
                 targetFile.delete()
             }
@@ -193,13 +229,17 @@ class AIClientViewModel @Inject constructor(
                 throw IOException("임시 파일을 정식 파일로 전환하는 데 실패했습니다.")
             }
         } catch (e: Exception) {
-            // 실패 시 남은 임시 찌꺼기 파일 삭제
             if (tempFile.exists()) {
                 tempFile.delete()
             }
             throw e
+        } finally {
+            connection?.disconnect()
         }
     }
+
+
+
 
     fun sendUserMessage(message: String) {
         if (message.isBlank()) return
