@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "mypadnoteone-a7ca4",
+    "public": "y",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

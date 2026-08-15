@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E4EBF5"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AeroRouter Channel Gateway"
+        android:textColor="#486581"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp" />
+
+    <!-- 사용자 ID 입력 -->
+    <EditText
+        android:id="@+id/etUserId"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#E4EBF5"
+        android:hint="사용자 ID (예: 펭귄)"
+        android:paddingHorizontal="16dp"
+        android:textColor="#333333"
+        android:textColorHint="#999999"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 권한 모드 또는 방 번호 입력 -->
+    <EditText
+        android:id="@+id/etModeOrRoom"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#E4EBF5"
+        android:hint="모드 또는 방 번호 (예: DEV_MASTER)"
+        android:paddingHorizontal="16dp"
+        android:textColor="#333333"
+        android:textColorHint="#999999"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 비밀번호 입력 -->
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#E4EBF5"
+        android:hint="비밀번호 (예: 1234)"
+        android:inputType="textPassword"
+        android:paddingHorizontal="16dp"
+        android:textColor="#333333"
+        android:textColorHint="#999999"
+        android:textSize="14sp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- [버튼 1] 권한 모드 인증 및 입장 (get_oi) -->
+    <Button
+        android:id="@+id/btnAuthJoin"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:backgroundTint="#627D98"
+        android:text="권한 모드 접속 (get_oi)"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp" />
+
+    <!-- [버튼 2] 일반 룸 수동 입장 (join-room) -->
+    <Button
+        android:id="@+id/btnRoomJoin"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:backgroundTint="#334E68"
+        android:text="일반 방 수동 입장 (join-room)"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold" />
+
+</LinearLayout>

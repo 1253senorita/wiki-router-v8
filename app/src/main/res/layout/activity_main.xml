@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="#FAFAFA"
+    tools:context=".presentation.main.MainActivity">
+
+    <!-- 🔥 바로바로 배차 프래그먼트가 쏙 들어갈 빈 방(컨테이너) 영역 (평소에는 gone으로 숨김) -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 1. 상단 앱바 -->
+    <LinearLayout
+        android:id="@+id/layout_top_bar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WIKI-Service"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FF0000"
+            android:layout_marginEnd="16dp"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- 🔥 [신규 추가] 고객(클라이언트) 페이지 진입 버튼 (로그아웃 버튼 왼쪽) -->
+        <Button
+            android:id="@+id/btnOpenClient"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="고객페이지"
+            android:textSize="11sp"
+            android:backgroundTint="#F9F5FF"
+            android:textColor="#6200EE"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- 기존 로그아웃 버튼 -->
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="로그아웃"
+            android:textSize="11sp"
+            android:backgroundTint="#F0F0F0"
+            android:textColor="#333333" />
+    </LinearLayout>
+
+    <!-- 2. 상단 카테고리/필터 탭 바 -->
+    <HorizontalScrollView
+        android:id="@+id/layout_category_scroll"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:scrollbars="none"
+        android:background="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@+id/layout_top_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp">
+
+            <Button
+                android:id="@+id/btnOpenPtt"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="무전기 이동"
+                android:textSize="12sp"
+                android:backgroundTint="#000000"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btnWIKIPtt"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="wiki라우터 이동"
+                android:textSize="12sp"
+                android:backgroundTint="#F0F0F0"
+                android:textColor="#333333"
+                android:layout_marginEnd="8dp"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- 3. 파이어베이스 자동 빌드/테스트 봇 감지용 상태 정보 패널 -->
+    <LinearLayout
+        android:id="@+id/layout_test_metadata"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:background="#EFEFEF"
+        app:layout_constraintTop_toBottomOf="@+id/layout_category_scroll"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tvRobotTestStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="[System Status] Clean Architecture &amp; Firebase Test Active"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#333333" />
+    </LinearLayout>
+
+    <!-- 구분선 -->
+    <View
+        android:id="@+id/divider_top"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        app:layout_constraintTop_toBottomOf="@+id/layout_test_metadata"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 4. 메뉴 카드들이 들어갈 대시보드 영역 (ScrollView) -->
+    <ScrollView
+        android:id="@+id/scrollViewMain"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@+id/divider_top"
+        app:layout_constraintBottom_toTopOf="@+id/layout_bottom_nav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 안내 텍스트 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="원하시는 메뉴를 --메인XML156--선택해 주세요."
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="16dp"/>
+
+
+            <!-- 서비스 바로가기 카드 5 (AI 보미 / 위키 라우터 관제 센터) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardWikiRouterClient"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="#E8F5E9">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🤖 AI 보미 &amp; 위키 라우터 관제"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#2E7D32"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="실시간 오더 필터링 및 소켓 통신 상태 확인"
+                        android:textSize="12sp"
+                        android:textColor="#666666"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 서비스 바로가기 카드 1 (무전기) -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="#FFFFFF">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📻 실시간 무전기 서비스"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
+                        android:layout_marginBottom="4dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PTT 기반 실시간 음성 통신 화면으로 이동합니다."
+                        android:textSize="12sp"
+                        android:textColor="#666666"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+
+
+            <!-- 서비스 바로가기 카드 2 (화물 오더 등록 바로가기) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardRegisterOrder"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="#F9F5FF">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📝 새 화물 오더 직접 등록 메인xml213"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#6200EE"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="카드등록메인 콤토넌트와 메인ATB 97 라인 버튼 이덴트 ."
+                        android:textSize="12sp"
+                        android:textColor="#666666"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <!-- 서비스 바로가기 카드 3 (파이어베이스 다운로드 및 호스팅 안내) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardFirebaseDownload"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                android:clickable="true"
+                android:focusable="true">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="#FFF8F8">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📦 파이어베이스 다운로드 및 호스팅"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#FF0000"
+                        android:layout_marginBottom="4dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="최신 빌드 파일 다운로드 및 안내 페이지 열기"
+                        android:textSize="12sp"
+                        android:textColor="#666666"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 서비스 바로가기 카드 4 (바로바로 화물 배차) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardBaroBaroBOTT"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="#F0F8FF">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🚚 --바로바로 메인XML261--화물 배차 서비스연결 호출은 메인a92"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#0066CC"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="실시간 화물 콜 대기 목록 및 상세 배차 관리"
+                        android:textSize="12sp"
+                        android:textColor="#666666"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 5. 하단 네비게이션 바 -->
+    <LinearLayout
+        android:id="@+id/layout_bottom_nav"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            text="홈"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textColor="#FF0000"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="다운로드/안내"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textColor="#606060"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="추가탭"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textColor="#606060"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="보관함"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textColor="#606060"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

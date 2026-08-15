@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false" />
+
+    <application
+        android:name=".MyPadNoteApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.MyPadNoteOne">
+
+        <!-- 1. 앱 실행 시 가장 먼저 뜨는 첫 화면: 스플래시 액티비티 -->
+        <activity
+            android:name=".presentation.splash.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MyPadNoteOne"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 2. 인증 화면 -->
+        <activity
+            android:name=".presentation.auth.AuthActivity"
+            android:exported="false" />
+
+        <!-- 3. 메인 화면 (스플래시 체크 후 진입) -->
+        <activity
+            android:name=".presentation.main.MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".presentation.wiki.ui.WikiActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- 4. AeroRouter 방/모드 선택 진입 화면 (메인에서 버튼을 눌러야 진입) -->
+        <activity
+            android:name=".presentation.aerorouter.ui.AeroRouterEntryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- 실시간 PTT 무전기 메인 액티비티 -->
+        <activity
+            android:name=".presentation.aerorouter.ui.AeroRouterActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- StellarNote PTT 백그라운드 무전 포그라운드 서비스 -->
+        <service
+            android:name=".service.PttService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+
+
+
+
+
+
+
+    </application>
+</manifest>
