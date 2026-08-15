@@ -47,24 +47,28 @@ fun BaroBaroListScreen(
 }
 
 
-
 @Composable
 fun OrderCardItem(
     order: DispatchOrder,
     onItemClick: () -> Unit,
     onAcceptClick: () -> Unit
 ) {
+    // 💡 route 문자열을 '➔' 또는 지정된 구분자를 기준으로 출발지와 도착지로 분리 (예: "서울 ➔ 부산" 형태 대응)
+    val routeParts = order.route.split("➔").map { it.trim() }
+    val departure = routeParts.getOrNull(0) ?: order.route
+    val destination = routeParts.getOrNull(1) ?: ""
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp), // 카드 간의 상하 간격을 좁힘 (기존 8dp -> 4dp)
+            .padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = onItemClick
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp) // 내부 여백을 컴팩트하게 축소 (기존 16dp -> 상하 8dp)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
             // 1. 기본 식별 및 구간 정보 (한 줄 컴팩트 배치)
             Row(
@@ -77,14 +81,53 @@ fun OrderCardItem(
             }
             Spacer(modifier = Modifier.height(3.dp))
 
-            Text(
-                text = "구간--ls36--: ${order.route}",
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 1
-            )
+            // 💡 2. 구간 정보를 출발지와 도착지 2개의 가로(Row) 배치로 분리 (차후 주소 검색 필드 확장 대비)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 출발지 영역
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
+                    Text(
+                        text = "출발: $departure",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)
+                    )
+                }
+
+                // 중간 화살표 아이콘 또는 구분 기호
+                Text(
+                    text = "➔",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+
+                // 도착지 영역
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
+                    Text(
+                        text = "도착: ${if (destination.isNotBlank()) destination else "미정"}",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(3.dp))
 
-            // 2. 화물 정보 및 운임 비용 (한 줄로 묶어서 높이 절약)
+            // 3. 화물 정보 및 운임 비용 (한 줄로 묶어서 높이 절약)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -105,7 +148,7 @@ fun OrderCardItem(
                 )
             }
 
-            // 3. 비고란 (있을 때만 아주 얇게 표시)
+            // 4. 비고란 (있을 때만 아주 얇게 표시)
             if (order.description.isNotBlank()) {
                 Spacer(modifier = Modifier.height(3.dp))
                 Text(
@@ -116,7 +159,7 @@ fun OrderCardItem(
                 )
             }
 
-            // 4. 상태별 액션 버튼 (대기중일 때 우측에 콤팩트하게 배치)
+            // 5. 상태별 액션 버튼 (대기중일 때 우측에 콤팩트하게 배치)
             if (order.status == "대기중") {
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -126,7 +169,7 @@ fun OrderCardItem(
                     Button(
                         onClick = onAcceptClick,
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 3.dp),
-                        modifier = Modifier.height(30.dp) // 버튼 높이를 강제로 낮춤
+                        modifier = Modifier.height(30.dp)
                     ) {
                         Text("오더 수락", fontSize = 11.sp)
                     }

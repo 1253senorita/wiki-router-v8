@@ -27,14 +27,18 @@ class BaroBaroViewModel @Inject constructor(
         searchQuery = query
     }
 
+    // 💡 최신 등록된 항목이 위로 오도록 역순(Reversed)으로 리스트 정렬 및 필터링 적용
     val filteredOrderList: List<DispatchOrder>
-        get() = if (searchQuery.isBlank()) {
-            _orderList
-        } else {
-            _orderList.filter {
-                it.route.contains(searchQuery, ignoreCase = true) ||
-                        it.cargoInfo.contains(searchQuery, ignoreCase = true)
+        get() {
+            val list = if (searchQuery.isBlank()) {
+                _orderList
+            } else {
+                _orderList.filter {
+                    it.route.contains(searchQuery, ignoreCase = true) ||
+                            it.cargoInfo.contains(searchQuery, ignoreCase = true)
+                }
             }
+            return list.reversed()
         }
 
     var selectedOrder by mutableStateOf<DispatchOrder?>(null)
@@ -43,7 +47,6 @@ class BaroBaroViewModel @Inject constructor(
     var errorMessage by mutableStateOf<String?>(null)
         private set
 
-    // 💡 [신규] 메모리 공간 마련 및 대규모 데이터 처리 상태 토스트용 메시지
     var memoryToastMessage by mutableStateOf<String?>(null)
         private set
 
@@ -77,14 +80,12 @@ class BaroBaroViewModel @Inject constructor(
     private fun loadOrders() {
         viewModelScope.launch {
             try {
-                // 💡 대규모 데이터 로드 전 메모리 확보 안내 토스트 트리거
                 memoryToastMessage = "⚠️ 대규모 화물 데이터 메모리 공간 마련 중..."
 
                 val orders = repository.getOrders()
                 _orderList.clear()
 
                 if (orders.isEmpty()) {
-                    // 🚀 [500개 오더 폭발적 자동 생성 루프]
                     val regions = listOf("서울", "인천", "경기", "부산", "대구", "대전", "광주", "울산", "강원", "충남", "전북", "경남", "제주", "경북", "전남")
                     val cargoTypes = listOf("1톤 다스퀵 / 박스", "2.5톤 윙바디", "5톤 카고 / 파레트", "11톤 윙바디 / 톤백", "5톤 냉동탑차", "25톤 대형 트레일러")
                     val prices = listOf("130,000원", "180,000원", "250,000원", "350,000원", "480,000원", "520,000원", "750,000원")
@@ -146,6 +147,7 @@ class BaroBaroViewModel @Inject constructor(
                     description = description
                 )
                 repository.addOrder(newOrder)
+                // 리스트 끝에 추가하면 reversed()에 의해 화면 최상단에 노출됩니다.
                 _orderList.add(newOrder)
             } catch (e: Exception) {
                 errorMessage = "오더 등록 실패: ${e.localizedMessage}"
