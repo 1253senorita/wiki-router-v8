@@ -1,4 +1,4 @@
-package com.terminator.mypadnoteone.presentation.barobaro.room
+package com.teminator.mypadnoteone.presentation.barobaro.room
 
 import android.os.Bundle
 import android.view.LayoutInflater

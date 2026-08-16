@@ -1,6 +1,8 @@
-package com.terminator.mypadnoteone.presentation.barobaro.room
+package com.teminator.mypadnoteone.presentation.barobaro.room
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +18,7 @@ fun MatchingRoomScreen(
     // 뷰모델의 상태들을 관찰 (State 연동)
     val roomStatus = viewModel.roomStatus
     val lastLogMessage = viewModel.lastLogMessage
+    var inputMessage by remember { mutableStateOf("") }
 
     // 화면이 처음 켜질 때 세컨드 룸 통신 파이프 연결 시도
     LaunchedEffect(roomId) {
@@ -88,14 +91,56 @@ fun MatchingRoomScreen(
             }
         }
 
-        // 3. 하단 액션 버튼 영역 (상태 업데이트 및 통신 확인)
-        Button(
-            onClick = {
-                viewModel.updateRoomAction("운행 진행 중 상태 전송")
-            },
-            modifier = Modifier.fillMaxWidth()
+        // 3. 하단 액션 및 실시간 대화 입력 바 영역
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("운행 상태 업데이트 / 신호 보내기")
+            // 실시간 메시지 입력 필드 및 전송 버튼
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = inputMessage,
+                    onValueChange = { inputMessage = it },
+                    placeholder = { Text("상대방에게 전달할 정보/메시지 입력...") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    maxLines = 1
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                IconButton(
+                    onClick = {
+                        if (inputMessage.isNotBlank()) {
+                            viewModel.sendCustomMessage(inputMessage)
+                            inputMessage = ""
+                        }
+                    },
+                    modifier = Modifier.size(56.dp),
+                    colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Send,
+                        contentDescription = "전송",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+
+            // 운행 상태 업데이트 고속 버튼
+            Button(
+                onClick = {
+                    viewModel.updateRoomAction("운행 진행 중 상태 전송")
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+            ) {
+                Text("운행 상태 업데이트 / 신호 보내기")
+            }
         }
     }
 }

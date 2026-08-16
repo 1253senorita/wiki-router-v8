@@ -1,4 +1,4 @@
-package com.terminator.mypadnoteone.presentation.barobaro.detail
+package com.teminator.mypadnoteone.presentation.barobaro.detail
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*

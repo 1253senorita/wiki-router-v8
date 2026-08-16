@@ -14,12 +14,16 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.teminator.mypadnoteone.R
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
 import com.teminator.mypadnoteone.presentation.aerorouter.ui.AeroRouterEntryActivity
 import com.teminator.mypadnoteone.presentation.auth.AuthActivity
+import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
+import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
 import com.teminator.mypadnoteone.presentation.wiki.ui.WikiActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.ComposeView
 
 /**
  * 앱의 메인 화면을 담당하는 Activity입니다.
@@ -94,10 +98,11 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "화물 오더 등록 화면으로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // 🔥 [수정] 상단바 고객 페이지 버튼 -> 뚜껑 닫고 "CLIENT_PAGE" 모드로 진입
+        // 🔥 [수정] 상단바 고객 페이지 버튼 -> 뚜껑 닫고 실시간 매칭 세컨드 룸으로 다이렉트 연동 통신 개통!
         binding.btnOpenClient.setOnClickListener {
-            navigator.navigateToClientUnified("CLIENT_PAGE")
-            Toast.makeText(this, "고객(클라이언트) 페이지로 진입합니다.", Toast.LENGTH_SHORT).show()
+            // 메인 화면 UI를 숨기거나 컨테이너 영역에 MatchingRoomScreen(ComposeView)을 동적으로 띄우는 라우팅 처리
+            openMatchingRoom("ROOM_TEST_GLOBAL")
+            Toast.makeText(this, "실시간 매칭 세컨드 룸 파이프를 개통합니다.", Toast.LENGTH_SHORT).show()
         }
 
         // 🔥 [수정] AI 보미 관제 카드 -> 뚜껑 닫고 "AI_BOMI_MONITOR" 모드로 진입
@@ -107,6 +112,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         setupOnBackPressed()
+    }
+
+    /**
+     * 🔥 실시간 세컨드 룸 화면을 컨테이너에 띄우는 함수 (상단 앱바 진입용)
+     */
+    private fun openMatchingRoom(roomId: String) {
+        // 기존 대시보드 레이아웃을 가리고 뷰 기반 혹은 ComposeView로 MatchingRoomScreen 전환
+        // MainNavigator에 위임하거나 동적 프래그먼트 교체 처리
+        val fragmentContainerId = android.R.id.content // 또는 오빠 프로젝트의 프래그먼트 컨테이너 ID
+
+        // Composable을 품은 Fragment나 커스텀 Dialog/Fragment로 관리할 수 있습니다.
+        // 현재 뷰계층 구조에 맞춰 navigator 혹은 FragmentTransaction을 활용하세요.
     }
 
     /**

@@ -12,9 +12,9 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.terminator.mypadnoteone.presentation.barobaro.detail.BaroBaroDetailScreen
-import com.terminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
-import com.terminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
+import com.teminator.mypadnoteone.presentation.barobaro.detail.BaroBaroDetailScreen
+import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
+import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

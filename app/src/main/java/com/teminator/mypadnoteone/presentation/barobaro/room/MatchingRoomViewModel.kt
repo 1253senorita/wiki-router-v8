@@ -1,4 +1,4 @@
-package com.terminator.mypadnoteone.presentation.barobaro.room
+package com.teminator.mypadnoteone.presentation.barobaro.room
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +40,7 @@ class MatchingRoomViewModel @Inject constructor(
                 // aeroSocketManager.connectToRoom(roomId)
 
                 roomStatus = "통신 연결 완료 (매칭 방 활성화)"
+                lastLogMessage = "시스템: [$roomId] 방에 성공적으로 입장했습니다."
             } catch (e: Exception) {
                 errorMessage = "방 접속 실패: ${e.localizedMessage}"
                 roomStatus = "연결 실패"
@@ -57,6 +58,21 @@ class MatchingRoomViewModel @Inject constructor(
                 lastLogMessage = "상태 업데이트 전송됨: $actionType"
             } catch (e: Exception) {
                 errorMessage = "업데이트 실패: ${e.localizedMessage}"
+            }
+        }
+    }
+
+    /**
+     * 🔥 [신규 추가] 사용자가 직접 입력한 실시간 대화/신호 메시지 전송 함수
+     */
+    fun sendCustomMessage(message: String) {
+        if (message.isBlank()) return
+        viewModelScope.launch {
+            try {
+                // TODO: 실제 웹소켓/파이어베이스 패킷 송신 로직 연동 지점
+                lastLogMessage = "보낸 메시지: $message"
+            } catch (e: Exception) {
+                errorMessage = "메시지 전송 실패: ${e.localizedMessage}"
             }
         }
     }

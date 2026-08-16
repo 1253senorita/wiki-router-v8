@@ -49,7 +49,18 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- 🔥 [신규 추가] 고객(클라이언트) 페이지 진입 버튼 (로그아웃 버튼 왼쪽) -->
+        <!-- 🔥 [신규 추가] 실시간 매칭 세컨드 룸 진입 버튼 -->
+        <Button
+            android:id="@+id/btnOpenMatchingRoom"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="세컨드룸"
+            android:textSize="11sp"
+            android:backgroundTint="#E8F5E9"
+            android:textColor="#2E7D32"
+            android:layout_marginEnd="6dp"/>
+
+        <!-- 고객(클라이언트) 페이지 진입 버튼 -->
         <Button
             android:id="@+id/btnOpenClient"
             android:layout_width="wrap_content"
@@ -58,7 +69,7 @@
             android:textSize="11sp"
             android:backgroundTint="#F9F5FF"
             android:textColor="#6200EE"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="6dp"/>
 
         <!-- 기존 로그아웃 버튼 -->
         <Button
