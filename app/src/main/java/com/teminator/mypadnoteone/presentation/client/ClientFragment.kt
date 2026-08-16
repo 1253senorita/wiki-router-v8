@@ -1,4 +1,6 @@
-package com.terminator.mypadnoteone.presentation.client
+package com.teminator.mypadnoteone.presentation.client
+
+
 
 import android.os.Bundle
 import android.view.LayoutInflater

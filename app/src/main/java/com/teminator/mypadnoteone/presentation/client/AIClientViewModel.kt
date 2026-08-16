@@ -1,4 +1,5 @@
-package com.terminator.mypadnoteone.presentation.client
+package com.teminator.mypadnoteone.presentation.client
+
 
 import android.app.Application
 import androidx.compose.runtime.getValue

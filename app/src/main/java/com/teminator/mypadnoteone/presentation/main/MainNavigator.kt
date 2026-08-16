@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.teminator.mypadnoteone.R
+import com.teminator.mypadnoteone.presentation.client.AiFragment
+import com.teminator.mypadnoteone.presentation.client.ClientFragment
 import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroFragment
-import com.terminator.mypadnoteone.presentation.client.AiFragment
-import com.terminator.mypadnoteone.presentation.client.ClientFragment
 
 class MainNavigator(
     private val activity: AppCompatActivity,

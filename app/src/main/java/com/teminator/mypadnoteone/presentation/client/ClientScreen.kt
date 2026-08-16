@@ -1,4 +1,8 @@
-package com.terminator.mypadnoteone.presentation.client
+package com.teminator.mypadnoteone.presentation.client
+
+
+
+
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
