@@ -29,7 +29,7 @@ fun AIScreen(
     ) {
         // --- 1. 상단 타이틀 ---
         Text(
-            text = "🤖 AI 보미 소통 관제 스크린",
+            text = "🤖 (AI 보미 소통 관제AIScreen32)상위자는 AiFragment20",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -153,7 +153,7 @@ fun AIScreen(
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
                 ) {
-                    Text(if (viewModel.isDownloading) "다운로드 중..." else "AI 모델 다운로드")
+                    Text(if (viewModel.isDownloading) "다운로드 중..." else "AI 모델 준비중 다운로드 구축중 AIScreen156")
                 }
             }
 

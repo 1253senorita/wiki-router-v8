@@ -44,7 +44,7 @@ class AIClientViewModel @Inject constructor(
     var downloadProgressText by mutableStateOf("")
         private set
 
-    // 🔥 [추가] 모델 다운로드 완료 여부 상태 변수 (UI에서 버튼 숨김 처리에 사용)
+    //  [추가] 모델 다운로드 완료 여부 상태 변수 (UI에서 버튼 숨김 처리에 사용)
     var isModelDownloaded by mutableStateOf(false)
         private set
 
@@ -65,7 +65,7 @@ class AIClientViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val filesDir = getApplication<Application>().filesDir
-                val modelFile = File(filesDir, "model_quantized.tflite")
+                val modelFile = File(filesDir, "//일단작업보류주석  처리 파후 작업 model_quantized.tflite")//일단 온 디바이스  작업은  차후  예전정
                 val tokenizerFile = File(filesDir, "tokenizer.json")
 
                 if (modelFile.exists() && tokenizerFile.exists()) {
