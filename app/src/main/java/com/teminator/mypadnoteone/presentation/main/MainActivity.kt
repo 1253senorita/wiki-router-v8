@@ -98,16 +98,21 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "화물 오더 등록 화면으로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // 🔥 [수정] 상단바 고객 페이지 버튼 -> 뚜껑 닫고 실시간 매칭 세컨드 룸으로 다이렉트 연동 통신 개통!
-        binding.btnOpenClient.setOnClickListener {
-            // 메인 화면 UI를 숨기거나 컨테이너 영역에 MatchingRoomScreen(ComposeView)을 동적으로 띄우는 라우팅 처리
+        // 🔥 [신규 추가] 상단바 '세컨드룸' 버튼 -> 뚜껑 닫고 실시간 매칭 세컨드 룸으로 진입!
+        binding.btnOpenMatchingRoom.setOnClickListener {
             openMatchingRoom("ROOM_TEST_GLOBAL")
             Toast.makeText(this, "실시간 매칭 세컨드 룸 파이프를 개통합니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // 🔥 [수정] AI 보미 관제 카드 -> 뚜껑 닫고 "AI_BOMI_MONITOR" 모드로 진입
+        // 🔥 상단바 고객 페이지 버튼 -> 뚜껑 닫고 ClientFragment 진입
+        binding.btnOpenClient.setOnClickListener {
+            navigator.navigateToClientAI("CLIENT_MODE")
+            Toast.makeText(this, "고객 페이지로 진입합니다.", Toast.LENGTH_SHORT).show()
+        }
+
+        // 🔥 AI 보미 관제 카드 -> 뚜껑 닫고 진짜 AI 보미 프래그먼트(AiFragment) 진입
         binding.cardWikiRouterClient.setOnClickListener {
-            navigator.navigateToClientAI("AI_BOMI_MONITOR")
+            navigator.navigateToClientUnified("AI_BOMI_MONITOR")
             Toast.makeText(this, "AI 보미 관제 페이지로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 
@@ -118,12 +123,7 @@ class MainActivity : AppCompatActivity() {
      * 🔥 실시간 세컨드 룸 화면을 컨테이너에 띄우는 함수 (상단 앱바 진입용)
      */
     private fun openMatchingRoom(roomId: String) {
-        // 기존 대시보드 레이아웃을 가리고 뷰 기반 혹은 ComposeView로 MatchingRoomScreen 전환
-        // MainNavigator에 위임하거나 동적 프래그먼트 교체 처리
-        val fragmentContainerId = android.R.id.content // 또는 오빠 프로젝트의 프래그먼트 컨테이너 ID
-
-        // Composable을 품은 Fragment나 커스텀 Dialog/Fragment로 관리할 수 있습니다.
-        // 현재 뷰계층 구조에 맞춰 navigator 혹은 FragmentTransaction을 활용하세요.
+        navigator.navigateToMatchingRoom(roomId)
     }
 
     /**

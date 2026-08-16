@@ -22,7 +22,7 @@ fun BaroBaroDetailScreen(
     val context = LocalContext.current
 
     Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
-        Text("디테일  스크린 화물 상세 정보", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text("(디테일  스크린 화물 상세 정보)상위자는 BaroBaroFragment124   ", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(modifier = Modifier.fillMaxWidth()) {

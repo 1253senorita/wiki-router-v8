@@ -28,7 +28,7 @@ fun BaroBaroListScreen(
     ) {
         item {
             Text(
-                text = "스크린 리스트 쿨 --ls22--화면",
+                text = "(스크린 리스트 쿨 --ls22--화면) 아이템의 상위자는 BaroBaroFragment내부 118 에서 분기 ",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )

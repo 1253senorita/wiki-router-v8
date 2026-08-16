@@ -39,7 +39,7 @@ fun MatchingRoomScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "실시간 매칭 세컨드 룸",
+                    text = "(실시간 매칭MatchingRoomScr42)상위자는BaroBaroFragmen 61",
                     style = MaterialTheme.typography.titleLarge
                 )
                 Button(onClick = onBackClick) {
@@ -48,7 +48,7 @@ fun MatchingRoomScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "현재 룸 ID: $roomId",
+                text = "현재Matc51 룸 ID: $roomId",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -64,7 +64,7 @@ fun MatchingRoomScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "상태: $roomStatus",
+                text = "Matc47상태: $roomStatus",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -77,7 +77,7 @@ fun MatchingRoomScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Text(
-                        text = "로그: $lastLogMessage",
+                        text = "Matc80로그: $lastLogMessage",
                         modifier = Modifier.padding(16.dp),
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -104,7 +104,7 @@ fun MatchingRoomScreen(
                 OutlinedTextField(
                     value = inputMessage,
                     onValueChange = { inputMessage = it },
-                    placeholder = { Text("상대방에게 전달할 정보/메시지 입력...") },
+                    placeholder = { Text("Matc상대방에게 전달할 정보/메시지 입력MatchingRoomScreen107...") },
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),

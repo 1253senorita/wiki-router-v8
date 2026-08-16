@@ -3,10 +3,13 @@ package com.teminator.mypadnoteone.presentation.main
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.teminator.mypadnoteone.R
 import com.teminator.mypadnoteone.presentation.client.AiFragment
 import com.teminator.mypadnoteone.presentation.client.ClientFragment
 import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroFragment
+import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
+import androidx.compose.ui.platform.ComposeView
 
 class MainNavigator(
     private val activity: AppCompatActivity,
@@ -31,12 +34,19 @@ class MainNavigator(
             .commit()
     }
 
+    /**
+     * 🔥 [신규 추가] 실시간 매칭 세컨드 룸(ComposeView를 담는 프래그먼트)으로 이동
+     */
+    fun navigateToMatchingRoom(roomId: String) {
+        hideMainUI()
 
+        val fragment = RoomContainerMatchingFragment.newInstance(roomId)
 
-
-
-
-
+        activity.supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack("MATCHING_ROOM")
+            .commit()
+    }
 
     /**
      * 🔥 [통합] 고객 및 AI 보미 관제 페이지로 이동 (진입 모드 타입 인자 전달)
@@ -56,10 +66,8 @@ class MainNavigator(
             .commit()
     }
 
-
-
     /**
-     * 🔥 [통합] 고객 및 AI 보미 관제 페이지로 이동 (진입 모드 타입 인자 전달)
+     * 🔥 [통합] 고객 및 AI 보미 관제 페이지로 이동 (진입 모드 타입 인자 전달 - ClientFragment)
      */
     fun navigateToClientAI(viewType: String) {
         hideMainUI()
@@ -72,11 +80,9 @@ class MainNavigator(
 
         activity.supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
-            .addToBackStack("CLIENT_UNIFIED")
+            .addToBackStack("CLIENT_AI")
             .commit()
     }
-
-
 
     /**
      * 메인 대시보드 UI 숨기기 (뚜껑 닫기)
