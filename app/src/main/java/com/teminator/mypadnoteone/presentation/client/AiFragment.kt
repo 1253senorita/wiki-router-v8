@@ -1,4 +1,4 @@
-package com.terminator.mypadnoteone.presentation.client
+package com.teminator.mypadnoteone.presentation.client
 
 
 
@@ -14,8 +14,7 @@ import androidx.fragment.app.viewModels
 import com.teminator.mypadnoteone.presentation.main.MainActivity
 //import com.terminator.mypadnoteone.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
-import com.terminator.mypadnoteone.presentation.client.AIClientViewModel
-import com.terminator.mypadnoteone.presentation.client.AIScreen
+import com.teminator.mypadnoteone.presentation.client.AIScreen
 
 @AndroidEntryPoint
 class AiFragment : Fragment() {
