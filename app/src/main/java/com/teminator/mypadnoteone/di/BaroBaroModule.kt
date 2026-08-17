@@ -4,7 +4,6 @@ import com.teminator.mypadnoteone.data.datasource.remote.WikiRouterSocketDataSou
 import com.teminator.mypadnoteone.data.repository.BaroBaroRepositoryImpl
 import com.teminator.mypadnoteone.data.repository.WikiRouterRepositoryImpl
 import com.teminator.mypadnoteone.domain.repository.BaroBaroRepository
-//import com.teminator.mypadnoteone.domain.repository.WikiRouterRepository
 import com.terminator.mypadnoteone.domain.repository.WikiRouterRepository
 import dagger.Binds
 import dagger.Module
@@ -33,6 +32,7 @@ abstract class BaroBaroModule {
         @Provides
         @Singleton
         fun provideWikiRouterSocketDataSource(): WikiRouterSocketDataSource {
+            // 기존에 오빠가 쓰던 object 형태 또는 기본 생성자 방식 그대로 반환합니다.
             return WikiRouterSocketDataSource
         }
     }

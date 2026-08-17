@@ -12,7 +12,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.teminator.mypadnoteone.presentation.barobaro.BaroBaroRegisterScreen
+import com.teminator.mypadnoteone.domain.model.DispatchOrder
+import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroRegisterScreen
 import com.teminator.mypadnoteone.presentation.barobaro.detail.BaroBaroDetailScreen
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
@@ -57,10 +58,13 @@ class BaroBaroFragment : Fragment() {
                         ) {
                             val selectedOrder = viewModel.selectedOrder
                             var isRegisterMode by remember { mutableStateOf(initialRegisterMode) }
+                            var editingOrder by remember { mutableStateOf<DispatchOrder?>(null) }
 
                             if (activeRoomId != null) {
+                                // 💡 [정리 완료] 뷰모델에 있는 selectedOrder(수락된 오더)를 안전하게 전달
                                 MatchingRoomScreen(
                                     roomId = activeRoomId,
+                                    order = selectedOrder,
                                     viewModel = roomViewModel,
                                     onBackClick = {
                                         viewModel.clearMockRoomId()
@@ -68,16 +72,26 @@ class BaroBaroFragment : Fragment() {
                                 )
                             } else {
                                 Column(modifier = Modifier.fillMaxSize()) {
-                                    if (isRegisterMode) {
+                                    if (isRegisterMode || editingOrder != null) {
                                         BaroBaroRegisterScreen(
+                                            initialOrder = editingOrder,
                                             onRegister = { route: String, cargo: String, price: String, desc: String ->
-                                                viewModel.addOrder(route, cargo, price, desc)
+                                                val targetEdit = editingOrder
+                                                if (targetEdit != null) {
+                                                    viewModel.updateOrder(targetEdit.id, route, cargo, price, desc)
+                                                } else {
+                                                    viewModel.addOrder(route, cargo, price, desc)
+                                                }
+
                                                 if (viewModel.errorMessage == null) {
                                                     isRegisterMode = false
+                                                    editingOrder = null
                                                 }
                                             },
                                             onCancel = {
-                                                if (arguments?.containsKey("IS_REGISTER_MODE") == true) {
+                                                if (editingOrder != null) {
+                                                    editingOrder = null
+                                                } else if (arguments?.containsKey("IS_REGISTER_MODE") == true) {
                                                     requireActivity().onBackPressedDispatcher.onBackPressed()
                                                 } else {
                                                     isRegisterMode = false
@@ -86,7 +100,6 @@ class BaroBaroFragment : Fragment() {
                                         )
                                     } else {
                                         if (selectedOrder == null) {
-                                            // 상단 영역: 타이틀, 검색창, 오더등록 버튼을 가로(Row)로 배치
                                             Row(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
@@ -94,7 +107,6 @@ class BaroBaroFragment : Fragment() {
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                                             ) {
-                                                // 1. 검색창을 Row 안에서 빈 공간을 채우도록 배치
                                                 OutlinedTextField(
                                                     value = viewModel.searchQuery,
                                                     onValueChange = { viewModel.updateSearchQuery(it) },
@@ -106,13 +118,12 @@ class BaroBaroFragment : Fragment() {
                                                     textStyle = MaterialTheme.typography.bodySmall
                                                 )
 
-                                                // 2. 오더등록 버튼
                                                 Button(
                                                     onClick = { isRegisterMode = true },
                                                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                                                     modifier = Modifier.height(40.dp)
                                                 ) {
-                                                    Text("오더등록", style = MaterialTheme.typography.labelMedium)
+                                                    Text("오더등록----", style = MaterialTheme.typography.labelMedium)
                                                 }
                                             }
 
@@ -128,14 +139,15 @@ class BaroBaroFragment : Fragment() {
                                                     viewModel.acceptOrder(selectedOrder.id)
                                                     viewModel.forceCreateTestMatchRoom(selectedOrder.id)
                                                 },
+                                                onEdit = {
+                                                    editingOrder = selectedOrder
+                                                },
                                                 onBack = {
                                                     viewModel.selectOrder(null)
                                                 },
                                                 onForceTestRoomOpen = { orderId ->
                                                     viewModel.forceCreateTestMatchRoom(orderId)
                                                 }
-
-
                                             )
                                         }
                                     }

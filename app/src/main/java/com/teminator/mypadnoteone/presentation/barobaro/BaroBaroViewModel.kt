@@ -100,7 +100,7 @@ class BaroBaroViewModel @Inject constructor(
                         generatedDummyList.add(
                             DispatchOrder(
                                 id = i.toString(),
-                                route = "$start ➔ $end [특급배차 #$i]",
+                                route = "$start ➔ $end",
                                 cargoInfo = cargo,
                                 price = price,
                                 status = "대기중",
@@ -151,6 +151,45 @@ class BaroBaroViewModel @Inject constructor(
                 _orderList.add(newOrder)
             } catch (e: Exception) {
                 errorMessage = "오더 등록 실패: ${e.localizedMessage}"
+            }
+        }
+    }
+
+    // 💡 [추가 완료] 기존 오더의 내용을 수정하는 ViewModel 메서드
+    fun updateOrder(orderId: String, route: String, cargo: String, price: String, description: String) {
+        if (route.isBlank() || cargo.isBlank() || price.isBlank()) {
+            errorMessage = "필수 항목을 모두 입력해주세요!"
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val targetIndex = _orderList.indexOfFirst { it.id == orderId }
+                if (targetIndex != -1) {
+                    val existingOrder = _orderList[targetIndex]
+                    val updatedOrder = existingOrder.copy(
+                        route = route,
+                        cargoInfo = cargo,
+                        price = price,
+                        description = description
+                    )
+
+                    // 1. Repository(저장소)에 수정 사항 반영
+                    repository.updateOrder(updatedOrder)
+
+                    // 2. ViewModel 내부 상태 리스트 실시간 갱신
+                    _orderList[targetIndex] = updatedOrder
+
+                    // 3. 현재 상세 보기로 열려있는 오더라면 선택된 오더 정보도 갱신
+                    if (selectedOrder?.id == orderId) {
+                        selectedOrder = updatedOrder
+                    }
+                    errorMessage = null
+                } else {
+                    errorMessage = "수정할 오더를 찾을 수 없습니다."
+                }
+            } catch (e: Exception) {
+                errorMessage = "오더 수정 실패: ${e.localizedMessage}"
             }
         }
     }

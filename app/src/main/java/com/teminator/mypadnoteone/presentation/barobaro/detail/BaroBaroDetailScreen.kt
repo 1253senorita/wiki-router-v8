@@ -16,13 +16,14 @@ import com.teminator.mypadnoteone.domain.model.DispatchOrder
 fun BaroBaroDetailScreen(
     order: DispatchOrder,
     onAccept: () -> Unit,
+    onEdit: () -> Unit, // 💡 [추가] 오더 수정 화면으로 전환하는 콜백
     onBack: () -> Unit,
-    onForceTestRoomOpen: (String) -> Unit // 💡 강제 세컨드 룸 오픈 콜백 추가
+    onForceTestRoomOpen: (String) -> Unit
 ) {
     val context = LocalContext.current
 
     Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
-        Text("(디테일  스크린 화물 상세 정보)상위자는 BaroBaroFragment124   ", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text("(디테일 스크린 화물 상세 정보)상위자는 BaroBaroFragment124   ", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(modifier = Modifier.fillMaxWidth()) {
@@ -30,6 +31,7 @@ fun BaroBaroDetailScreen(
                 Text("경로: ${order.route}", fontWeight = FontWeight.Bold)
                 Text("정보: ${order.cargoInfo}")
                 Text("요금: ${order.price}", color = Color(0xFF2E7D32))
+                Text("상태: ${order.status}", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 if (!order.description.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text("요청사항: ${order.description}", fontSize = 10.sp, color = Color.Gray)
@@ -38,6 +40,18 @@ fun BaroBaroDetailScreen(
         }
 
         Spacer(modifier = Modifier.weight(1f))
+
+        // 💡 [추가] 대기중 상태일 때만 '오더 수정' 버튼 노출
+        if (order.status == "대기중") {
+            Button(
+                onClick = onEdit,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+            ) {
+                Text("오더 수정하기")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         // 1. 콜 수락 버튼 (정식 수락 로직)
         Button(
@@ -52,11 +66,11 @@ fun BaroBaroDetailScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // 2. 💡 [테스트용] 강제 세컨드 룸 및 통신 파이프 진입 버튼 추가
+        // 2. [테스트용] 강제 세컨드 룸 및 통신 파이프 진입 버튼
         OutlinedButton(
             onClick = {
                 Toast.makeText(context, "⚠️ [테스트] 가상 세컨드 룸 통신 파이프 개설!", Toast.LENGTH_SHORT).show()
-                onForceTestRoomOpen(order.id) // 가상 방 생성 트리거
+                onForceTestRoomOpen(order.id)
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFD32F2F))

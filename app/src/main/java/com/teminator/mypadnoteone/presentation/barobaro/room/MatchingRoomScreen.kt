@@ -8,10 +8,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.teminator.mypadnoteone.domain.model.DispatchOrder
 
 @Composable
 fun MatchingRoomScreen(
     roomId: String,
+    order: DispatchOrder?, // 💡 [추가] 수락한 화물 오더 정보를 받아오기 위한 파라미터!
     viewModel: MatchingRoomViewModel,
     onBackClick: () -> Unit
 ) {
@@ -39,19 +41,45 @@ fun MatchingRoomScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "(실시간 매칭MatchingRoomScr42)상위자는BaroBaroFragmen 61",
-                    style = MaterialTheme.typography.titleLarge
+                    text = "(콜 수락 가상룸 매칭MatchingRoomScr42)상위자는BaroBaroFragmen 61",
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Button(onClick = onBackClick) {
                     Text("방 나가기")
                 }
             }
+
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "현재Matc51 룸 ID: $roomId",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
+
+            // 💡 [핵심 추가] 매칭 룸 상단에 방금 수락한 화물 오더 정보를 카드 형태로 고정 출력!
+            if (order != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(
+                            text = "📦 매칭된 화물 정보 (#${order.id})",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(text = "경로: ${order.route}", style = MaterialTheme.typography.bodyMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                        Text(text = "화물: ${order.cargoInfo} | 요금: ${order.price}", style = MaterialTheme.typography.bodySmall)
+                        if (!order.description.isNullOrBlank()) {
+                            Text(text = "요청사항: ${order.description}", style = MaterialTheme.typography.bodySmall, color = androidx.compose.ui.graphics.Color.Gray)
+                        }
+                    }
+                }
+            }
+
             Divider(modifier = Modifier.padding(vertical = 12.dp))
         }
 
@@ -104,7 +132,7 @@ fun MatchingRoomScreen(
                 OutlinedTextField(
                     value = inputMessage,
                     onValueChange = { inputMessage = it },
-                    placeholder = { Text("Matc상대방에게 전달할 정보/메시지 입력MatchingRoomScreen107...") },
+                    placeholder = { Text("Matc상대방에게 전달할 정보/메시지 입력...") },
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),

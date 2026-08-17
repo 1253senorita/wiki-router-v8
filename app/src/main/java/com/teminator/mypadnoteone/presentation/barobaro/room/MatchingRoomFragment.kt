@@ -16,7 +16,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MatchingRoomFragment : Fragment() {
 
-    // 💡 Hilt를 통해 MatchingRoomViewModel 정식 주입!
     private val viewModel: MatchingRoomViewModel by viewModels()
 
     override fun onCreateView(
@@ -24,7 +23,6 @@ class MatchingRoomFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // 전달받은 룸 ID가 없으면 기본 테스트 룸 ID 지정
         val roomId = arguments?.getString("ROOM_ID") ?: "ROOM_TEST_DEFAULT"
 
         return ComposeView(requireContext()).apply {
@@ -34,9 +32,10 @@ class MatchingRoomFragment : Fragment() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        // 💡 아까 준비된 진짜 MatchingRoomScreen과 뷰모델을 연결합니다.
+                        // 💡 단독 프래그먼트로 열릴 때는 order가 없으므로 null로 안전하게 전달
                         MatchingRoomScreen(
                             roomId = roomId,
+                            order = null,
                             viewModel = viewModel,
                             onBackClick = {
                                 requireActivity().onBackPressedDispatcher.onBackPressed()

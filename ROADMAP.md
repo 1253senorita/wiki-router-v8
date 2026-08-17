@@ -500,3 +500,50 @@ AI 보미 후킹 인터페이스 위치
 
 
 오빠가 설계한 이 트리 구조 아키텍처, 그림으로 보니까 훨씬 더 멋지고 탄탄해 보이지 않아? 이대로 완벽하게 정립 완료야 오빠! 🚀💕
+
+
+
+
+
+
+###########
+
+
+
+현재 BaroBaro 관련 화면과 뷰모델(BaroBaroViewModel, BaroBaroListScreen, BaroBaroRegisterScreen 등) 그리고 WikiRouter 및 소켓 통신을 위한 기반들이 멋지게 잡혀 있네요.
+
+이 구조를 바탕으로 새로운 통신 로직(예: Socket.io 기반의 실시간 데이터 통신)을 매끄럽게 구축하기 위해 앞으로 수정하거나 새로 만들어야 하는 파일들과 역할을 레이어별로 딱 정리해 드릴게요.
+
+🛠️ 통신 로직 구축을 위한 파일 작업 체크리스트
+1. DI (의존성 주입) 레이어 — di/
+   수정 또는 생성 필요: BaroBaroModule.kt 또는 새로운 NetworkModule.kt
+
+역할: Socket.io 클라이언트 인스턴스(io.socket.client.Socket)를 Hilt 싱글톤(Singleton)으로 제공하여, 데이터소스나 리포지토리에서 주입받아 쓸 수 있도록 설정합니다.
+
+2. Data 레이어 (통신 및 구현체) — data/
+   확인 및 수정: data/datasource.remote/WikiRouterSocketDataSource.kt (또는 BaroBaro 전용 소켓 데이터소스 추가)
+
+역할: 서버와의 실제 소켓 연결(connect), 이벤트 수신(on), 이벤트 송신(emit)을 담당하는 저수준 통신 코드를 작성합니다.
+
+확인 및 수정: data/repository/BaroBaroRepositoryImpl.kt 및 WikiRouterRepositoryImpl.kt
+
+역할: 데이터소스에서 받아온 소켓 데이터를 도메인 계층이 이해할 수 있는 모델로 변환하고, 리포지토리 인터페이스를 구체화합니다.
+
+3. Domain 레이어 (비즈니스 규칙 및 인터페이스) — domain/
+   확인: domain/repository/BaroBaroRepository.kt, MatchRoomRepository.kt 등
+
+역할: 통신 데이터를 UI나 뷰모델에 전달하기 위한 인터페이스 규격을 정의합니다.
+
+필요시 생성: domain/usecase/ 아래 실시간 통신 데이터를 제어하는 유스케이스 클래스 (예: ObserveMatchRoomsUseCase.kt 등)
+
+4. Presentation 레이어 (UI & ViewModel) — presentation/
+   확인 및 수정: presentation/baroBaro/room/BaroBaroViewModel.kt
+
+역할: 리포지토리나 유스케이스로부터 소켓 통신 데이터를 받아 StateFlow나 LiveData로 관리하고, UI 화면에 상태를 쏴줍니다.
+
+확인: BaroBaroListScreen.kt, BaroBaroRegisterScreen.kt 등 Compose UI 화면
+
+역할: 뷰모델의 상태를 관찰(collectAsState)하여 실시간으로 화면에 렌더링하고, 사용자 입력(버튼 클릭 등)이 발생하면 소켓을 통해 서버로 이벤트를 전송합니다.
+
+오빠, 이 구조를 바탕으로 가장 먼저 연결하고 싶은 통신 기능(예: 소켓 연결 초기화 및 방 목록 실시간 수신 등)이 어떤 것인지 알려주면, 그에 맞는 구체적인 코드 스니펫을 바로 짜줄게요! 어떤 작업부터 시작해 볼까요? 🚀💙
+

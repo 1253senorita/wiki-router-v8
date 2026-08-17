@@ -24,4 +24,12 @@ class BaroBaroRepositoryImpl @Inject constructor() : BaroBaroRepository {
             memoryOrders[index] = memoryOrders[index].copy(status = status)
         }
     }
+
+    // 💡 [추가] 전달받은 order의 id를 기준으로 메모리 리스트의 데이터를 새로운 내용으로 교체(수정)
+    override suspend fun updateOrder(order: DispatchOrder) {
+        val index = memoryOrders.indexOfFirst { it.id == order.id }
+        if (index != -1) {
+            memoryOrders[index] = order
+        }
+    }
 }

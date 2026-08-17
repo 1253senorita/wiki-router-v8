@@ -35,8 +35,10 @@ class RoomContainerMatchingFragment : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
+                // 💡 [수정] 함수 선언이 아니라 함수를 정상적으로 호출하도록 변경했습니다!
                 MatchingRoomScreen(
                     roomId = roomId,
+                    order = null, // 단독 컨테이너 진입 시 오더 정보는 기본 null 처리
                     viewModel = viewModel,
                     onBackClick = {
                         // 뒤로가기 누를 때 프래그먼트를 닫고 메인 대시보드 UI 복구
