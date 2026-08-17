@@ -1,6 +1,5 @@
 package com.terminator.mypadnoteone.presentation.barobaro
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
 import com.teminator.mypadnoteone.domain.repository.BaroBaroRepository
+import com.teminator.mypadnoteone.data.cache.OrderCacheManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,8 +17,10 @@ class BaroBaroViewModel @Inject constructor(
     private val repository: BaroBaroRepository
 ) : ViewModel() {
 
-    private val _orderList = mutableStateListOf<DispatchOrder>()
-    val orderList: List<DispatchOrder> get() = _orderList
+    // 💡 [메모리 방어] 오더 캐시 매니저 도입 (최대 100개 유지로 OOM 방지)
+    private val cacheManager = OrderCacheManager(maxCapacity = 100)
+
+    val orderList: List<DispatchOrder> get() = cacheManager.cachedOrders
 
     var searchQuery by mutableStateOf("")
         private set
@@ -28,16 +30,24 @@ class BaroBaroViewModel @Inject constructor(
     }
 
     // 💡 최신 등록된 항목이 위로 오도록 역순(Reversed)으로 리스트 정렬 및 필터링 적용
+    // 💡 [수정] 수락된 오더는 제외하고, 미수락(대기중 등) 오더들만 필터링하여 최신순(역순)으로 노출
     val filteredOrderList: List<DispatchOrder>
         get() {
+            // 1단계: "수락됨" 상태가 아닌(미수락) 오더들만 추려냄
+            val unacceptedList = cacheManager.cachedOrders.filter { order ->
+                order.status != "수락됨"
+            }
+
+            // 2단계: 검색어가 있으면 추가 필터링, 없으면 전체 미수락 리스트 반환
             val list = if (searchQuery.isBlank()) {
-                _orderList
+                unacceptedList
             } else {
-                _orderList.filter {
+                unacceptedList.filter {
                     it.route.contains(searchQuery, ignoreCase = true) ||
                             it.cargoInfo.contains(searchQuery, ignoreCase = true)
                 }
             }
+            // 3단계: 최신 등록된 항목이 위로 오도록 역순 정렬
             return list.reversed()
         }
 
@@ -76,14 +86,12 @@ class BaroBaroViewModel @Inject constructor(
     init {
         loadOrders()
     }
-
     private fun loadOrders() {
         viewModelScope.launch {
             try {
-                memoryToastMessage = "⚠️ 대규모 화물 데이터 메모리 공간 마련 중..."
+                memoryToastMessage = "⚠️ 초기 오더 데이터 로딩 중..."
 
                 val orders = repository.getOrders()
-                _orderList.clear()
 
                 if (orders.isEmpty()) {
                     val regions = listOf("서울", "인천", "경기", "부산", "대구", "대전", "광주", "울산", "강원", "충남", "전북", "경남", "제주", "경북", "전남")
@@ -91,7 +99,7 @@ class BaroBaroViewModel @Inject constructor(
                     val prices = listOf("130,000원", "180,000원", "250,000원", "350,000원", "480,000원", "520,000원", "750,000원")
 
                     val generatedDummyList = mutableListOf<DispatchOrder>()
-                    for (i in 1..500) {
+                    for (i in 1..10) {
                         val start = regions[(i * 3) % regions.size]
                         val end = regions[(i * 7) % regions.size]
                         val cargo = cargoTypes[i % cargoTypes.size]
@@ -103,19 +111,21 @@ class BaroBaroViewModel @Inject constructor(
                                 route = "$start ➔ $end",
                                 cargoInfo = cargo,
                                 price = price,
-                                status = "대기중",
-                                description = "500개 대기열 시스템 부하 분산 테스트용 오더 데이터입니다 (#$i)"
+                                status = "대기중", // 💡 초기 상태는 '대기중'으로 설정하여 리스트에 노출됨
+                                description = "기본 테스트용 샘플 오더 데이터입니다 (#$i)"
                             )
                         )
                     }
-                    _orderList.addAll(generatedDummyList)
-                    memoryToastMessage = "✅ 500개 오더 메모리 적재 완료!"
+                    cacheManager.updateOrders(generatedDummyList)
+                    // 💡 토스트 메시지도 실제 생성 개수(10개)에 맞게 수정
+                    memoryToastMessage = "✅ 샘플 오더 10개 캐시 적재 완료 (대기 중)"
                 } else {
-                    _orderList.addAll(orders)
+                    cacheManager.updateOrders(orders)
                     memoryToastMessage = "✅ 원격 서버 데이터 동기화 완료!"
                 }
             } catch (e: OutOfMemoryError) {
-                memoryToastMessage = "❌ 메모리 부족! 임시 캐시를 정리하고 있습니다."
+                memoryToastMessage = "❌ 메모리 부족! 임시 캐시를 정리했습니다."
+                cacheManager.clear()
             } catch (e: Exception) {
                 errorMessage = "데이터 로드 실패: ${e.localizedMessage}"
             }
@@ -138,8 +148,9 @@ class BaroBaroViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
+                val newId = (cacheManager.cachedOrders.size + 1).toString()
                 val newOrder = DispatchOrder(
-                    id = (_orderList.size + 1).toString(),
+                    id = newId,
                     route = route,
                     cargoInfo = cargo,
                     price = price,
@@ -147,15 +158,14 @@ class BaroBaroViewModel @Inject constructor(
                     description = description
                 )
                 repository.addOrder(newOrder)
-                // 리스트 끝에 추가하면 reversed()에 의해 화면 최상단에 노출됩니다.
-                _orderList.add(newOrder)
+                cacheManager.addOrUpdateOrder(newOrder)
+                errorMessage = null
             } catch (e: Exception) {
                 errorMessage = "오더 등록 실패: ${e.localizedMessage}"
             }
         }
     }
 
-    // 💡 [추가 완료] 기존 오더의 내용을 수정하는 ViewModel 메서드
     fun updateOrder(orderId: String, route: String, cargo: String, price: String, description: String) {
         if (route.isBlank() || cargo.isBlank() || price.isBlank()) {
             errorMessage = "필수 항목을 모두 입력해주세요!"
@@ -164,23 +174,22 @@ class BaroBaroViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val targetIndex = _orderList.indexOfFirst { it.id == orderId }
-                if (targetIndex != -1) {
-                    val existingOrder = _orderList[targetIndex]
-                    val updatedOrder = existingOrder.copy(
+                val existing = cacheManager.cachedOrders.find { it.id == orderId }
+                if (existing != null) {
+                    val updatedOrder = existing.copy(
                         route = route,
                         cargoInfo = cargo,
                         price = price,
                         description = description
                     )
 
-                    // 1. Repository(저장소)에 수정 사항 반영
+                    // 1. Repository 반영
                     repository.updateOrder(updatedOrder)
 
-                    // 2. ViewModel 내부 상태 리스트 실시간 갱신
-                    _orderList[targetIndex] = updatedOrder
+                    // 2. 캐시 매니저 갱신
+                    cacheManager.addOrUpdateOrder(updatedOrder)
 
-                    // 3. 현재 상세 보기로 열려있는 오더라면 선택된 오더 정보도 갱신
+                    // 3. 선택된 오더 갱신
                     if (selectedOrder?.id == orderId) {
                         selectedOrder = updatedOrder
                     }
@@ -198,10 +207,10 @@ class BaroBaroViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 repository.updateOrderStatus(orderId, "수락됨")
-                val index = _orderList.indexOfFirst { it.id == orderId }
-                if (index != -1) {
-                    val updated = _orderList[index].copy(status = "수락됨")
-                    _orderList[index] = updated
+                val existing = cacheManager.cachedOrders.find { it.id == orderId }
+                if (existing != null) {
+                    val updated = existing.copy(status = "수락됨")
+                    cacheManager.addOrUpdateOrder(updated)
                     selectedOrder = updated
                 }
             } catch (e: Exception) {
@@ -209,4 +218,28 @@ class BaroBaroViewModel @Inject constructor(
             }
         }
     }
+
+    // 💡 [신규 추가] 리스트에서 특정 오더를 완전히 제외(삭제)하는 메서드
+    fun deleteOrder(orderId: String) {
+        viewModelScope.launch {
+            try {
+                // 1. 서버(Repository)에서 데이터 삭제
+                repository.deleteOrder(orderId)
+
+                // 2. 캐시 매니저에서 해당 오더 제거
+                cacheManager.removeOrder(orderId)
+
+                // 3. 만약 현재 보고 있던 상세 오더라면 선택 해제
+                if (selectedOrder?.id == orderId) {
+                    selectedOrder = null
+                }
+                errorMessage = null
+            } catch (e: Exception) {
+                errorMessage = "오더 삭제 실패: ${e.localizedMessage}"
+            }
+        }
+    }
+
+
+
 }
