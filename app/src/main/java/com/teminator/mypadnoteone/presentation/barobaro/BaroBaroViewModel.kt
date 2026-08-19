@@ -30,7 +30,6 @@ class BaroBaroViewModel @Inject constructor(
     }
 
     // 💡 최신 등록된 항목이 위로 오도록 역순(Reversed)으로 리스트 정렬 및 필터링 적용
-    // 💡 [수정] 수락된 오더는 제외하고, 미수락(대기중 등) 오더들만 필터링하여 최신순(역순)으로 노출
     val filteredOrderList: List<DispatchOrder>
         get() {
             // 1단계: "수락됨" 상태가 아닌(미수락) 오더들만 추려냄
@@ -86,6 +85,7 @@ class BaroBaroViewModel @Inject constructor(
     init {
         loadOrders()
     }
+
     private fun loadOrders() {
         viewModelScope.launch {
             try {
@@ -111,13 +111,12 @@ class BaroBaroViewModel @Inject constructor(
                                 route = "$start ➔ $end",
                                 cargoInfo = cargo,
                                 price = price,
-                                status = "대기중", // 💡 초기 상태는 '대기중'으로 설정하여 리스트에 노출됨
+                                status = "대기중",
                                 description = "기본 테스트용 샘플 오더 데이터입니다 (#$i)"
                             )
                         )
                     }
                     cacheManager.updateOrders(generatedDummyList)
-                    // 💡 토스트 메시지도 실제 생성 개수(10개)에 맞게 수정
                     memoryToastMessage = "✅ 샘플 오더 10개 캐시 적재 완료 (대기 중)"
                 } else {
                     cacheManager.updateOrders(orders)
@@ -148,7 +147,7 @@ class BaroBaroViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val newId = (cacheManager.cachedOrders.size + 1).toString()
+                val newId = "order_${System.currentTimeMillis()}" // 💡 고유하고 충돌 없는 ID 생성 개선
                 val newOrder = DispatchOrder(
                     id = newId,
                     route = route,
@@ -183,13 +182,9 @@ class BaroBaroViewModel @Inject constructor(
                         description = description
                     )
 
-                    // 1. Repository 반영
                     repository.updateOrder(updatedOrder)
-
-                    // 2. 캐시 매니저 갱신
                     cacheManager.addOrUpdateOrder(updatedOrder)
 
-                    // 3. 선택된 오더 갱신
                     if (selectedOrder?.id == orderId) {
                         selectedOrder = updatedOrder
                     }
@@ -219,17 +214,12 @@ class BaroBaroViewModel @Inject constructor(
         }
     }
 
-    // 💡 [신규 추가] 리스트에서 특정 오더를 완전히 제외(삭제)하는 메서드
     fun deleteOrder(orderId: String) {
         viewModelScope.launch {
             try {
-                // 1. 서버(Repository)에서 데이터 삭제
                 repository.deleteOrder(orderId)
-
-                // 2. 캐시 매니저에서 해당 오더 제거
                 cacheManager.removeOrder(orderId)
 
-                // 3. 만약 현재 보고 있던 상세 오더라면 선택 해제
                 if (selectedOrder?.id == orderId) {
                     selectedOrder = null
                 }
@@ -239,7 +229,4 @@ class BaroBaroViewModel @Inject constructor(
             }
         }
     }
-
-
-
 }
