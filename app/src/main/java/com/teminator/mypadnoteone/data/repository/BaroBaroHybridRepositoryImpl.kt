@@ -63,7 +63,10 @@ class BaroBaroHybridRepositoryImpl @Inject constructor(
         memoryOrders.add(order)
         try {
             ordersCollection.document(order.id).set(order).await()
-        } catch (_: Exception) {}
+            Log.d("BaroBaroSync", "✅ [Firebase 성공] 오더 서버 전송 완료: ${order.id}")
+        } catch (e: Exception) {
+            Log.e("BaroBaroSync", "❌ [Firebase 에러] 오더 전송 실패: ${e.localizedMessage}")
+        }
     }
 
     override suspend fun updateOrderStatus(orderId: String, status: String) {
