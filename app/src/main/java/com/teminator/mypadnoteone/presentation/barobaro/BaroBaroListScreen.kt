@@ -28,11 +28,15 @@ fun BaroBaroListScreen(
     ) {
         item {
             Text(
-                text = "(-------------------------------이줄부터는  아래  리스트스크린의 31 --ls22--화면 그리고  아래는이  화면의 아이템 리스트) 아이템의 상위자는 BaroBaroFragment내부 118 에서 분기 ",
+                text = " 프레그먼트와 컨태이너가  쩍  이고  그  위에  인포트로  가져온  컴포져믈 상테  한수에  추가  하는  갓  컴포저블(Composable 함수)일 뿐입니다 그래서  컴포져블이 샅태를  버군  다  라는  계념 으로바뀐 ui 를  보여준다  ! .BaroBaroFragment  setContent { ... }selectedOrder ",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 6.dp)
             )
         }
+
+
+
+
 
         items(viewModel.filteredOrderList) { order ->
             OrderCardItem(
