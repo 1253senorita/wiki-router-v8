@@ -1,7 +1,7 @@
 package com.teminator.mypadnoteone.di
 
 import com.teminator.mypadnoteone.data.datasource.remote.WikiRouterSocketDataSource
-import com.teminator.mypadnoteone.data.repository.BaroBaroRepositoryImpl
+import com.teminator.mypadnoteone.data.repository.BaroBaroHybridRepositoryImpl // 👈 하이브리드 구현체 임포트
 import com.teminator.mypadnoteone.data.repository.WikiRouterRepositoryImpl
 import com.teminator.mypadnoteone.domain.repository.BaroBaroRepository
 import com.terminator.mypadnoteone.domain.repository.WikiRouterRepository
@@ -19,7 +19,7 @@ abstract class BaroBaroModule {
     @Binds
     @Singleton
     abstract fun bindBaroBaroRepository(
-        impl: BaroBaroRepositoryImpl
+        impl: BaroBaroHybridRepositoryImpl // 👈 주입할 구현체를 하이브리드 버전으로 변경
     ): BaroBaroRepository
 
     @Binds
@@ -32,7 +32,6 @@ abstract class BaroBaroModule {
         @Provides
         @Singleton
         fun provideWikiRouterSocketDataSource(): WikiRouterSocketDataSource {
-            // 기존에 오빠가 쓰던 object 형태 또는 기본 생성자 방식 그대로 반환합니다.
             return WikiRouterSocketDataSource
         }
     }
