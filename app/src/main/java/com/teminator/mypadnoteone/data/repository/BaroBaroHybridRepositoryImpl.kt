@@ -18,7 +18,6 @@ class BaroBaroHybridRepositoryImpl @Inject constructor(
 
     private val ordersCollection = firestore.collection("orders")
 
-    // 💡 1. 로컬 메모리 캐시 (구별용 태그 장착)
     private val memoryOrders = mutableListOf<DispatchOrder>().apply {
         for (i in 1..1) {
             add(
@@ -35,7 +34,6 @@ class BaroBaroHybridRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getOrders(): List<DispatchOrder> {
-        // 💡 2. 백그라운드에서 파이어베이스 서버와 싱크 시도
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val snapshot = ordersCollection.get().await()
@@ -55,7 +53,6 @@ class BaroBaroHybridRepositoryImpl @Inject constructor(
             }
         }
 
-        // 💡 3. 우선 로컬 데이터를 즉시 반환
         return memoryOrders
     }
 
@@ -69,7 +66,6 @@ class BaroBaroHybridRepositoryImpl @Inject constructor(
         }
     }
 
-    // 💡 [수정 완료] status와 driverId를 모두 받아 메모리와 파이어베이스에 동시에 업데이트
     override suspend fun updateOrderStatus(orderId: String, status: String, driverId: String) {
         val index = memoryOrders.indexOfFirst { it.id == orderId }
         if (index != -1) {

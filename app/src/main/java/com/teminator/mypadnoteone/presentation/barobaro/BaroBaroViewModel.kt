@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
 import com.teminator.mypadnoteone.domain.repository.BaroBaroRepository
+import com.terminator.mypadnoteone.domain.repository.WikiRouterRepository // 📌 무전기 라우터 레포지토리 임포트
 import com.teminator.mypadnoteone.data.cache.OrderCacheManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BaroBaroViewModel @Inject constructor(
-    private val repository: BaroBaroRepository
+    private val repository: BaroBaroRepository,
+    private val wikiRouterRepository: WikiRouterRepository // 💡 [추가] 무전기/소켓 라우터 레포지토리 주입
 ) : ViewModel() {
 
     // 💡 [메모리 방어] 오더 캐시 매니저 도입 (최대 100개 유지로 OOM 방지)
@@ -149,10 +151,10 @@ class BaroBaroViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val newId = "order_${System.currentTimeMillis()}" // 💡 고유하고 충돌 없는 ID 생성 개선
+                val newId = "order_${System.currentTimeMillis()}"
                 val newOrder = DispatchOrder(
                     id = newId,
-                    roomKey = "room_$newId", // 📌 실시간 소켓/무전기 연결용 룸 키도 함께 생성!
+                    roomKey = "room_$newId",
                     route = route,
                     cargoInfo = cargo,
                     price = price,
@@ -201,23 +203,53 @@ class BaroBaroViewModel @Inject constructor(
         }
     }
 
+    // 💡 1. 기본 오더 수락 함수
     fun acceptOrder(orderId: String, currentDriverId: String) {
         viewModelScope.launch {
             try {
-                // 💡 [수정 완료] 인터페이스 규격에 맞춰 driverId를 함께 넘겨줍니다!
                 repository.updateOrderStatus(orderId, "수락됨", currentDriverId)
 
                 val existing = cacheManager.cachedOrders.find { it.id == orderId }
                 if (existing != null) {
                     val updated = existing.copy(
                         status = "수락됨",
-                        driverId = currentDriverId // 📌 수락한 기사의 ID를 쏙 기록!
+                        driverId = currentDriverId
                     )
                     cacheManager.addOrUpdateOrder(updated)
                     selectedOrder = updated
                 }
             } catch (e: Exception) {
                 errorMessage = "상태 변경 실패: ${e.localizedMessage}"
+            }
+        }
+    }
+
+    // 💡 2. 오더 수락 및 무전기 라우터 연동 통합 함수
+    fun acceptOrderAndConnectRouter(orderId: String, currentDriverId: String, roomKey: String) {
+        viewModelScope.launch {
+            try {
+                repository.updateOrderStatus(orderId, "수락됨", currentDriverId)
+
+                val existing = cacheManager.cachedOrders.find { it.id == orderId }
+                if (existing != null) {
+                    val updated = existing.copy(
+                        status = "수락됨",
+                        driverId = currentDriverId
+                    )
+                    cacheManager.addOrUpdateOrder(updated)
+                    selectedOrder = updated
+                }
+
+                // 📌 확보된 roomKey를 이용해 WikiRouter 무전기 채널 가동!
+                wikiRouterRepository.startRouterConnection(roomKey)
+
+                // 📌 AI 보미의 실시간 메시지 옵저브 시작
+                wikiRouterRepository.observeIncomingMessages { isAllowed, statusMessage ->
+                    memoryToastMessage = statusMessage
+                }
+
+            } catch (e: Exception) {
+                errorMessage = "오더 수락 및 라우터 연동 실패: ${e.localizedMessage}"
             }
         }
     }

@@ -547,3 +547,85 @@ AI 보미 후킹 인터페이스 위치
 
 오빠, 이 구조를 바탕으로 가장 먼저 연결하고 싶은 통신 기능(예: 소켓 연결 초기화 및 방 목록 실시간 수신 등)이 어떤 것인지 알려주면, 그에 맞는 구체적인 코드 스니펫을 바로 짜줄게요! 어떤 작업부터 시작해 볼까요? 🚀💙
 
+
+
+
+/
+
+
+
+
+---------------------------
+
+[1. UI / ViewModel] ➔ acceptOrderAndConnectRouter() 호출
+↓
+[2. BaroBaroRepositoryImpl] ➔ Firebase & 로컬에 오더 상태("수락됨") 및 driverId 기록
+↓
+[3. WikiRouterRepositoryImpl] ➔ roomKey를 이용해 소켓/무전기 채널 연결 시작
+↓
+[4. WikiRouterSocketDataSource] ➔ AI 보미의 메시지 인터셉트 및 실시간 통신(Observer) 가동
+
+
+----------------
+오빠, 방금 구현하신 **`acceptOrderAndConnectRouter`** 함수가 실행될 때, 앱의 계층(Layer) 구조 속에서 데이터와 신호가 어떤 파일들을 차례대로 거쳐 흘러가는지 그 여정을 알기 쉽게 단계별로 설명해 드릴게요!
+
+---
+
+### 🗂️ `acceptOrderAndConnectRouter`의 계층 간 호출 여정 (총 4단계)
+
+#### 1단계: 프레젠테이션(Presentation) 레이어 — `ViewModel`
+
+* **관련 파일:** `BaroBaroViewModel.kt`
+* **역할:** 사용자가 UI 화면에서 [오더 수락] 버튼을 누르는 순간, 이 함수가 가장 먼저 호출됩니다. 내부적으로 코루틴(`viewModelScope.launch`)을 열어 비동기 작업을 총괄하고, UI 상태(`selectedOrder`, `memoryToastMessage`, `errorMessage`)를 관리합니다.
+
+#### 2단계: 도메인(Domain) & 데이터(Data) 레이어 — 오더 상태 및 기사 매칭 기록
+
+* **관련 파일들:**
+* `BaroBaroRepository.kt` (도메인 인터페이스 계약)
+* `BaroBaroHybridRepositoryImpl.kt` (데이터 구현체)
+
+
+* **역할:**
+* 뷰모델의 지시를 받아 `repository.updateOrderStatus(orderId, "수락됨", currentDriverId)`를 호출합니다.
+* 로컬 메모리 캐시(`memoryOrders`)와 원격 데이터베이스(`Firebase Firestore`)에 동시에 접근하여 해당 오더의 상태를 `"수락됨"`으로 바꾸고, 수락한 기사의 고유 ID(`driverId`)를 안전하게 기록("도장 쾅")합니다.
+
+
+
+#### 3단계: 도메인 & 데이터 레이어 — 무전기 라우터 통신 파이프 가동
+
+* **관련 파일들:**
+* `WikiRouterRepository.kt` (도메인 인터페이스 계약)
+* `WikiRouterRepositoryImpl.kt` (데이터 구현체)
+
+
+* **역할:**
+* 오더에 담겨 있던 고유한 `roomKey`를 꺼내어 `wikiRouterRepository.startRouterConnection(roomKey)`를 호출합니다.
+* 이 신호가 소켓 데이터 소스로 전달되어 실시간 통신 채널(방)을 열어줍니다.
+
+
+
+#### 4단계: 리모트 데이터 소스(Remote Data Source) — AI 보미 인터셉트 및 실시간 관찰
+
+* **관련 파일:** `WikiRouterSocketDataSource.kt`
+* **역할:**
+* `wikiRouterRepository.observeIncomingMessages`를 통해 상대방이나 서버로부터 들어오는 메시지를 구독합니다.
+* 이 과정에서 AI '보미'의 인터셉트 메서드(`interceptAndFilterMessage`)가 작동하여, 수신된 메시지가 단골이나 VIP 콜인지 1차로 필터링한 뒤 결과를 토스트 메시지나 상태 로그(`memoryToastMessage`)로 뷰모델에 다시 올려보내 UI 화면까지 실시간으로 반영되게 만듭니다.
+
+
+
+---
+
+### 🎯 한눈에 보는 흐름 요약
+
+```text
+[1. UI / ViewModel] ➔ acceptOrderAndConnectRouter() 호출
+       ↓
+[2. BaroBaroRepositoryImpl] ➔ Firebase & 로컬에 오더 상태("수락됨") 및 driverId 기록
+       ↓
+[3. WikiRouterRepositoryImpl] ➔ roomKey를 이용해 소켓/무전기 채널 연결 시작
+       ↓
+[4. WikiRouterSocketDataSource] ➔ AI 보미의 메시지 인터셉트 및 실시간 통신(Observer) 가동
+
+```
+
+오빠가 설계하신 이 구조는 오더 수락이라는 비즈니스 로직과 소켓 통신이라는 네트워크 로직이 클린 아키텍처 원칙에 따라 각자의 레이어(ViewModel ➔ Repository ➔ DataSource)에 아주 유기적으로 잘 분산되어 있는 멋진 구조입니다! 🚀
