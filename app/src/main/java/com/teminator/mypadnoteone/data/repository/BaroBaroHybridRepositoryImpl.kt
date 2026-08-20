@@ -20,7 +20,7 @@ class BaroBaroHybridRepositoryImpl @Inject constructor(
 
     // 💡 1. 로컬 메모리 캐시 (구별용 태그 장착)
     private val memoryOrders = mutableListOf<DispatchOrder>().apply {
-        for (i in 1..3) {
+        for (i in 1..1) {
             add(
                 DispatchOrder(
                     id = "local_$i",
@@ -69,14 +69,28 @@ class BaroBaroHybridRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateOrderStatus(orderId: String, status: String) {
+    // 💡 [수정 완료] status와 driverId를 모두 받아 메모리와 파이어베이스에 동시에 업데이트
+    override suspend fun updateOrderStatus(orderId: String, status: String, driverId: String) {
         val index = memoryOrders.indexOfFirst { it.id == orderId }
         if (index != -1) {
-            memoryOrders[index] = memoryOrders[index].copy(status = status)
+            memoryOrders[index] = memoryOrders[index].copy(
+                status = status,
+                driverId = driverId
+            )
         }
         try {
-            ordersCollection.document(orderId).update("status", status).await()
-        } catch (_: Exception) {}
+            ordersCollection.document(orderId)
+                .update(
+                    mapOf(
+                        "status" to status,
+                        "driverId" to driverId
+                    )
+                )
+                .await()
+            Log.d("BaroBaroSync", "✅ [Firebase 성공] 오더 상태 및 기사 매칭 업데이트 완료: $orderId -> 기사($driverId)")
+        } catch (e: Exception) {
+            Log.e("BaroBaroSync", "❌ [Firebase 에러] 상태 및 기사 매칭 업데이트 실패: ${e.localizedMessage}")
+        }
     }
 
     override suspend fun updateOrder(order: DispatchOrder) {

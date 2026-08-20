@@ -15,10 +15,14 @@ class BaroBaroRepositoryImpl @Inject constructor() : BaroBaroRepository {
         memoryOrders.add(order)
     }
 
-    override suspend fun updateOrderStatus(orderId: String, status: String) {
+    // 💡 [수정됨] status와 함께 driverId도 전달받아 메모리 데이터를 안전하게 갱신
+    override suspend fun updateOrderStatus(orderId: String, status: String, driverId: String) {
         val index = memoryOrders.indexOfFirst { it.id == orderId }
         if (index != -1) {
-            memoryOrders[index] = memoryOrders[index].copy(status = status)
+            memoryOrders[index] = memoryOrders[index].copy(
+                status = status,
+                driverId = driverId // 📌 수락한 기사 ID 반영
+            )
         }
     }
 

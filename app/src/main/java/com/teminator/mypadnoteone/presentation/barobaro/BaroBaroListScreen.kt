@@ -42,7 +42,11 @@ fun BaroBaroListScreen(
             OrderCardItem(
                 order = order,
                 onItemClick = { onItemClick(order) },
-                onAcceptClick = { viewModel.acceptOrder(order.id) }
+                onAcceptClick = {
+                    // 💡 [수정 완료] 리스트 화면에서도 수락 시 드라이버 ID를 함께 전달합니다!
+                    val testDriverId = "driver_kim_${System.currentTimeMillis()}"
+                    viewModel.acceptOrder(order.id, testDriverId)
+                }
             )
         }
     }

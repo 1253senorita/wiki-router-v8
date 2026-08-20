@@ -86,7 +86,7 @@ class BaroBaroViewModel @Inject constructor(
         loadOrders()
     }
 
-    private fun loadOrders() {
+    fun loadOrders() {
         viewModelScope.launch {
             try {
                 memoryToastMessage = "⚠️ 초기 오더 데이터 로딩 중..."
@@ -104,10 +104,12 @@ class BaroBaroViewModel @Inject constructor(
                         val end = regions[(i * 7) % regions.size]
                         val cargo = cargoTypes[i % cargoTypes.size]
                         val price = prices[i % prices.size]
+                        val dummyId = "dummy_$i"
 
                         generatedDummyList.add(
                             DispatchOrder(
-                                id = i.toString(),
+                                id = dummyId,
+                                roomKey = "room_$dummyId", // 💡 샘플 데이터도 룸 키 자동 생성 부여
                                 route = "$start ➔ $end",
                                 cargoInfo = cargo,
                                 price = price,
@@ -150,6 +152,7 @@ class BaroBaroViewModel @Inject constructor(
                 val newId = "order_${System.currentTimeMillis()}" // 💡 고유하고 충돌 없는 ID 생성 개선
                 val newOrder = DispatchOrder(
                     id = newId,
+                    roomKey = "room_$newId", // 📌 실시간 소켓/무전기 연결용 룸 키도 함께 생성!
                     route = route,
                     cargoInfo = cargo,
                     price = price,
@@ -198,13 +201,18 @@ class BaroBaroViewModel @Inject constructor(
         }
     }
 
-    fun acceptOrder(orderId: String) {
+    fun acceptOrder(orderId: String, currentDriverId: String) {
         viewModelScope.launch {
             try {
-                repository.updateOrderStatus(orderId, "수락됨")
+                // 💡 [수정 완료] 인터페이스 규격에 맞춰 driverId를 함께 넘겨줍니다!
+                repository.updateOrderStatus(orderId, "수락됨", currentDriverId)
+
                 val existing = cacheManager.cachedOrders.find { it.id == orderId }
                 if (existing != null) {
-                    val updated = existing.copy(status = "수락됨")
+                    val updated = existing.copy(
+                        status = "수락됨",
+                        driverId = currentDriverId // 📌 수락한 기사의 ID를 쏙 기록!
+                    )
                     cacheManager.addOrUpdateOrder(updated)
                     selectedOrder = updated
                 }

@@ -18,6 +18,9 @@ import com.teminator.mypadnoteone.presentation.barobaro.detail.BaroBaroDetailScr
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
 import dagger.hilt.android.AndroidEntryPoint
+//import com.teminator.mypadnoteone.data.repository.loadOrders
+
+
 
 @AndroidEntryPoint
 class BaroBaroFragment : Fragment() {
@@ -86,6 +89,9 @@ class BaroBaroFragment : Fragment() {
                                                 if (viewModel.errorMessage == null) {
                                                     isRegisterMode = false
                                                     editingOrder = null
+
+                                                    // 💡 [핵심 추가] 등록/수정이 성공적으로 끝나면 즉시 목록을 다시 불러오도록 호출!
+                                                    viewModel.loadOrders() // 혹은 뷰모델에 목록을 새로고침하는 함수 이름
                                                 }
                                             },
                                             onCancel = {
@@ -136,7 +142,9 @@ class BaroBaroFragment : Fragment() {
                                             BaroBaroDetailScreen(
                                                 order = selectedOrder,
                                                 onAccept = {
-                                                    viewModel.acceptOrder(selectedOrder.id)
+                                                    // 💡 [수정 완료] 테스트용 드라이버 ID나 실제 기사 고유값을 함께 전달합니다!
+                                                    val testDriverId = "driver_kim_${System.currentTimeMillis()}"
+                                                    viewModel.acceptOrder(selectedOrder.id, testDriverId)
                                                     viewModel.forceCreateTestMatchRoom(selectedOrder.id)
                                                 },
                                                 onEdit = {
