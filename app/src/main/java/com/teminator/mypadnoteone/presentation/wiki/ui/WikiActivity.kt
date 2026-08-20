@@ -28,7 +28,7 @@ class WikiActivity : AppCompatActivity() {
         setupWikiOnBackPressed()
 
         // 메인 웹뷰 서비스 주소(10.0.2.2:8080) 또는 위키 전용 주소 로드
-        binding.webViewWiki.loadUrl("https://10.0.2.2:8080")
+        binding.webViewWiki.loadUrl("https://192.168.0.5:8080")
     }
 
     private fun setupWikiWebView() {

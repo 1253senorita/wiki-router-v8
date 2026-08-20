@@ -44,25 +44,28 @@ class AeroRouterActivity : AppCompatActivity() {
     }
 
     private fun initEngineAndSocket() {
-        // 오디오 엔진 초기화: 마이크 버퍼 데이터를 실시간으로 socketManager의 sendAudioData와 연동
+        val roomId = intent.getStringExtra("ROOM_ID") ?: "DEFAULT_ROOM"
+
+        // 1. 오디오 엔진 초기화 (마이크 데이터를 socketManager를 통해 전송)
         audioEngine = AeroAudioEngine { buffer, length ->
             if (isConnected) {
-                // 정확한 크기만큼의 바이트 배열로 잘라서 소켓 전송 함수 호출
-                val actualData =
-                    if (length == buffer.size) buffer else buffer.copyOfRange(0, length)
+                val actualData = if (length == buffer.size) buffer else buffer.copyOfRange(0, length)
                 socketManager.sendAudioData(actualData)
             }
         }
 
         socketManager = AeroSocketManager()
 
-        // 서버 연결 시도
+        // 2. 서버 연결 및 방 입장
         socketManager.connect(
             onConnected = {
                 runOnUiThread {
                     isConnected = true
-                    binding.tvStatus.text = "CONNECTED (STANDBY)"
-                    Toast.makeText(this@AeroRouterActivity, "AeroRouter 서버 연결 성공!", Toast.LENGTH_SHORT).show()
+                    binding.tvStatus.text = "CONNECTED ($roomId)"
+                    Toast.makeText(this@AeroRouterActivity, "서버 연결 성공!", Toast.LENGTH_SHORT).show()
+
+                    // 연결 성공 직후 해당 룸으로 입장 요청
+                    socketManager.joinRoom(roomId)
                 }
             },
             onError = { error ->

@@ -14,16 +14,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.teminator.mypadnoteone.R
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
 import com.teminator.mypadnoteone.presentation.aerorouter.ui.AeroRouterEntryActivity
 import com.teminator.mypadnoteone.presentation.auth.AuthActivity
-import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
-import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
-import com.teminator.mypadnoteone.presentation.wiki.ui.WikiActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import androidx.compose.ui.platform.ComposeView
 
 /**
  * 앱의 메인 화면을 담당하는 Activity입니다.
@@ -68,12 +63,6 @@ class MainActivity : AppCompatActivity() {
         // 로그아웃 버튼 클릭 시 ViewModel을 통해 로그아웃 처리 요청
         binding.btnLogout.setOnClickListener {
             viewModel.signOut()
-        }
-
-        // WIKI 화면으로 이동
-        binding.btnWIKIPtt.setOnClickListener {
-            val intent = Intent(this, WikiActivity::class.java)
-            startActivity(intent)
         }
 
         // 파이어베이스 웹 다운로드 페이지 링크 열기

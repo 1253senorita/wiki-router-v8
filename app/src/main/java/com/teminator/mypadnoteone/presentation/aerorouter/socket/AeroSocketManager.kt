@@ -1,25 +1,50 @@
 package com.teminator.mypadnoteone.presentation.aerorouter.socket
 
 import android.util.Log
+import com.teminator.mypadnoteone.data.datasource.remote.WikiRouterSocketDataSource
 import io.socket.client.IO
 import io.socket.client.Socket
+import okhttp3.OkHttpClient
 import org.json.JSONObject
 import java.net.URISyntaxException
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 class AeroSocketManager {
 
     private var socket: Socket? = null
     private val TAG = "AeroSocketManager"
 
-    // 💡 에뮬레이터 테스트 시 http://10.0.2.2:8080 (실기기는 PC IP 사용)
-    private val SERVER_URL = "http://10.0.2.2:8080"
+    // 서버가 HTTPS로 열려있으므로 10.0.2.2 HTTPS 주소 지정
+    private val SERVER_URL = "https://10.0.2.2:8080"
 
     /**
-     * Socket.io 서버 연결 초기화
+     * Socket.io 서버 연결 초기화 (HTTPS 사설 인증서 우회 적용)
      */
     fun connect(onConnected: () -> Unit, onError: (String) -> Unit) {
         try {
+            // 사설 HTTPS 인증서 검증 무시 설정
+            val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+                override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
+                override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
+            })
+
+            val sslContext = SSLContext.getInstance("TLS").apply {
+                init(null, trustAllCerts, SecureRandom())
+            }
+
+            val okHttpClient = OkHttpClient.Builder()
+                .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
+                .hostnameVerifier { _, _ -> true }
+                .build()
+
             val options = IO.Options().apply {
+                callFactory = okHttpClient
+                webSocketFactory = okHttpClient
                 forceNew = true
                 reconnection = true
                 reconnectionAttempts = 5
@@ -40,18 +65,12 @@ class AeroSocketManager {
             }
 
             socket?.connect()
-
         } catch (e: URISyntaxException) {
             Log.e(TAG, "URI Syntax Exception: ${e.message}")
             onError(e.message ?: "Invalid URL")
         }
     }
 
-    /**
-     * 1. [권한 및 자동 룸 분기 인증] get_oi 이벤트
-     * 서버 측에서 인증 성공 시 해당 modeId 룸으로 자동 socket.join() 수행됨
-     * modeId 종류: 'DEV_MASTER' (PW: 1234), 'GUEST_USER' (PW: 0000), 'NORMAL_USER' (PW: 1111)
-     */
     fun requestWikiAuth(userId: String, userPw: String, modeId: String, callback: (Boolean, String) -> Unit) {
         val data = JSONObject().apply {
             put("userId", userId)
@@ -65,8 +84,6 @@ class AeroSocketManager {
                 val success = res.optBoolean("success", false)
                 val payload = res.optJSONObject("payload")
                 val text = payload?.optString("text") ?: "응답 없음"
-
-                Log.d(TAG, "Auth Result -> Success: $success, Message: $text")
                 callback(success, text)
             } else {
                 callback(false, "서버 응답 오류")
@@ -74,18 +91,11 @@ class AeroSocketManager {
         }
     }
 
-    /**
-     * 2. [수동 룸 입장 분기] join-room 이벤트
-     * 특정 방 번호(roomId)를 인자로 보내어 서버 룸에 가입
-     */
     fun joinRoom(roomId: String) {
         socket?.emit("join-room", roomId)
         Log.d(TAG, "🏠 방 입장 요청 전송 -> Room ID: [$roomId]")
     }
 
-    /**
-     * 3. [무전기 오디오 전송] sync-audio-file 이벤트
-     */
     fun sendAudioData(audioByteArray: ByteArray) {
         val data = JSONObject().apply {
             put("blob", audioByteArray)
@@ -93,33 +103,10 @@ class AeroSocketManager {
         socket?.emit("sync-audio-file", arrayOf<Any>(data))
     }
 
-    /**
-     * 4. [무전기 오디오 수신 리스너] receive-sync-audio 이벤트
-     */
-    fun onReceiveAudio(callback: (ByteArray, String) -> Unit) {
-        socket?.on("receive-sync-audio") { args ->
-            if (args != null && args.isNotEmpty() && args[0] is JSONObject) {
-                val obj = args[0] as JSONObject
-                val senderId = obj.optString("id", "unknown")
-                // 추후 바이너리 블롭 데이터 핸들링 위치
-                Log.d(TAG, "🎤 오디오 수신됨 from: $senderId")
-            }
-        }
-    }
-
-    /**
-     * 연결 해제
-     */
     fun disconnect() {
         socket?.disconnect()
         socket?.off()
         socket = null
         Log.d(TAG, "Socket Disconnected.")
     }
-    fun sendAudio(buffer: ByteArray, length: Int) {
-        // Socket.io 또는 WebSocket을 통해 바이트 배열 스트리밍 전송 로직
-        // 예: socket.emit("audio_stream", buffer)
-    }
-
-
 }

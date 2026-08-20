@@ -49,7 +49,7 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- 🔥 [신규 추가] 실시간 매칭 세컨드 룸 진입 버튼 -->
+        <!-- 🔥 실시간 매칭 세컨드 룸 진입 버튼 -->
         <Button
             android:id="@+id/btnOpenMatchingRoom"
             android:layout_width="wrap_content"
@@ -110,16 +110,6 @@
                 android:textColor="#FFFFFF"
                 android:layout_marginEnd="8dp"/>
 
-            <Button
-                android:id="@+id/btnWIKIPtt"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:text="wiki라우터 이동"
-                android:textSize="12sp"
-                android:backgroundTint="#F0F0F0"
-                android:textColor="#333333"
-                android:layout_marginEnd="8dp"/>
-
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -176,7 +166,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="원하시는 메뉴를 --메인XML156--선택해 주세요."
+                android:text="원하시는 메뉴를 선택해 주세요."
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="#333333"
@@ -196,7 +186,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:gravity="center"
                     android:background="#E8F5E9"
                     android:padding="8dp">
@@ -219,10 +209,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-
-
-
-
             <!-- 서비스 바로가기 카드 4 (바로바로 화물 배차) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardBaroBaroBOTT"
@@ -244,7 +230,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🚚 --바로바로 메인XML261--화물 배차 서비스연결 호출은 메인a92"
+                        android:text="🚚 바로바로 화물 배차 서비스"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#0066CC"
@@ -258,13 +244,6 @@
                         android:textColor="#666666"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-
-
-
-
-
-
 
             <!-- 서비스 바로가기 카드 1 (무전기) -->
             <androidx.cardview.widget.CardView
@@ -296,9 +275,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-
-
-
             <!-- 서비스 바로가기 카드 2 (화물 오더 등록 바로가기) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardRegisterOrder"
@@ -320,7 +296,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📝 새 화물 오더 직접 등록 메인xml213"
+                        android:text="📝 새 화물 오더 직접 등록"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#6200EE"
@@ -329,11 +305,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="카드등록메인 콤토넌트와 메인ATB 97 라인 버튼 이덴트 ."
+                        android:text="신규 화물 배차 오더를 간편하게 등록합니다."
                         android:textSize="12sp"
                         android:textColor="#666666"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
             <!-- 서비스 바로가기 카드 3 (파이어베이스 다운로드 및 호스팅 안내) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardFirebaseDownload"
@@ -366,7 +343,6 @@
                         android:textColor="#666666"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
 
         </LinearLayout>
     </ScrollView>

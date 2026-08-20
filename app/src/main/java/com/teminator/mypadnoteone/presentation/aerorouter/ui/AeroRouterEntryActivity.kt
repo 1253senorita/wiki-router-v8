@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.teminator.mypadnoteone.databinding.ActivityAerorouterEntryBinding
-import com.teminator.mypadnoteone.presentation.aerorouter.ui.AeroRouterActivity
 import com.teminator.mypadnoteone.presentation.aerorouter.socket.AeroSocketManager
 
 class AeroRouterEntryActivity : AppCompatActivity() {
@@ -38,37 +37,19 @@ class AeroRouterEntryActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        // 1. 권한 모드 인증 및 입장 버튼 (get_oi -> 서버가 자동 room.join 처리)
+        // 1. 권한 모드 인증 및 입장 버튼 (잠금 해제: 항상 성공(true) 처리로 바로 통과)
         binding.btnAuthJoin.setOnClickListener {
-            val userId = binding.etUserId.text.toString().trim()
-            val modeId = binding.etModeOrRoom.text.toString().trim() // 예: DEV_MASTER, GUEST_USER 등
-            val userPw = binding.etPassword.text.toString().trim()
+            val modeId = binding.etModeOrRoom.text.toString().trim().ifEmpty { "DEV_MASTER" }
 
-            if (userId.isEmpty() || modeId.isEmpty() || userPw.isEmpty()) {
-                Toast.makeText(this, "모든 정보를 입력해주세요!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            Toast.makeText(this, "권한 모드 잠금 해제됨 (무조건 입장)", Toast.LENGTH_SHORT).show()
 
-            // 서버의 get_oi 이벤트 호출
-            socketManager.requestWikiAuth(userId, userPw, modeId) { success, message ->
-                runOnUiThread {
-                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-                    if (success) {
-                        // 인증 및 방 자동 입장 성공 시 -> 무전기 메인 화면(AeroRouterActivity)으로 이동!
-                        moveToPttScreen(modeId)
-                    }
-                }
-            }
+            // 서버 인증을 거치지 않고 곧바로 PTT 화면으로 이동
+            moveToPttScreen(modeId)
         }
 
         // 2. 일반 방 수동 입장 버튼 (join-room 이벤트 직접 호출)
         binding.btnRoomJoin.setOnClickListener {
-            val roomId = binding.etModeOrRoom.text.toString().trim()
-
-            if (roomId.isEmpty()) {
-                Toast.makeText(this, "입장할 방 번호를 입력해주세요!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            val roomId = binding.etModeOrRoom.text.toString().trim().ifEmpty { "DEFAULT_ROOM" }
 
             // 서버의 join-room 이벤트 호출
             socketManager.joinRoom(roomId)

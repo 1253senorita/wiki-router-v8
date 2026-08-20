@@ -3,75 +3,86 @@ package com.teminator.mypadnoteone.presentation.aerorouter.socket
 import android.util.Log
 import io.socket.client.IO
 import io.socket.client.Socket
+import okhttp3.OkHttpClient
 import org.json.JSONObject
 import java.net.URISyntaxException
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 class AeroMultiSocketManager {
 
     private var socket: Socket? = null
-    private val TAG = "AeroMultiSocket"
-    private val SERVER_URL = "http://YOUR_SERVER_IP_OR_DOMAIN:8080" // 서버 주소에 맞게 수정
+    private val TAG = "AeroMultiSocketManager"
+
+    // 💡 올바른 HTTPS 서버 주소 설정 (오타 수정 완료)
+    // 에뮬레이터 테스트용 주소
+    private val SERVER_URL = "https://10.0.2.2:8080"
 
     /**
-     * 서버 연결 초기화
+     * 서버 연결 초기화 (OkHttp를 통한 사설 HTTPS 인증서 우회 적용)
      */
     fun connect(onConnected: () -> Unit, onError: (String) -> Unit) {
         try {
+            // 1. 사설 HTTPS 인증서 검증 무시를 위한 TrustManager 설정
+            val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+                override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
+                override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
+            })
+
+            val sslContext = SSLContext.getInstance("TLS").apply {
+                init(null, trustAllCerts, SecureRandom())
+            }
+
+            // 2. 사설 인증서와 호스트네임을 신뢰하는 OkHttpClient 생성
+            val okHttpClient = OkHttpClient.Builder()
+                .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
+                .hostnameVerifier { _, _ -> true }
+                .build()
+
+            // 3. Socket.io 옵션에 OkHttpClient 주입 (callFactory, webSocketFactory 활용)
             val options = IO.Options().apply {
+                callFactory = okHttpClient
+                webSocketFactory = okHttpClient
                 forceNew = true
                 reconnection = true
+                reconnectionAttempts = 5
+                reconnectionDelay = 1000
             }
+
             socket = IO.socket(SERVER_URL, options)
 
             socket?.on(Socket.EVENT_CONNECT) {
-                Log.d(TAG, "서버 연결 성공")
+                Log.d(TAG, "Socket Connected Successfully!")
                 onConnected()
             }
 
             socket?.on(Socket.EVENT_CONNECT_ERROR) { args ->
-                val err = if (args.isNotEmpty()) args[0].toString() else "Connection Error"
-                onError(err)
+                val errorMsg = if (args.isNotEmpty()) args[0].toString() else "Unknown Connection Error"
+                Log.e(TAG, "Connection Error: $errorMsg")
+                onError(errorMsg)
             }
 
             socket?.connect()
         } catch (e: URISyntaxException) {
-            onError(e.message ?: "URL Error")
+            Log.e(TAG, "URI Syntax Exception: ${e.message}")
+            onError(e.message ?: "Invalid URL")
         }
     }
 
     /**
-     * 1. 권한 인증 요청 (get_oi) -> 서버 코드의 PASSWORDS 검증과 연동
-     */
-    fun requestAuth(userId: String, userPw: String, modeId: String, callback: (Boolean, String) -> Unit) {
-        val data = JSONObject().apply {
-            put("userId", userId)
-            put("userPw", userPw)
-            put("modeId", modeId) // 'DEV_MASTER', 'GUEST_USER', 'NORMAL_USER'
-        }
-
-        socket?.emit("get_oi", arrayOf<Any>(data)) { args ->
-            if (args != null && args.isNotEmpty() && args[0] is JSONObject) {
-                val res = args[0] as JSONObject
-                val success = res.optBoolean("success", false)
-                val payload = res.optJSONObject("payload")
-                val text = payload?.optString("text") ?: "응답 없음"
-                callback(success, text)
-            } else {
-                callback(false, "서버 응답 오류")
-            }
-        }
-    }
-
-    /**
-     * 2. 룸 입장 (join-room)
+     * 방 입장 요청
      */
     fun joinRoom(roomId: String) {
         socket?.emit("join-room", roomId)
-        Log.d(TAG, "방 입장 요청: $roomId")
+        Log.d(TAG, "🏠 방 입장 요청 전송 -> Room ID: [$roomId]")
     }
 
     /**
-     * 3. [무전기 / 전화기 모드] 오디오 스트리밍 데이터 전송 (sync-audio-file)
+     * 오디오 데이터 전송
      */
     fun sendAudioData(audioByteArray: ByteArray) {
         val data = JSONObject().apply {
@@ -81,50 +92,12 @@ class AeroMultiSocketManager {
     }
 
     /**
-     * [무전기 / 전화기 모드] 상대방 오디오 수신 리스너 등록
+     * 연결 해제
      */
-    fun onReceiveAudio(callback: (ByteArray, String) -> Unit) {
-        socket?.on("receive-sync-audio") { args ->
-            if (args != null && args.isNotEmpty() && args[0] is JSONObject) {
-                val obj = args[0] as JSONObject
-                // 서버에서 전달된 blob 및 유저 식별값 처리
-                // 실제 구현 시 바이너리 배열 추출 로직 추가
-                val senderId = obj.optString("id", "unknown")
-                // val blobData = obj.opt("blob") as? ByteArray
-                // if (blobData != null) callback(blobData, senderId)
-            }
-        }
-    }
-
-    /**
-     * 4. [문자 / 카톡 모드] 텍스트 메시지 송신 이벤트 예시
-     */
-    fun sendChatMessage(message: String, roomId: String) {
-        val data = JSONObject().apply {
-            put("room", roomId)
-            put("message", message)
-            put("time", System.currentTimeMillis())
-        }
-        socket?.emit("chat-message", arrayOf<Any>(data))
-    }
-
-    /**
-     * [문자 / 카톡 모드] 텍스트 메시지 수신 리스너 예시
-     */
-    fun onReceiveChatMessage(callback: (String, String) -> Unit) {
-        socket?.on("receive-chat-message") { args ->
-            if (args != null && args.isNotEmpty() && args[0] is JSONObject) {
-                val obj = args[0] as JSONObject
-                val sender = obj.optString("sender", "상대방")
-                val msg = obj.optString("message", "")
-                callback(sender, msg)
-            }
-        }
-    }
-
     fun disconnect() {
         socket?.disconnect()
         socket?.off()
         socket = null
+        Log.d(TAG, "Socket Disconnected.")
     }
 }
