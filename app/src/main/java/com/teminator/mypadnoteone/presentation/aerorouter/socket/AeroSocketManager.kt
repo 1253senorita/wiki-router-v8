@@ -1,50 +1,25 @@
 package com.teminator.mypadnoteone.presentation.aerorouter.socket
 
 import android.util.Log
-import com.teminator.mypadnoteone.data.datasource.remote.WikiRouterSocketDataSource
 import io.socket.client.IO
 import io.socket.client.Socket
-import okhttp3.OkHttpClient
 import org.json.JSONObject
 import java.net.URISyntaxException
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 
 class AeroSocketManager {
 
     private var socket: Socket? = null
     private val TAG = "AeroSocketManager"
 
-    // 서버가 HTTPS로 열려있으므로 10.0.2.2 HTTPS 주소 지정
-    private val SERVER_URL = "https://10.0.2.2:8080"
+    // 💡 핵심 수정: 서버가 HTTP로 구동 중이므로 http:// 10.0.2.2:8080 지정
+    private val SERVER_URL = "http://192.168.219.100:8080"
 
     /**
-     * Socket.io 서버 연결 초기화 (HTTPS 사설 인증서 우회 적용)
+     * Socket.io 서버 연결 초기화 (HTTP 환경 최적화)
      */
     fun connect(onConnected: () -> Unit, onError: (String) -> Unit) {
         try {
-            // 사설 HTTPS 인증서 검증 무시 설정
-            val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
-                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-                override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
-                override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
-            })
-
-            val sslContext = SSLContext.getInstance("TLS").apply {
-                init(null, trustAllCerts, SecureRandom())
-            }
-
-            val okHttpClient = OkHttpClient.Builder()
-                .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
-                .hostnameVerifier { _, _ -> true }
-                .build()
-
             val options = IO.Options().apply {
-                callFactory = okHttpClient
-                webSocketFactory = okHttpClient
                 forceNew = true
                 reconnection = true
                 reconnectionAttempts = 5

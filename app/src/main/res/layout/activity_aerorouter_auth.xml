@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/neumorphic_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="JOIN 🍎"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#1a1a1a"
+        android:layout_marginBottom="30dp"/>
+
+    <!-- ID 입력 필드 -->
+    <EditText
+        android:id="@+id/etJoinId"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/neumorphic_inset_bg"
+        android:hint="ID 입력"
+        android:text="DEV_MASTER"
+        android:paddingHorizontal="16dp"
+        android:textColor="#1a1a1a"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- PW 입력 필드 -->
+    <EditText
+        android:id="@+id/etJoinPw"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/neumorphic_inset_bg"
+        android:hint="PW 입력"
+        android:inputType="textPassword"
+        android:text="1234"
+        android:paddingHorizontal="16dp"
+        android:textColor="#1a1a1a"
+        android:textSize="14sp"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- 모드 선택 버튼 그룹 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:layout_marginBottom="20dp">
+
+        <Button
+            android:id="@+id/btnModeHotel"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/neumorphic_button_normal"
+            android:text="호텔객실"
+            android:textSize="12sp"
+            android:stateListAnimator="@null"/>
+
+        <Button
+            android:id="@+id/btnModeGeneral"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="2dp"
+            android:background="@drawable/neumorphic_button_normal"
+            android:text="일반룸"
+            android:textSize="12sp"
+            android:stateListAnimator="@null"/>
+
+        <Button
+            android:id="@+id/btnModePrivate"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/neumorphic_button_normal"
+            android:text="프라이빗"
+            android:textSize="12sp"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSystemJoin"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@drawable/neumorphic_button_active"
+        android:text="시스템 접속"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:stateListAnimator="@null"/>
+
+</LinearLayout>
