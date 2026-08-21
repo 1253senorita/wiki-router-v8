@@ -60,6 +60,16 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+
+        // 🌟 [추가] indep 패키지의 독립 테스트 액티비티로 이동
+        binding.btnOpenIndep.setOnClickListener {
+            val intent = Intent(this, com.teminator.mypadnoteone.indep.IndepRouterActivity::class.java)
+            startActivity(intent)
+            Toast.makeText(this, "독립 테스트 모듈로 진입합니다.", Toast.LENGTH_SHORT).show()
+        }
+
+
+
         // 로그아웃 버튼 클릭 시 ViewModel을 통해 로그아웃 처리 요청
         binding.btnLogout.setOnClickListener {
             viewModel.signOut()

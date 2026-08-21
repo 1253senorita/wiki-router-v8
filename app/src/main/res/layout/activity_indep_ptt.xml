@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/neumorphic_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <!-- 타이틀 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="INDEP PTT LAB 🍎"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#1a1a1a"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- 통신 상태 표시 텍스트 -->
+    <TextView
+        android:id="@+id/tvIndepStatus"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:background="@drawable/neumorphic_inset_bg"
+        android:text="Status: Disconnected"
+        android:textColor="#6200EE"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- 기능 테스트 버튼 그룹 1: 소켓 연결 및 핑 테스트 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btnIndepConnect"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/neumorphic_button_normal"
+            android:text="소켓 연결"
+            android:textColor="#333333"
+            android:textSize="12sp"
+            android:stateListAnimator="@null"/>
+
+        <Button
+            android:id="@+id/btnIndepPing"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/neumorphic_button_normal"
+            android:text="핑(Ping) 전송"
+            android:textColor="#333333"
+            android:textSize="12sp"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
+
+    <!-- 기능 테스트 버튼 그룹 2: 오디오 룸 입장 및 채널 선택 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginBottom="24dp">
+
+        <Button
+            android:id="@+id/btnIndepJoinRoom"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/neumorphic_button_normal"
+            android:text="방(Room) 입장"
+            android:textColor="#333333"
+            android:textSize="12sp"
+            android:stateListAnimator="@null"/>
+
+        <Button
+            android:id="@+id/btnIndepLeaveRoom"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/neumorphic_button_normal"
+            android:text="방 나가기"
+            android:textColor="#333333"
+            android:textSize="12sp"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
+
+    <!-- 핵심 PTT 마이크 송출 토글 버튼 -->
+    <Button
+        android:id="@+id/btnIndepPttToggle"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@drawable/neumorphic_button_active"
+        android:text="🎙️ PTT 마이크 송출 시작"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:stateListAnimator="@null"/>
+
+</LinearLayout>

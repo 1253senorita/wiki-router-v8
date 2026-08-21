@@ -100,13 +100,25 @@
             android:gravity="center_vertical"
             android:paddingHorizontal="12dp">
 
+            <!-- 기존 무전기 이동 버튼 -->
             <Button
                 android:id="@+id/btnOpenPtt"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="32sp"
                 android:text="무전기 이동"
                 android:textSize="12sp"
                 android:backgroundTint="#000000"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- 🌟 [추가] 독립 테스트 화면으로 이동하는 버튼 -->
+            <Button
+                android:id="@+id/btnOpenIndep"
+                android:layout_width="wrap_content"
+                android:layout_height="32sp"
+                android:text="독립 테스트"
+                android:textSize="12sp"
+                android:backgroundTint="#FF6F00"
                 android:textColor="#FFFFFF"
                 android:layout_marginEnd="8dp"/>
 

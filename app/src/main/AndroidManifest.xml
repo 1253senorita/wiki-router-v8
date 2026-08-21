@@ -66,6 +66,16 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".indep.IndepRouterActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".indep.IndepPttActivity"
+            android:exported="false" />
+
+
+
         <!-- StellarNote PTT 백그라운드 무전 포그라운드 서비스 -->
         <service
             android:name=".service.PttService"
