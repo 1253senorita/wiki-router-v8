@@ -18,7 +18,6 @@ class IndepRouterActivity : AppCompatActivity() {
 
         streamManager = IndepStreamManager()
 
-        // 독립 소켓 연결 시도 (결과 콜백 처리 추가)
         streamManager.connect { isSuccess ->
             runOnUiThread {
                 if (isSuccess) {
@@ -33,14 +32,12 @@ class IndepRouterActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        // 1. 권한 모드 접속 버튼
         binding.btnAuthJoin.setOnClickListener {
             val modeId = binding.etModeOrRoom.text.toString().trim().ifEmpty { "INDEP_MASTER" }
             Toast.makeText(this, "[$modeId] 독립 권한 모드 임시 허용 통과!", Toast.LENGTH_SHORT).show()
             moveToIndepPtt(modeId)
         }
 
-        // 2. 일반 방 수동 입장 버튼
         binding.btnRoomJoin.setOnClickListener {
             val roomId = binding.etModeOrRoom.text.toString().trim().ifEmpty { "INDEP_ROOM" }
             Toast.makeText(this, "[$roomId] 독립 방으로 임시 입장합니다.", Toast.LENGTH_SHORT).show()
@@ -49,9 +46,8 @@ class IndepRouterActivity : AppCompatActivity() {
     }
 
     private fun moveToIndepPtt(target: String) {
-        val intent = Intent(this, IndepPttActivity::class.java).apply {
-            putExtra("INDEP_TARGET_ROOM", target)
-        }
+        val intent = Intent(this, IndepPttActivity::class.java)
+        intent.putExtra("INDEP_TARGET_ROOM", target)
         startActivity(intent)
     }
 

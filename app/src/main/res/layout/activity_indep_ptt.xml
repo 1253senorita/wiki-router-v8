@@ -5,30 +5,79 @@
     android:background="@drawable/neumorphic_bg"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="32dp">
+    android:padding="16dp">
 
     <!-- 타이틀 -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="INDEP PTT LAB 🍎"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#1a1a1a"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="6dp"/>
 
     <!-- 통신 상태 표시 텍스트 -->
     <TextView
         android:id="@+id/tvIndepStatus"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="36dp"
         android:gravity="center"
         android:background="@drawable/neumorphic_inset_bg"
         android:text="Status: Disconnected"
         android:textColor="#6200EE"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:textStyle="bold"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginBottom="8dp"/>
+
+    <!-- 3배 커진 실시간 상태 확인 및 채팅 로그 출력 창 (스크롤 가능) -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="340dp"
+        android:background="@drawable/neumorphic_inset_bg"
+        android:padding="10dp"
+        android:layout_marginBottom="8dp"
+        android:fillViewport="true">
+
+        <TextView
+            android:id="@+id/tvIndepLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="[시스템 로그 및 대화 창]\n"
+            android:textColor="#333333"
+            android:textSize="14sp"
+            android:scrollbars="vertical"/>
+    </ScrollView>
+
+    <!-- 카카오톡 스타일 텍스트 입력 및 전송 버튼 그룹 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <EditText
+            android:id="@+id/etIndepMessage"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/neumorphic_inset_bg"
+            android:hint=" 메시지 입력..."
+            android:textSize="12sp"
+            android:textColor="#333333"
+            android:paddingHorizontal="10dp"/>
+
+        <Button
+            android:id="@+id/btnIndepSendChat"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/neumorphic_button_normal"
+            android:text="전송"
+            android:textColor="#333333"
+            android:textSize="12sp"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
 
     <!-- 기능 테스트 버튼 그룹 1: 소켓 연결 및 핑 테스트 -->
     <LinearLayout
@@ -36,12 +85,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="2"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="8dp">
 
         <Button
             android:id="@+id/btnIndepConnect"
             android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_height="38dp"
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
             android:background="@drawable/neumorphic_button_normal"
@@ -53,7 +102,7 @@
         <Button
             android:id="@+id/btnIndepPing"
             android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_height="38dp"
             android:layout_weight="1"
             android:layout_marginStart="6dp"
             android:background="@drawable/neumorphic_button_normal"
@@ -69,12 +118,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="2"
-        android:layout_marginBottom="24dp">
+        android:layout_marginBottom="8dp">
 
         <Button
             android:id="@+id/btnIndepJoinRoom"
             android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_height="38dp"
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
             android:background="@drawable/neumorphic_button_normal"
@@ -86,7 +135,7 @@
         <Button
             android:id="@+id/btnIndepLeaveRoom"
             android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_height="38dp"
             android:layout_weight="1"
             android:layout_marginStart="6dp"
             android:background="@drawable/neumorphic_button_normal"
@@ -100,7 +149,7 @@
     <Button
         android:id="@+id/btnIndepPttToggle"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
+        android:layout_height="44dp"
         android:background="@drawable/neumorphic_button_active"
         android:text="🎙️ PTT 마이크 송출 시작"
         android:textColor="#ffffff"

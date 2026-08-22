@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,8 @@ class IndepPttActivity : AppCompatActivity() {
     private var isTalking = false
 
     private val REQUEST_RECORD_AUDIO_PERMISSION = 200
+    private val logBuffer = StringBuilder()
+    private lateinit var tvIndepLog: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,13 +29,33 @@ class IndepPttActivity : AppCompatActivity() {
         audioEngine = IndepAudioEngine(this)
         streamManager = IndepStreamManager()
 
-        // 진입 시 마이크 권한 체크 및 요청
+        tvIndepLog = findViewById(R.id.tvIndepLog)
         checkAudioPermission()
 
         val targetRoom = intent.getStringExtra("INDEP_TARGET_ROOM") ?: "DEFAULT_ROOM"
-        Toast.makeText(this, "[$targetRoom] 독립 PTT 랩실 입장 완료", Toast.LENGTH_SHORT).show()
+        appendLog("[$targetRoom] 위키-라우터 PTT 랩실 입장 완료")
 
         setupListeners(targetRoom)
+
+        // 텍스트 메시지 수신 리스너
+        streamManager.onMessageReceived { senderId, message ->
+            appendLog("상대방($senderId): $message")
+        }
+
+        // 상대방 오디오 스트림 수신 리스너
+        streamManager.onAudioReceived { audioBytes ->
+            if (audioBytes.isNotEmpty()) {
+                appendLog("🔊 상대방 음성 데이터 수신됨 (${audioBytes.size} bytes)")
+                // TODO: 추후 AudioTrack을 이용한 스피커 재생 로직 연결 지점
+            }
+        }
+    }
+
+    private fun appendLog(message: String) {
+        runOnUiThread {
+            logBuffer.append("$message\n")
+            tvIndepLog.text = logBuffer.toString()
+        }
     }
 
     private fun checkAudioPermission() {
@@ -47,21 +70,6 @@ class IndepPttActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "마이크 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "마이크 권한이 거부되어 음성 송출을 할 수 없습니다.", Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
     private fun setupListeners(targetRoom: String) {
         val tvStatus = findViewById<TextView>(R.id.tvIndepStatus)
         val btnConnect = findViewById<Button>(R.id.btnIndepConnect)
@@ -70,59 +78,75 @@ class IndepPttActivity : AppCompatActivity() {
         val btnLeaveRoom = findViewById<Button>(R.id.btnIndepLeaveRoom)
         val btnPttToggle = findViewById<Button>(R.id.btnIndepPttToggle)
 
-        // 1. 소켓 연결 버튼
+        val etMessage = findViewById<EditText>(R.id.etIndepMessage)
+        val btnSendChat = findViewById<Button>(R.id.btnIndepSendChat)
+
         btnConnect.setOnClickListener {
             tvStatus.text = "Status: Connecting..."
-            Toast.makeText(this, "독립 소켓 연결 시도 중...", Toast.LENGTH_SHORT).show()
+            appendLog("위키-라우터 소켓 연결 시도 중...")
 
             streamManager.connect { isSuccess ->
                 runOnUiThread {
                     if (isSuccess) {
                         tvStatus.text = "Status: Connected"
-                        Toast.makeText(this, "소켓 연결 성공!", Toast.LENGTH_SHORT).show()
+                        appendLog("소켓 연결 성공!")
                     } else {
                         tvStatus.text = "Status: Connection Failed"
+                        appendLog("소켓 연결 실패")
                     }
                 }
             }
         }
 
-        // 2. 핑 테스트 버튼
         btnPing.setOnClickListener {
             streamManager.sendPing { latency ->
                 runOnUiThread {
-                    Toast.makeText(this, "Ping Pong! 응답 속도: ${latency}ms", Toast.LENGTH_SHORT)
-                        .show()
+                    appendLog("Ping Pong! 응답 속도: ${latency}ms")
                     tvStatus.text = "Status: Ping ${latency}ms"
                 }
             }
         }
 
-        // 3. 방 입장 버튼
         btnJoinRoom.setOnClickListener {
             streamManager.joinRoom(targetRoom) { success ->
                 runOnUiThread {
                     if (success) {
-                        Toast.makeText(this, "[$targetRoom] 방 입장 완료", Toast.LENGTH_SHORT).show()
+                        appendLog("[$targetRoom] 방 입장 완료")
                         tvStatus.text = "Status: In Room [$targetRoom]"
                     }
                 }
             }
         }
 
-        // 4. 방 나가기 버튼
         btnLeaveRoom.setOnClickListener {
             streamManager.leaveRoom()
-            Toast.makeText(this, "방 퇴장 처리", Toast.LENGTH_SHORT).show()
+            appendLog("방 퇴장 처리 완료")
             tvStatus.text = "Status: Connected (No Room)"
         }
 
-        // 5. PTT 마이크 송출 토글 버튼
+        btnSendChat.setOnClickListener {
+            val msgText = etMessage.text.toString().trim()
+            if (msgText.isNotEmpty()) {
+                streamManager.sendChatMessage(msgText, "OppaUser") { success ->
+                    runOnUiThread {
+                        if (success) {
+                            appendLog("나: $msgText")
+                            etMessage.setText("")
+                        } else {
+                            appendLog("메시지 전송 실패")
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(this, "메시지를 입력하세요", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         btnPttToggle.setOnClickListener {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED
             ) {
-                Toast.makeText(this, "마이크 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+                appendLog("마이크 권한이 필요합니다.")
                 checkAudioPermission()
                 return@setOnClickListener
             }
@@ -130,7 +154,7 @@ class IndepPttActivity : AppCompatActivity() {
             isTalking = !isTalking
             if (isTalking) {
                 btnPttToggle.text = "🔴 PTT 송출 중지 (마이크 켜짐)"
-                Toast.makeText(this, "🎙️ 마이크 녹음 및 음성 스트림 송출 시작", Toast.LENGTH_SHORT).show()
+                appendLog("🎙️ 마이크 녹음 및 음성 스트림 송출 시작")
 
                 audioEngine.startRecording { audioData ->
                     if (audioData.isNotEmpty()) {
@@ -139,13 +163,12 @@ class IndepPttActivity : AppCompatActivity() {
                 }
             } else {
                 btnPttToggle.text = "🎙️ PTT 마이크 송출 시작"
-                Toast.makeText(this, "⏹️ 마이크 송출 중지", Toast.LENGTH_SHORT).show()
+                appendLog("⏹️ 마이크 송출 중지")
                 audioEngine.stopRecording()
             }
         }
     }
 
-    // 💡 onDestroy 함수는 액티비티 클래스 내부, setupListeners 바깥에 올바르게 위치시킵니다.
     override fun onDestroy() {
         super.onDestroy()
         audioEngine.stopRecording()
