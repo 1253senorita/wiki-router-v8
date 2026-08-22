@@ -42,11 +42,11 @@ class IndepPttActivity : AppCompatActivity() {
             appendLog("상대방($senderId): $message")
         }
 
-        // 상대방 오디오 스트림 수신 리스너
+        // 🔊 상대방 오디오 스트림 수신 리스너 -> 스피커 재생 연결 완료!
         streamManager.onAudioReceived { audioBytes ->
             if (audioBytes.isNotEmpty()) {
-                appendLog("🔊 상대방 음성 데이터 수신됨 (${audioBytes.size} bytes)")
-                // TODO: 추후 AudioTrack을 이용한 스피커 재생 로직 연결 지점
+                appendLog("🔊 상대방 음성 수신 & 재생 중 (${audioBytes.size} bytes)")
+                audioEngine.playAudio(audioBytes)
             }
         }
     }
@@ -171,7 +171,7 @@ class IndepPttActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        audioEngine.stopRecording()
+        audioEngine.release()
         streamManager.disconnect()
     }
 }
