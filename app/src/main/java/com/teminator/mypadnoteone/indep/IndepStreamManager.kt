@@ -12,33 +12,40 @@ class IndepStreamManager {
         private var socket: Socket? = null
     }
 
-    fun connect(callback: (Boolean) -> Unit) {
+    fun connect(onConnected: () -> Unit, onError: (String) -> Unit) {
         try {
             if (socket != null && socket?.connected() == true) {
-                callback(true)
+                onConnected()
                 return
             }
 
-            // 로컬 서버 접속 주소 (나중에 클라우드 주소로 변경할 위치)
-            socket = IO.socket("http://10.0.2.2:8080")
+            val options = IO.Options().apply {
+                forceNew = true
+                reconnection = true
+                reconnectionAttempts = 5
+                reconnectionDelay = 1000
+            }
+
+            socket = IO.socket(IndepConfig.SERVER_URL, options)
 
             socket?.on(Socket.EVENT_CONNECT) {
-                callback(true)
-            }?.on(Socket.EVENT_CONNECT_ERROR) {
-                callback(false)
+                Log.d(IndepConfig.TAG, "Socket Connected Successfully!")
+                onConnected()
+            }?.on(Socket.EVENT_CONNECT_ERROR) { args ->
+                val errorMsg = if (args.isNotEmpty()) args[0].toString() else "Unknown Connection Error"
+                Log.e(IndepConfig.TAG, "Connection Error: $errorMsg")
+                onError(errorMsg)
             }
 
             socket?.connect()
         } catch (e: URISyntaxException) {
-            e.printStackTrace()
-            callback(false)
+            Log.e(IndepConfig.TAG, "URI Syntax Exception: ${e.message}")
+            onError(e.message ?: "Invalid URL")
         }
     }
 
-    // 💎 서버와 핑퐁 테스트를 수행하는 메서드
     fun sendPing(callback: (Long) -> Unit) {
         val startTime = System.currentTimeMillis()
-
         socket?.emit("ping", object : io.socket.client.Ack {
             override fun call(vararg args: Any) {
                 val latency = System.currentTimeMillis() - startTime
@@ -47,23 +54,22 @@ class IndepStreamManager {
         })
     }
 
-    // 💎 방 입장 메서드
-    fun joinRoom(roomId: String, callback: (Boolean) -> Unit) {
+    fun joinRoom(roomId: String) {
         socket?.emit("join-room", roomId)
-        callback(true)
+        Log.d(IndepConfig.TAG, "🏠 방 입장 요청 전송 -> Room ID: [$roomId]")
     }
 
-    // 💎 방 퇴장 메서드
     fun leaveRoom() {
         socket?.emit("leave-room")
     }
 
-    // 💎 채팅 메시지 전송 메서드
+    // 💬 카톡 스타일 텍스트 메시지 전송
     fun sendChatMessage(message: String, senderId: String, callback: (Boolean) -> Unit) {
         try {
             val data = JSONObject().apply {
                 put("message", message)
                 put("senderId", senderId)
+                put("timestamp", System.currentTimeMillis())
             }
             socket?.emit("chat-message", data)
             callback(true)
@@ -73,7 +79,6 @@ class IndepStreamManager {
         }
     }
 
-    // 💎 텍스트 메시지 수신 리스너 등록 메서드
     fun onMessageReceived(listener: (String, String) -> Unit) {
         socket?.off("chat-message")
         socket?.on("chat-message") { args ->
@@ -86,54 +91,90 @@ class IndepStreamManager {
                         listener(senderId, message)
                     }
                 } catch (e: Exception) {
-                    Log.e("PTT_DATA_CHECK", "❌ [예외 발생] 메시지 수신 실패", e)
+                    Log.e(IndepConfig.TAG, "❌ 메시지 수신 실패", e)
                 }
             }
         }
     }
 
-    // 💎 서버가 던져주는 오디오 스트림을 받는(Receive) 리스너 위치
+    // 🖼️ 이미지 + 캡션(텍스트) 전송
+    fun sendImageMessage(imageBytes: ByteArray, senderId: String, caption: String = "", callback: (Boolean) -> Unit) {
+        try {
+            val data = JSONObject().apply {
+                put("image", imageBytes)
+                put("senderId", senderId)
+                put("message", caption)
+                put("timestamp", System.currentTimeMillis())
+            }
+            socket?.emit("chat-image", data)
+            callback(true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            callback(false)
+        }
+    }
+
+    fun onImageReceived(listener: (String, ByteArray, String) -> Unit) {
+        socket?.off("chat-image")
+        socket?.on("chat-image") { args ->
+            if (args.isNotEmpty()) {
+                try {
+                    val data = args[0] as? JSONObject
+                    val blobObj = data?.opt("image")
+                    val senderId = data?.optString("senderId", "Unknown") ?: "Unknown"
+                    val caption = data?.optString("message", "") ?: ""
+
+                    if (blobObj is JSONArray) {
+                        val bytes = ByteArray(blobObj.length())
+                        for (i in 0 until blobObj.length()) {
+                            bytes[i] = blobObj.getInt(i).toByte()
+                        }
+                        listener(senderId, bytes, caption)
+                    }
+                } catch (e: Exception) {
+                    Log.e(IndepConfig.TAG, "❌ 이미지 수신 실패", e)
+                }
+            }
+        }
+    }
+
+    // 🎙️ 오디오 스트림 데이터 전송 (Aero 스타일 적용)
+    fun sendVoiceData(audioByteArray: ByteArray) {
+        try {
+            val data = JSONObject().apply {
+                put("blob", audioByteArray)
+            }
+            socket?.emit("sync-audio-file", arrayOf<Any>(data))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     fun onAudioReceived(listener: (ByteArray) -> Unit) {
         socket?.off("receive-sync-audio")
         socket?.on("receive-sync-audio") { args ->
             if (args.isNotEmpty()) {
                 try {
                     val data = args[0] as? JSONObject
-                    if (data != null) {
-                        val blobObj = data.opt("blob")
-                        if (blobObj is JSONArray) {
-                            val bytes = ByteArray(blobObj.length())
-                            for (i in 0 until blobObj.length()) {
-                                bytes[i] = blobObj.getInt(i).toByte()
-                            }
-
-                            Log.e("PTT_DATA_CHECK", "🎉 [앱 수신 성공!] 서버로부터 오디오 패킷 도착! 크기: ${bytes.size} bytes")
-                            listener(bytes)
-                        } else {
-                            Log.e("PTT_DATA_CHECK", "⚠️ [형식 오류] blob이 JSONArray가 아님")
+                    val blobObj = data?.opt("blob")
+                    if (blobObj is JSONArray) {
+                        val bytes = ByteArray(blobObj.length())
+                        for (i in 0 until blobObj.length()) {
+                            bytes[i] = blobObj.getInt(i).toByte()
                         }
+                        listener(bytes)
                     }
                 } catch (e: Exception) {
-                    Log.e("PTT_DATA_CHECK", "❌ [예외 발생] 오디오 수신 실패", e)
+                    Log.e(IndepConfig.TAG, "❌ 오디오 수신 실패", e)
                 }
             }
         }
     }
 
-    // 💎 마이크 오디오 바이트를 서버로 던지는(Send) 함수 위치
-    fun sendVoiceData(audioBytes: ByteArray) {
-        try {
-            val data = JSONObject().apply {
-                put("blob", audioBytes)
-            }
-            socket?.emit("sync-audio-file", data)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     fun disconnect() {
         socket?.disconnect()
+        socket?.off()
         socket = null
+        Log.d(IndepConfig.TAG, "Socket Disconnected.")
     }
 }

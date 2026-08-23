@@ -1,173 +1,307 @@
 package com.teminator.mypadnoteone.presentation.barobaro.room
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
 
 @Composable
 fun MatchingRoomScreen(
     roomId: String,
-    order: DispatchOrder?, // 💡 [추가] 수락한 화물 오더 정보를 받아오기 위한 파라미터!
+    order: DispatchOrder?,
     viewModel: MatchingRoomViewModel,
     onBackClick: () -> Unit
 ) {
-    // 뷰모델의 상태들을 관찰 (State 연동)
     val roomStatus = viewModel.roomStatus
-    val lastLogMessage = viewModel.lastLogMessage
-    var inputMessage by remember { mutableStateOf("") }
+    val logList = viewModel.logList
+    val inputMessage = viewModel.inputMessage
 
-    // 화면이 처음 켜질 때 세컨드 룸 통신 파이프 연결 시도
+    var isCameraOn by remember { mutableStateOf(false) }
+    var isVideoCallActive by remember { mutableStateOf(false) }
+
+    val listState = rememberLazyListState()
+
+    // 💡 갤러리에서 사진을 선택하기 위한 런처 정의
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            viewModel.sendImageMessage(it.toString())
+        }
+    }
+
+    // 로그가 추가될 때 가장 하단으로 자동 스크롤 이동
+    LaunchedEffect(logList.size) {
+        if (logList.isNotEmpty()) {
+            listState.animateScrollToItem(logList.size - 1)
+        }
+    }
+
     LaunchedEffect(roomId) {
         viewModel.joinMatchingRoom(roomId)
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween
+            .background(Color(0xFF121212))
+            .padding(16.dp)
     ) {
-        // 1. 상단 타이틀 및 방 정보 영역
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "(콜 수락 가상룸 매칭MatchingRoomScr42)상위자는BaroBaroFragmen 61",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Button(onClick = onBackClick) {
-                    Text("방 나가기")
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            // ==========================================
+            // 1. 상단 타이틀 영역
+            // ==========================================
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "WIKI-ROUTER HYBRID CALL",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
+
+                    Button(
+                        onClick = onBackClick,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF424242)),
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                        modifier = Modifier.height(32.dp)
+                    ) {
+                        Text("방 나가기", color = Color.White, fontSize = 11.sp)
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "현재 룸 ID: $roomId | 상태: $roomStatus",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFFB0BEC5)
+                )
+
+                if (order != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = "📦 매칭된 화물 정보 (#${order.id})",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                                color = Color(0xFFFF5722)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(text = "경로: ${order.route}", style = MaterialTheme.typography.bodyMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = Color.White)
+                            Text(text = "화물: ${order.cargoInfo} | 요금: ${order.price}", style = MaterialTheme.typography.bodySmall, color = Color.LightGray)
+                        }
+                    }
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = Color.DarkGray)
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "현재Matc51 룸 ID: $roomId",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
-            // 💡 [핵심 추가] 매칭 룸 상단에 방금 수락한 화물 오더 정보를 카드 형태로 고정 출력!
-            if (order != null) {
-                Spacer(modifier = Modifier.height(8.dp))
+            // ==========================================
+            // 2. 중앙 컨테이너 (채팅 및 로그 리스트 영역)
+            // ==========================================
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    modifier = Modifier.fillMaxSize(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E)),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(
-                            text = "📦 매칭된 화물 정보 (#${order.id})",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = "경로: ${order.route}", style = MaterialTheme.typography.bodyMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-                        Text(text = "화물: ${order.cargoInfo} | 요금: ${order.price}", style = MaterialTheme.typography.bodySmall)
-                        if (!order.description.isNullOrBlank()) {
-                            Text(text = "요청사항: ${order.description}", style = MaterialTheme.typography.bodySmall, color = androidx.compose.ui.graphics.Color.Gray)
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(logList) { logItem ->
+                            Surface(
+                                color = when (logItem.type) {
+                                    RoomLogItem.LogType.MY_MESSAGE -> Color(0xFF37474F)
+                                    RoomLogItem.LogType.ACTION -> Color(0xFF4E342E)
+                                    RoomLogItem.LogType.IMAGE -> Color(0xFF1B5E20) // 사진 메시지는 초록빛 계열로 구분
+                                    else -> Color(0xFF2C2C2C)
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(10.dp)) {
+                                    Text(
+                                        text = "[${logItem.sender}]",
+                                        fontSize = 11.sp,
+                                        color = Color(0xFFFF5722),
+                                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = logItem.message,
+                                        fontSize = 13.sp,
+                                        color = Color.White
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            Divider(modifier = Modifier.padding(vertical = 12.dp))
-        }
-
-        // 2. 중앙 통신 파이프 및 상태 로그 표시 영역
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Matc47상태: $roomStatus",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (!lastLogMessage.isNullOrBlank()) {
-                Card(
+            // ==========================================
+            // 3. 하단 액션 및 실시간 대화 입력 바 영역 (사진 첨부 버튼 포함)
+            // ==========================================
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Matc80로그: $lastLogMessage",
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyMedium
+                    // 💡 갤러리 사진 첨부 버튼 (에러가 나던 PhotoCamera 대신 표준 Add 아이콘 사용)
+                    IconButton(
+                        onClick = { galleryLauncher.launch("image/*") },
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(Color(0xFF333333), RoundedCornerShape(8.dp))
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "사진 첨부",
+                            tint = Color(0xFFFF5722)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    OutlinedTextField(
+                        value = inputMessage,
+                        onValueChange = { viewModel.onInputChanged(it) },
+                        placeholder = { Text("메시지 입력...", color = Color.Gray) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp),
+                        maxLines = 1,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFFFF5722),
+                            unfocusedBorderColor = Color.DarkGray,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
+                        )
                     )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    IconButton(
+                        onClick = { viewModel.sendCurrentMessage() },
+                        modifier = Modifier
+                            .size(52.dp)
+                            .background(Color(0xFFFF5722), RoundedCornerShape(8.dp))
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            contentDescription = "전송",
+                            tint = Color.White
+                        )
+                    }
                 }
-            } else {
-                Text(
-                    text = "기사와 화주 간의 통신 파이프 대기 중...",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            isVideoCallActive = !isVideoCallActive
+                            viewModel.updateRoomAction(if (isVideoCallActive) "영상 통화 연결됨" else "영상 통화 종료됨")
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(46.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isVideoCallActive) Color(0xFF00695C) else Color(0xFF333333)
+                        )
+                    ) {
+                        Text(
+                            text = if (isVideoCallActive) "📹 영상 통화 중지" else "📹 영상 통화 시작",
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
+                    }
+
+                    Button(
+                        onClick = { viewModel.updateRoomAction("PTT 송신 중") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(46.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xD32F2F))
+                    ) {
+                        Text("[누르고 말하기] PTT", color = Color.White, fontSize = 12.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                    }
+                }
             }
         }
 
-        // 3. 하단 액션 및 실시간 대화 입력 바 영역
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        // ==============================================
+        // 4. 우측 상단 PiP 내 카메라 화면 및 켜기 스위치
+        // ==============================================
+        Card(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 70.dp, end = 4.dp)
+                .width(110.dp)
+                .height(130.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF2C2C2C)),
+            shape = RoundedCornerShape(8.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
-            // 실시간 메시지 입력 필드 및 전송 버튼
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                OutlinedTextField(
-                    value = inputMessage,
-                    onValueChange = { inputMessage = it },
-                    placeholder = { Text("Matc상대방에게 전달할 정보/메시지 입력...") },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
+                Text(
+                    text = if (isCameraOn) "📹 내 카메라 켜짐" else "📷 내 카메라 꺼짐",
+                    color = if (isCameraOn) Color(0xFFFF5722) else Color.LightGray,
+                    fontSize = 9.sp,
                     maxLines = 1
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconButton(
-                    onClick = {
-                        if (inputMessage.isNotBlank()) {
-                            viewModel.sendCustomMessage(inputMessage)
-                            inputMessage = ""
-                        }
-                    },
-                    modifier = Modifier.size(56.dp),
-                    colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Send,
-                        contentDescription = "전송",
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-            }
-
-            // 운행 상태 업데이트 고속 버튼
-            Button(
-                onClick = {
-                    viewModel.updateRoomAction("운행 진행 중 상태 전송")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-            ) {
-                Text("운행 상태 업데이트 / 신호 보내기")
+                Switch(
+                    checked = isCameraOn,
+                    onCheckedChange = { isCameraOn = it },
+                    modifier = Modifier.scale(0.7f)
+                )
             }
         }
     }

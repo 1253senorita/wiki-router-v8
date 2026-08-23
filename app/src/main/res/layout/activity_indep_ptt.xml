@@ -30,10 +30,10 @@
         android:textStyle="bold"
         android:layout_marginBottom="8dp"/>
 
-    <!-- 3배 커진 실시간 상태 확인 및 채팅 로그 출력 창 (스크롤 가능) -->
+    <!-- 실시간 상태 확인 및 채팅 로그 출력 창 (스크롤 가능) -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="340dp"
+        android:layout_height="220dp"
         android:background="@drawable/neumorphic_inset_bg"
         android:padding="10dp"
         android:layout_marginBottom="8dp"
@@ -49,7 +49,18 @@
             android:scrollbars="vertical"/>
     </ScrollView>
 
-    <!-- 카카오톡 스타일 텍스트 입력 및 전송 버튼 그룹 -->
+    <!-- 🖼️ 수신 또는 전송된 이미지를 보여줄 프리뷰 뷰 -->
+    <ImageView
+        android:id="@+id/ivIndepPreview"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/neumorphic_inset_bg"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        android:contentDescription="이미지 미리보기" />
+
+    <!-- 💬 기존 메시지 입력창 + 텍스트 전송 버튼 + 이미지 버튼 통합 구역 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -74,6 +85,17 @@
             android:layout_height="40dp"
             android:background="@drawable/neumorphic_button_normal"
             android:text="전송"
+            android:textColor="#333333"
+            android:textSize="12sp"
+            android:stateListAnimator="@null"
+            android:layout_marginEnd="6dp"/>
+
+        <Button
+            android:id="@+id/btnIndepSendImage"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/neumorphic_button_normal"
+            android:text="🖼️ 이미지"
             android:textColor="#333333"
             android:textSize="12sp"
             android:stateListAnimator="@null"/>

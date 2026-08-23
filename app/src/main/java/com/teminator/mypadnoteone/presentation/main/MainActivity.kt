@@ -15,8 +15,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
-import com.teminator.mypadnoteone.presentation.aerorouter.ui.AeroRouterEntryActivity
 import com.teminator.mypadnoteone.presentation.auth.AuthActivity
+import com.teminator.mypadnoteone.video.VideoCallActivity // 🔥 영상 통화 화면 임포트
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -54,12 +54,13 @@ class MainActivity : AppCompatActivity() {
      * UI 컴포넌트의 리스너 및 클릭 이벤트를 초기화합니다.
      */
     private fun setupUI() {
-        // PTT(무전기) 화면으로 이동
+        // 🔥 [변경] 기존 무전기 버튼(btnOpenPtt) 자리에 영상 통화 액티비티 진입 연결
+        // (만약 레이아웃 XML의 버튼 아이디가 다르다면 binding.btnOpenVideoCall 등으로 맞춰주세요)
         binding.btnOpenPtt.setOnClickListener {
-            val intent = Intent(this, AeroRouterEntryActivity::class.java)
+            val intent = Intent(this, VideoCallActivity::class.java)
             startActivity(intent)
+            Toast.makeText(this, "영상 통화 모듈로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
-
 
         // 🌟 [추가] indep 패키지의 독립 테스트 액티비티로 이동
         binding.btnOpenIndep.setOnClickListener {
@@ -67,8 +68,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
             Toast.makeText(this, "독립 테스트 모듈로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
-
-
 
         // 로그아웃 버튼 클릭 시 ViewModel을 통해 로그아웃 처리 요청
         binding.btnLogout.setOnClickListener {
@@ -154,7 +153,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * 무전기 기능 사용을 위한 마이크(오디오 녹음) 권한을 확인합니다.
+     * 영상/음성 통화 기능 사용을 위한 마이크 권한을 확인합니다.
      */
     private fun checkAudioPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
@@ -181,7 +180,7 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "마이크 권한이 승인되었습니다.", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "무전기 기능을 사용하려면 마이크 권한이 필요합니다.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "통화 기능을 사용하려면 마이크 권한이 필요합니다.", Toast.LENGTH_LONG).show()
             }
         }
     }

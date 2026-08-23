@@ -49,16 +49,17 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- 🔥 실시간 매칭 세컨드 룸 진입 버튼 -->
+        <!-- 독립 테스트 버튼 -->
         <Button
-            android:id="@+id/btnOpenMatchingRoom"
+            android:id="@+id/btnOpenIndep"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="세컨드룸"
-            android:textSize="11sp"
-            android:backgroundTint="#E8F5E9"
-            android:textColor="#2E7D32"
-            android:layout_marginEnd="6dp"/>
+            android:layout_height="32dp"
+            android:text="독립 테스트"
+            android:textSize="12sp"
+            android:backgroundTint="#00FF5D"
+            android:textColor="#FFFFFF"
+            android:layout_marginEnd="8dp"/>
+
 
         <!-- 고객(클라이언트) 페이지 진입 버튼 -->
         <Button
@@ -100,27 +101,27 @@
             android:gravity="center_vertical"
             android:paddingHorizontal="12dp">
 
-            <!-- 기존 무전기 이동 버튼 -->
+            <!-- 영상 통화 이동 버튼 -->
             <Button
                 android:id="@+id/btnOpenPtt"
                 android:layout_width="wrap_content"
-                android:layout_height="32sp"
-                android:text="무전기 이동"
+                android:layout_height="32dp"
+                android:text="영상 통화"
                 android:textSize="12sp"
                 android:backgroundTint="#000000"
-                android:textColor="#FFFFFF"
+                android:textColor="#03A9F4"
                 android:layout_marginEnd="8dp"/>
 
-            <!-- 🌟 [추가] 독립 테스트 화면으로 이동하는 버튼 -->
+            <!-- 세컨드룸 이동 버튼 (🔥 색상 코드 수정: ffffff -> #FFFFFF) -->
             <Button
-                android:id="@+id/btnOpenIndep"
+                android:id="@+id/btnOpenMatchingRoom"
                 android:layout_width="wrap_content"
-                android:layout_height="32sp"
-                android:text="독립 테스트"
-                android:textSize="12sp"
-                android:backgroundTint="#FF6F00"
+                android:layout_height="36dp"
+                android:text="세컨드룸"
+                android:textSize="11sp"
+                android:backgroundTint="#2E7D32"
                 android:textColor="#FFFFFF"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="6dp"/>
 
         </LinearLayout>
     </HorizontalScrollView>
@@ -257,7 +258,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- 서비스 바로가기 카드 1 (무전기) -->
+            <!-- 서비스 바로가기 카드 1 (영상 통화 서비스) -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
@@ -273,7 +274,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📻 실시간 무전기 서비스"
+                        android:text="📹 실시간 영상 통화 서비스"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#000000"
@@ -281,7 +282,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PTT 기반 실시간 음성 통신 화면으로 이동합니다."
+                        android:text="WebRTC 기반 고화질 영상 통신 화면으로 이동합니다."
                         android:textSize="12sp"
                         android:textColor="#666666"/>
                 </LinearLayout>
