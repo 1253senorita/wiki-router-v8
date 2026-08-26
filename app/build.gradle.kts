@@ -120,6 +120,12 @@ dependencies {
     implementation("com.google.ai.edge.litert:litert:1.0.1")
     implementation("com.google.ai.edge.litert:litert-support:1.0.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-// 또는 최신 버전
+    implementation("io.getstream:stream-webrtc-android:1.3.9")
+
+
+
 
 }
+
+
+

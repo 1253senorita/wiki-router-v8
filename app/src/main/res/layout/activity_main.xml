@@ -115,13 +115,13 @@
             <!-- 세컨드룸 이동 버튼 (🔥 색상 코드 수정: ffffff -> #FFFFFF) -->
             <Button
                 android:id="@+id/btnOpenMatchingRoom"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="세컨드룸"
-                android:textSize="11sp"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
                 android:backgroundTint="#2E7D32"
+                android:text="세컨드룸"
                 android:textColor="#FFFFFF"
-                android:layout_marginEnd="6dp"/>
+                android:textSize="11sp" />
 
         </LinearLayout>
     </HorizontalScrollView>

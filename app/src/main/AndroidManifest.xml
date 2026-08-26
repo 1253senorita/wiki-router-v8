@@ -49,24 +49,21 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- 위키 액티비티 (중복 제거 완료) -->
         <activity
             android:name=".presentation.wiki.ui.WikiActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- 비디오 통화 액티비티 (중복 제거 완료) -->
         <activity
             android:name=".video.VideoCallActivity"
             android:exported="false" />
 
+        <!-- 독립 라우터 액티비티 -->
         <activity
             android:name=".indep.IndepRouterActivity"
             android:exported="false" />
-
-        <activity
-            android:name=".indep.IndepPttActivity"
-            android:exported="false" />
-
-
 
         <!-- StellarNote PTT 백그라운드 무전 포그라운드 서비스 -->
         <service
@@ -74,17 +71,6 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="microphone" />
-        <!--
-                <service
-                    android:name=".service.DaemonRouterService"
-                    android:enabled="true"
-                    android:exported="false"
-                    android:foregroundServiceType="microphone" />
-                -->
-
-
-
-
 
     </application>
 </manifest>
