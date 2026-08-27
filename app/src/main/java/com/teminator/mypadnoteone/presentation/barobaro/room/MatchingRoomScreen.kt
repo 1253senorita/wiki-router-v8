@@ -1,5 +1,6 @@
 package com.teminator.mypadnoteone.presentation.barobaro.room
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
@@ -29,6 +31,8 @@ fun MatchingRoomScreen(
     viewModel: MatchingRoomViewModel,
     onBackClick: () -> Unit
 ) {
+    val context = LocalContext.current
+
     val roomStatus = viewModel.roomStatus
     val logList = viewModel.logList
     val inputMessage = viewModel.inputMessage
@@ -38,7 +42,6 @@ fun MatchingRoomScreen(
 
     val listState = rememberLazyListState()
 
-    // 💡 갤러리에서 사진을 선택하기 위한 런처 정의
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -47,7 +50,6 @@ fun MatchingRoomScreen(
         }
     }
 
-    // 로그가 추가될 때 가장 하단으로 자동 스크롤 이동
     LaunchedEffect(logList.size) {
         if (logList.isNotEmpty()) {
             listState.animateScrollToItem(logList.size - 1)
@@ -116,6 +118,31 @@ fun MatchingRoomScreen(
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(text = "경로: ${order.route}", style = MaterialTheme.typography.bodyMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = Color.White)
                             Text(text = "화물: ${order.cargoInfo} | 요금: ${order.price}", style = MaterialTheme.typography.bodySmall, color = Color.LightGray)
+
+                            if (order.shipperPhone.isNotBlank()) {
+                                Text(text = "연락처: ${order.shipperPhone}", style = MaterialTheme.typography.bodySmall, color = Color(0xFF81C784))
+                            }
+
+                            // 📞 [수정] 오더에 등록된 실제 화주 전화번호 연결
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = {
+                                    val targetPhone = order.shipperPhone.takeIf { it.isNotBlank() } ?: "010-0000-0000"
+                                    val intent = Intent(Intent.ACTION_DIAL).apply {
+                                        data = Uri.parse("tel:$targetPhone")
+                                    }
+                                    try {
+                                        context.startActivity(intent)
+                                    } catch (e: Exception) {
+                                        android.widget.Toast.makeText(context, "전화 앱을 열 수 없습니다.", android.widget.Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                                contentPadding = PaddingValues(vertical = 4.dp)
+                            ) {
+                                Text("📞 화주에게 바로 전화 걸기", color = Color.White, fontSize = 12.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                            }
                         }
                     }
                 }
@@ -149,7 +176,7 @@ fun MatchingRoomScreen(
                                 color = when (logItem.type) {
                                     RoomLogItem.LogType.MY_MESSAGE -> Color(0xFF37474F)
                                     RoomLogItem.LogType.ACTION -> Color(0xFF4E342E)
-                                    RoomLogItem.LogType.IMAGE -> Color(0xFF1B5E20) // 사진 메시지는 초록빛 계열로 구분
+                                    RoomLogItem.LogType.IMAGE -> Color(0xFF1B5E20)
                                     else -> Color(0xFF2C2C2C)
                                 },
                                 shape = RoundedCornerShape(8.dp),
@@ -176,7 +203,7 @@ fun MatchingRoomScreen(
             }
 
             // ==========================================
-            // 3. 하단 액션 및 실시간 대화 입력 바 영역 (사진 첨부 버튼 포함)
+            // 3. 하단 액션 및 실시간 대화 입력 바 영역
             // ==========================================
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -186,7 +213,6 @@ fun MatchingRoomScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 💡 갤러리 사진 첨부 버튼 (에러가 나던 PhotoCamera 대신 표준 Add 아이콘 사용)
                     IconButton(
                         onClick = { galleryLauncher.launch("image/*") },
                         modifier = Modifier

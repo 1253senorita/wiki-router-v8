@@ -8,5 +8,6 @@ data class DispatchOrder(
     val price: String = "",       // 금액
     val status: String = "대기중", // 상태 (대기중 / 수락됨 등)
     val description: String = "", // 설명
-    val driverId: String = ""     // 📌 [추가 추천] 이 오더를 잡은 기사(클라이언트)의 고유 ID
+    val driverId: String = "",    // 이 오더를 잡은 기사(클라이언트)의 고유 ID
+    val shipperPhone: String = "" // 📞 [추가] 화주 전화번호
 )

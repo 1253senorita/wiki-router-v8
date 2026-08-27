@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
-import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroRegisterScreen
+import com.teminator.mypadnoteone.presentation.barobaro.BaroBaroRegisterScreen
 import com.teminator.mypadnoteone.presentation.barobaro.detail.BaroBaroDetailScreen
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
@@ -78,20 +78,21 @@ class BaroBaroFragment : Fragment() {
                                     if (isRegisterMode || editingOrder != null) {
                                         BaroBaroRegisterScreen(
                                             initialOrder = editingOrder,
-                                            onRegister = { route: String, cargo: String, price: String, desc: String ->
+                                            // 💡 1. 람다 인자에 shipperPhone을 추가해 줍니다. (총 5개)
+                                            onRegister = { route: String, cargo: String, price: String, desc: String, shipperPhone: String ->
                                                 val targetEdit = editingOrder
                                                 if (targetEdit != null) {
-                                                    viewModel.updateOrder(targetEdit.id, route, cargo, price, desc)
+                                                    // 💡 2. 뷰모델의 updateOrder에 전화번호까지 전달 (함수 시그니처에 맞게 파라미터 추가 필요)
+                                                    viewModel.updateOrder(targetEdit.id, route, cargo, price, desc, shipperPhone)
                                                 } else {
-                                                    viewModel.addOrder(route, cargo, price, desc)
+                                                    // 💡 3. 뷰모델의 addOrder에 전화번호까지 전달 (함수 시그니처에 맞게 파라미터 추가 필요)
+                                                    viewModel.addOrder(route, cargo, price, desc, shipperPhone)
                                                 }
 
                                                 if (viewModel.errorMessage == null) {
                                                     isRegisterMode = false
                                                     editingOrder = null
-
-                                                    // 💡 [핵심 추가] 등록/수정이 성공적으로 끝나면 즉시 목록을 다시 불러오도록 호출!
-                                                    viewModel.loadOrders() // 혹은 뷰모델에 목록을 새로고침하는 함수 이름
+                                                    viewModel.loadOrders()
                                                 }
                                             },
                                             onCancel = {

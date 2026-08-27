@@ -1,34 +1,18 @@
-package com.terminator.mypadnoteone.presentation.barobaro
+package com.teminator.mypadnoteone.presentation.barobaro
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
 
 @Composable
 fun BaroBaroRegisterScreen(
-    initialOrder: DispatchOrder? = null, // 💡 수정할 때 기존 오더 데이터 전달 (등록일 때는 null)
-    onRegister: (String, String, String, String) -> Unit, // 등록 또는 수정 완료 콜백
+    initialOrder: DispatchOrder? = null, // 수정할 때 기존 오더 데이터 전달 (등록일 때는 null)
+    onRegister: (String, String, String, String, String) -> Unit, // 📞 [수정] 콜백에 전화번호 포함 (route, cargo, price, description, shipperPhone)
     onCancel: () -> Unit
 ) {
-    // 💡 기존 데이터가 있으면 출발지/도착지를 '➔' 기준으로 쪼개서 초기값으로 세팅하고, 없으면 빈 칸("")으로 시작
     val initialRouteParts = initialOrder?.route?.split(" ➔ ") ?: listOf("", "")
     val initialDeparture = if (initialRouteParts.isNotEmpty()) initialRouteParts[0] else ""
     val initialDestination = if (initialRouteParts.size > 1) initialRouteParts[1] else ""
@@ -38,6 +22,9 @@ fun BaroBaroRegisterScreen(
     var cargo by remember { mutableStateOf(initialOrder?.cargoInfo ?: "") }
     var price by remember { mutableStateOf(initialOrder?.price ?: "") }
     var description by remember { mutableStateOf(initialOrder?.description ?: "") }
+
+    // 📞 [추가] 화주 전화번호 상태값
+    var shipperPhone by remember { mutableStateOf(initialOrder?.shipperPhone ?: "") }
 
     val isEditMode = initialOrder != null
 
@@ -93,7 +80,16 @@ fun BaroBaroRegisterScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        // 5. 상세 기재 사항 입력창
+        // 📞 5. [추가] 화주 전화번호 입력창
+        OutlinedTextField(
+            value = shipperPhone,
+            onValueChange = { shipperPhone = it },
+            label = { Text("화주 전화번호 (예: 010-1234-5678)") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 6. 상세 기재 사항 입력창
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
@@ -108,14 +104,13 @@ fun BaroBaroRegisterScreen(
         ) {
             Button(
                 onClick = {
-                    if (departure.isNotBlank() && destination.isNotBlank() && cargo.isNotBlank() && price.isNotBlank()) {
+                    if (departure.isNotBlank() && destination.isNotBlank() && cargo.isNotBlank() && price.isNotBlank() && shipperPhone.isNotBlank()) {
                         val combinedRoute = "$departure ➔ $destination"
-                        onRegister(combinedRoute, cargo, price, description)
+                        onRegister(combinedRoute, cargo, price, description, shipperPhone)
                     }
                 },
                 modifier = Modifier.weight(1f)
             ) {
-                // 모드에 따라 버튼 문구 동적 변경
                 Text(if (!isEditMode) "등록 완료" else "수정 완료")
             }
 

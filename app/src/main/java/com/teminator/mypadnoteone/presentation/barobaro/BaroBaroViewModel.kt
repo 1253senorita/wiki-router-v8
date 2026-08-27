@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
 import com.teminator.mypadnoteone.domain.repository.BaroBaroRepository
-import com.terminator.mypadnoteone.domain.repository.WikiRouterRepository // 📌 무전기 라우터 레포지토리 임포트
+import com.terminator.mypadnoteone.domain.repository.WikiRouterRepository
 import com.teminator.mypadnoteone.data.cache.OrderCacheManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -16,10 +16,9 @@ import javax.inject.Inject
 @HiltViewModel
 class BaroBaroViewModel @Inject constructor(
     private val repository: BaroBaroRepository,
-    private val wikiRouterRepository: WikiRouterRepository // 💡 [추가] 무전기/소켓 라우터 레포지토리 주입
+    private val wikiRouterRepository: WikiRouterRepository
 ) : ViewModel() {
 
-    // 💡 [메모리 방어] 오더 캐시 매니저 도입 (최대 100개 유지로 OOM 방지)
     private val cacheManager = OrderCacheManager(maxCapacity = 100)
 
     val orderList: List<DispatchOrder> get() = cacheManager.cachedOrders
@@ -31,15 +30,12 @@ class BaroBaroViewModel @Inject constructor(
         searchQuery = query
     }
 
-    // 💡 최신 등록된 항목이 위로 오도록 역순(Reversed)으로 리스트 정렬 및 필터링 적용
     val filteredOrderList: List<DispatchOrder>
         get() {
-            // 1단계: "수락됨" 상태가 아닌(미수락) 오더들만 추려냄
             val unacceptedList = cacheManager.cachedOrders.filter { order ->
                 order.status != "수락됨"
             }
 
-            // 2단계: 검색어가 있으면 추가 필터링, 없으면 전체 미수락 리스트 반환
             val list = if (searchQuery.isBlank()) {
                 unacceptedList
             } else {
@@ -48,7 +44,6 @@ class BaroBaroViewModel @Inject constructor(
                             it.cargoInfo.contains(searchQuery, ignoreCase = true)
                 }
             }
-            // 3단계: 최신 등록된 항목이 위로 오도록 역순 정렬
             return list.reversed()
         }
 
@@ -111,12 +106,13 @@ class BaroBaroViewModel @Inject constructor(
                         generatedDummyList.add(
                             DispatchOrder(
                                 id = dummyId,
-                                roomKey = "room_$dummyId", // 💡 샘플 데이터도 룸 키 자동 생성 부여
+                                roomKey = "room_$dummyId",
                                 route = "$start ➔ $end",
                                 cargoInfo = cargo,
                                 price = price,
                                 status = "대기중",
-                                description = "기본 테스트용 샘플 오더 데이터입니다 (#$i)"
+                                description = "기본 테스트용 샘플 오더 데이터입니다 (#$i)",
+                                shipperPhone = "010-1234-56${i % 10}" // 더미 전화번호 추가
                             )
                         )
                     }
@@ -143,7 +139,8 @@ class BaroBaroViewModel @Inject constructor(
         errorMessage = null
     }
 
-    fun addOrder(route: String, cargo: String, price: String, description: String) {
+    // 💡 [수정됨] addOrder에 shipperPhone 파라미터 추가
+    fun addOrder(route: String, cargo: String, price: String, description: String, shipperPhone: String) {
         if (route.isBlank() || cargo.isBlank() || price.isBlank()) {
             errorMessage = "필수 항목을 모두 입력해주세요!"
             return
@@ -159,7 +156,8 @@ class BaroBaroViewModel @Inject constructor(
                     cargoInfo = cargo,
                     price = price,
                     status = "대기중",
-                    description = description
+                    description = description,
+                    shipperPhone = shipperPhone // 📞 전화번호 바인딩
                 )
                 repository.addOrder(newOrder)
                 cacheManager.addOrUpdateOrder(newOrder)
@@ -170,7 +168,8 @@ class BaroBaroViewModel @Inject constructor(
         }
     }
 
-    fun updateOrder(orderId: String, route: String, cargo: String, price: String, description: String) {
+    // 💡 [수정됨] updateOrder에 shipperPhone 파라미터 추가
+    fun updateOrder(orderId: String, route: String, cargo: String, price: String, description: String, shipperPhone: String) {
         if (route.isBlank() || cargo.isBlank() || price.isBlank()) {
             errorMessage = "필수 항목을 모두 입력해주세요!"
             return
@@ -184,7 +183,8 @@ class BaroBaroViewModel @Inject constructor(
                         route = route,
                         cargoInfo = cargo,
                         price = price,
-                        description = description
+                        description = description,
+                        shipperPhone = shipperPhone // 📞 수정된 전화번호 반영
                     )
 
                     repository.updateOrder(updatedOrder)
@@ -203,7 +203,6 @@ class BaroBaroViewModel @Inject constructor(
         }
     }
 
-    // 💡 1. 기본 오더 수락 함수
     fun acceptOrder(orderId: String, currentDriverId: String) {
         viewModelScope.launch {
             try {
@@ -224,7 +223,6 @@ class BaroBaroViewModel @Inject constructor(
         }
     }
 
-    // 💡 2. 오더 수락 및 무전기 라우터 연동 통합 함수
     fun acceptOrderAndConnectRouter(orderId: String, currentDriverId: String, roomKey: String) {
         viewModelScope.launch {
             try {
@@ -240,10 +238,8 @@ class BaroBaroViewModel @Inject constructor(
                     selectedOrder = updated
                 }
 
-                // 📌 확보된 roomKey를 이용해 WikiRouter 무전기 채널 가동!
                 wikiRouterRepository.startRouterConnection(roomKey)
 
-                // 📌 AI 보미의 실시간 메시지 옵저브 시작
                 wikiRouterRepository.observeIncomingMessages { isAllowed, statusMessage ->
                     memoryToastMessage = statusMessage
                 }
