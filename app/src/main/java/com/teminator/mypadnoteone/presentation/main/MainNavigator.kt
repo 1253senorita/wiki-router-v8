@@ -3,17 +3,15 @@ package com.teminator.mypadnoteone.presentation.main
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import com.teminator.mypadnoteone.R
 import com.teminator.mypadnoteone.presentation.client.AiFragment
 import com.teminator.mypadnoteone.presentation.client.ClientFragment
-import com.terminator.mypadnoteone.presentation.barobaro.BaroBaroFragment
-import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
-import androidx.compose.ui.platform.ComposeView
+import com.teminator.mypadnoteone.presentation.barobaro.BaroBaroFragment
+import com.teminator.mypadnoteone.databinding.ActivityMainBinding
 
 class MainNavigator(
     private val activity: AppCompatActivity,
-    private val binding: com.teminator.mypadnoteone.databinding.ActivityMainBinding
+    private val binding: ActivityMainBinding
 ) {
 
     /**

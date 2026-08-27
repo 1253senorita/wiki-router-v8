@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#121212"
-    tools:context=".video.VideoCallActivity">
+    tools:context="com.terminator.mypadnoteone.com.teminator.mypadnoteone.video.VideoCallActivity">
 
     <!-- 1. 상단 타이틀 및 모드 전환 탭 영역 -->
     <LinearLayout

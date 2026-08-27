@@ -1,6 +1,7 @@
 package com.teminator.mypadnoteone.indep
 
 import android.util.Log
+import io.socket.client.Ack
 import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONArray
@@ -46,7 +47,7 @@ class IndepStreamManager {
 
     fun sendPing(callback: (Long) -> Unit) {
         val startTime = System.currentTimeMillis()
-        socket?.emit("ping", object : io.socket.client.Ack {
+        socket?.emit("ping", object : Ack {
             override fun call(vararg args: Any) {
                 val latency = System.currentTimeMillis() - startTime
                 callback(latency)

@@ -1,7 +1,7 @@
 package com.teminator.mypadnoteone.data.repository
 
 import com.teminator.mypadnoteone.data.datasource.remote.WikiRouterSocketDataSource
-import com.terminator.mypadnoteone.domain.repository.WikiRouterRepository
+import com.teminator.mypadnoteone.domain.repository.WikiRouterRepository
 import javax.inject.Inject
 
 class WikiRouterRepositoryImpl @Inject constructor(

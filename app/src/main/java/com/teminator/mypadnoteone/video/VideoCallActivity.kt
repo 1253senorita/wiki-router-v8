@@ -1,4 +1,4 @@
-package com.teminator.mypadnoteone.video
+package com.teminator.mypadnoteone.video // 혹은 현재 프로젝트의 정확한 패키지명
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -10,21 +10,23 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.teminator.mypadnoteone.R
 import com.teminator.mypadnoteone.indep.IndepStreamManager
 import dagger.hilt.android.AndroidEntryPoint
 import org.webrtc.*
+import com.teminator.mypadnoteone.R
+
 
 @AndroidEntryPoint
 class VideoCallActivity : AppCompatActivity() {
+    // ... 기존 코드 동일 ...
 
     private lateinit var streamManager: IndepStreamManager
 
     // WebRTC 컴포넌트
     private lateinit var rootEglBase: EglBase
     private var peerConnectionFactory: PeerConnectionFactory? = null
-    private var localVideoTrack: org.webrtc.VideoTrack? = null
-    private var localAudioTrack: org.webrtc.AudioTrack? = null // 🔥 패키지 명확히 지정
+    private var localVideoTrack: VideoTrack? = null
+    private var localAudioTrack: AudioTrack? = null // 🔥 패키지 명확히 지정
     private var videoCapturer: CameraVideoCapturer? = null
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
 

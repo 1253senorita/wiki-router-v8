@@ -1,4 +1,4 @@
-package com.terminator.mypadnoteone.presentation.barobaro
+package com.teminator.mypadnoteone.presentation.barobaro
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
-import com.teminator.mypadnoteone.presentation.barobaro.BaroBaroRegisterScreen
 import com.teminator.mypadnoteone.presentation.barobaro.detail.BaroBaroDetailScreen
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
@@ -112,7 +112,7 @@ class BaroBaroFragment : Fragment() {
                                                     .fillMaxWidth()
                                                     .padding(horizontal = 16.dp, vertical = 8.dp),
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                                                verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 OutlinedTextField(
                                                     value = viewModel.searchQuery,
@@ -144,8 +144,12 @@ class BaroBaroFragment : Fragment() {
                                                 order = selectedOrder,
                                                 onAccept = {
                                                     // 💡 [수정 완료] 테스트용 드라이버 ID나 실제 기사 고유값을 함께 전달합니다!
-                                                    val testDriverId = "driver_kim_${System.currentTimeMillis()}"
-                                                    viewModel.acceptOrder(selectedOrder.id, testDriverId)
+                                                    val testDriverId =
+                                                        "driver_kim_${System.currentTimeMillis()}"
+                                                    viewModel.acceptOrder(
+                                                        selectedOrder.id,
+                                                        testDriverId
+                                                    )
                                                     viewModel.forceCreateTestMatchRoom(selectedOrder.id)
                                                 },
                                                 onEdit = {

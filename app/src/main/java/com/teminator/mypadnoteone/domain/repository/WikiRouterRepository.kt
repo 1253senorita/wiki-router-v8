@@ -1,4 +1,4 @@
-package com.terminator.mypadnoteone.domain.repository
+package com.teminator.mypadnoteone.domain.repository
 
 interface WikiRouterRepository {
     // 💡 roomKey를 이용해 무전기 통로 접속

@@ -2,6 +2,7 @@ package com.teminator.mypadnoteone.presentation.barobaro.room
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
@@ -112,11 +114,11 @@ fun MatchingRoomScreen(
                             Text(
                                 text = "📦 매칭된 화물 정보 (#${order.id})",
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                                fontWeight = FontWeight.Bold,
                                 color = Color(0xFFFF5722)
                             )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text(text = "경로: ${order.route}", style = MaterialTheme.typography.bodyMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = Color.White)
+                            Text(text = "경로: ${order.route}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
                             Text(text = "화물: ${order.cargoInfo} | 요금: ${order.price}", style = MaterialTheme.typography.bodySmall, color = Color.LightGray)
 
                             if (order.shipperPhone.isNotBlank()) {
@@ -134,14 +136,14 @@ fun MatchingRoomScreen(
                                     try {
                                         context.startActivity(intent)
                                     } catch (e: Exception) {
-                                        android.widget.Toast.makeText(context, "전화 앱을 열 수 없습니다.", android.widget.Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "전화 앱을 열 수 없습니다.", Toast.LENGTH_SHORT).show()
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
                                 contentPadding = PaddingValues(vertical = 4.dp)
                             ) {
-                                Text("📞 화주에게 바로 전화 걸기", color = Color.White, fontSize = 12.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                                Text("📞 화주에게 바로 전화 걸기", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -187,7 +189,7 @@ fun MatchingRoomScreen(
                                         text = "[${logItem.sender}]",
                                         fontSize = 11.sp,
                                         color = Color(0xFFFF5722),
-                                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                                        fontWeight = FontWeight.Bold
                                     )
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
@@ -290,7 +292,7 @@ fun MatchingRoomScreen(
                             .height(46.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xD32F2F))
                     ) {
-                        Text("[누르고 말하기] PTT", color = Color.White, fontSize = 12.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                        Text("[누르고 말하기] PTT", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }

@@ -1,10 +1,10 @@
 package com.teminator.mypadnoteone.di
 
 import com.teminator.mypadnoteone.data.datasource.remote.WikiRouterSocketDataSource
-import com.teminator.mypadnoteone.data.repository.BaroBaroHybridRepositoryImpl // 👈 하이브리드 구현체 임포트
+import com.teminator.mypadnoteone.data.repository.BaroBaroHybridRepositoryImpl
 import com.teminator.mypadnoteone.data.repository.WikiRouterRepositoryImpl
 import com.teminator.mypadnoteone.domain.repository.BaroBaroRepository
-import com.terminator.mypadnoteone.domain.repository.WikiRouterRepository
+import com.teminator.mypadnoteone.domain.repository.WikiRouterRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

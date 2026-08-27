@@ -1,4 +1,4 @@
-package com.terminator.mypadnoteone.presentation.barobaro
+package com.teminator.mypadnoteone.presentation.barobaro
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

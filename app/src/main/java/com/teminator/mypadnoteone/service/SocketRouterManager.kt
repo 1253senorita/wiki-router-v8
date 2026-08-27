@@ -1,4 +1,4 @@
-package com.terminator.mypadnoteone.service
+package com.teminator.mypadnoteone.service
 
 import android.util.Log
 import kotlinx.coroutines.*

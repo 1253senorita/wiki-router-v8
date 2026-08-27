@@ -49,13 +49,13 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
-        <!-- 위키 액티비티 (중복 제거 완료) -->
+        <!-- 위키 액티비티 -->
         <activity
             android:name=".presentation.wiki.ui.WikiActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
-        <!-- 비디오 통화 액티비티 (중복 제거 완료) -->
+        <!-- 비디오 통화 액티비티 -->
         <activity
             android:name=".video.VideoCallActivity"
             android:exported="false" />

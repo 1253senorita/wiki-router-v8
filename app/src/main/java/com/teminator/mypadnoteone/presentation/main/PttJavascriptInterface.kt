@@ -25,12 +25,12 @@ class PttJavascriptInterface(
     // 포그라운드 무전 서비스 시작
     @JavascriptInterface
     fun startPttService() {
-        PttService.startService(context)
+        PttService.Companion.startService(context)
     }
 
     // 포그라운드 무전 서비스 종료
     @JavascriptInterface
     fun stopPttService() {
-        PttService.stopService(context)
+        PttService.Companion.stopService(context)
     }
 }

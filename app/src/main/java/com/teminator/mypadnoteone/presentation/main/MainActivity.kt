@@ -15,8 +15,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
+import com.teminator.mypadnoteone.indep.IndepRouterActivity
 import com.teminator.mypadnoteone.presentation.auth.AuthActivity
-import com.teminator.mypadnoteone.video.VideoCallActivity // 🔥 영상 통화 화면 임포트
+import com.teminator.mypadnoteone.video.VideoCallActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
         // 🌟 [추가] indep 패키지의 독립 테스트 액티비티로 이동
         binding.btnOpenIndep.setOnClickListener {
-            val intent = Intent(this, com.teminator.mypadnoteone.indep.IndepRouterActivity::class.java)
+            val intent = Intent(this, IndepRouterActivity::class.java)
             startActivity(intent)
             Toast.makeText(this, "독립 테스트 모듈로 진입합니다.", Toast.LENGTH_SHORT).show()
         }

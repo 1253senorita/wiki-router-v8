@@ -2,8 +2,10 @@ package com.teminator.mypadnoteone.presentation.wiki.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.net.http.SslError
 import android.os.Bundle
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -35,8 +37,8 @@ class WikiActivity : AppCompatActivity() {
         binding.webViewWiki.webViewClient = object : WebViewClient() {
             override fun onReceivedSslError(
                 view: WebView?,
-                handler: android.webkit.SslErrorHandler?,
-                error: android.net.http.SslError?
+                handler: SslErrorHandler?,
+                error: SslError?
             ) {
                 handler?.proceed() // 사설 인증서 허용
             }

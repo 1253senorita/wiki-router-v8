@@ -1,6 +1,6 @@
-package com.terminator.mypadnoteone.domain.usecase
+package com.teminator.mypadnoteone.domain.usecase
 
-import com.terminator.mypadnoteone.domain.repository.WikiRouterRepository
+import com.teminator.mypadnoteone.domain.repository.WikiRouterRepository
 import javax.inject.Inject
 
 class WikiInterceptAndHoldOrderUseCase @Inject constructor(

@@ -12,7 +12,6 @@ import androidx.fragment.app.viewModels
 import com.teminator.mypadnoteone.presentation.main.MainActivity
 //import com.terminator.mypadnoteone.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
-import com.teminator.mypadnoteone.presentation.client.ClientViewModel
 
 @AndroidEntryPoint
 class ClientFragment : Fragment() {

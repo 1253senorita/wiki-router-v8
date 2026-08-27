@@ -1,4 +1,4 @@
-package com.terminator.mypadnoteone.domain.model
+package com.teminator.mypadnoteone.domain.model
 
 data class WikiAgentFilterModel(
     val isAllowed: Boolean,       // VIP/단골 여부 (하이패스 통과 여부)

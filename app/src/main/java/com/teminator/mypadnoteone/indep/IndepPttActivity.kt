@@ -1,8 +1,5 @@
 package com.teminator.mypadnoteone.presentation.barobaro.room
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color as AndroidColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,7 +16,6 @@ import androidx.compose.ui.unit.sp
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
 import com.teminator.mypadnoteone.indep.IndepAudioEngine
 import com.teminator.mypadnoteone.indep.IndepStreamManager
-import java.io.ByteArrayOutputStream
 
 @Composable
 fun MatchingRoomScreen(

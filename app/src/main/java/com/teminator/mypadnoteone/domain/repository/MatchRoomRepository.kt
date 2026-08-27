@@ -1,11 +1,18 @@
 package com.teminator.mypadnoteone.domain.repository
 
-import com.terminator.mypadnoteone.domain.model.MatchRoom
+import com.teminator.mypadnoteone.domain.model.MatchRoom
+
 import kotlinx.coroutines.flow.Flow
 
 interface MatchRoomRepository {
-    // 1. 오더 수락 시 새로운 세컨드 룸(매칭 방) 생성 및 서버/로컬 저장
-    suspend fun createMatchRoom(orderId: String, shipperId: String, driverId: String): Result<MatchRoom>
+    // 1. 오더 수락 시 새로운 세컨드 룸(매칭 방) 생성 및 서버/로컬 저장 (전화번호 파라미터 추가)
+    suspend fun createMatchRoom(
+        orderId: String,
+        shipperId: String,
+        driverId: String,
+        shipperPhone: String? = null, // 화주 전화번호
+        driverPhone: String? = null   // 기사 전화번호
+    ): Result<MatchRoom>
 
     // 2. 특정 방의 상태나 정보를 실시간으로 관찰(Flow)하기 위한 메서드
     fun getMatchRoomStream(roomId: String): Flow<MatchRoom?>

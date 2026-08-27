@@ -1,12 +1,10 @@
 package com.teminator.mypadnoteone.indep
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import com.teminator.mypadnoteone.databinding.ActivityAerorouterEntryBinding
-import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
+
 // 💡 프로젝트에 맞는 테마 임포트로 변경 (예: com.teminator.mypadnoteone.ui.theme 등 확인 필요)
 // 만약 테마 임포트가 헷갈린다면 아래처럼 액티비티 내부에서 XML 레이아웃과 Compose를 분리하는 것이 안전합니다.
 

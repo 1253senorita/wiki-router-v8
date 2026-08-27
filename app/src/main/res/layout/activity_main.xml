@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="#FAFAFA"
-    tools:context=".presentation.main.MainActivity">
+    tools:context="com.terminator.mypadnoteone.com.teminator.mypadnoteone.presentation.main.MainActivity">
 
     <!-- 🔥 바로바로 배차 프래그먼트가 쏙 들어갈 빈 방(컨테이너) 영역 (평소에는 gone으로 숨김) -->
     <androidx.fragment.app.FragmentContainerView
