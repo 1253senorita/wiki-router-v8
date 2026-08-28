@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="#FAFAFA"
-    tools:context="com.terminator.mypadnoteone.com.teminator.mypadnoteone.presentation.main.MainActivity">
+    tools:context="com.teminator.mypadnoteone.presentation.main.MainActivity">
 
     <!-- 🔥 바로바로 배차 프래그먼트가 쏙 들어갈 빈 방(컨테이너) 영역 (평소에는 gone으로 숨김) -->
     <androidx.fragment.app.FragmentContainerView
@@ -57,6 +57,17 @@
             android:text="독립 테스트"
             android:textSize="12sp"
             android:backgroundTint="#00FF5D"
+            android:textColor="#FFFFFF"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- BJ 스타일 다중 화면 통합 회의/방송 모드 진입 버튼 -->
+        <Button
+            android:id="@+id/btnOpenMultiStream"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="멀티스트림"
+            android:textSize="12sp"
+            android:backgroundTint="#6200EE"
             android:textColor="#FFFFFF"
             android:layout_marginEnd="8dp"/>
 

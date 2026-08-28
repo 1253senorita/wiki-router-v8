@@ -33,6 +33,21 @@ class MainNavigator(
     }
 
     /**
+     * 🔥 [신규 추가] 다중 화면 통합 방송/회의 모드 프래그먼트로 이동
+     */
+    fun navigateToMultiStreamRoom(roomId: String) {
+        hideMainUI()
+
+        val fragment = MultiStreamRoomFragment.newInstance(roomId)
+
+        activity.supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack("MULTI_STREAM_ROOM")
+            .commit()
+    }
+
+
+    /**
      * 🔥 [신규 추가] 실시간 매칭 세컨드 룸(ComposeView를 담는 프래그먼트)으로 이동
      */
     fun navigateToMatchingRoom(roomId: String) {

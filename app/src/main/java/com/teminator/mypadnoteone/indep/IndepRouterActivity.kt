@@ -54,13 +54,25 @@ class IndepRouterActivity : AppCompatActivity() {
     // 💡 기존처럼 액티비티 전환 방식으로 안전하게 연결하려면 Intent를 쓰거나,
     // 혹은 별도의 Compose 전용 Activity를 만드는 것이 좋습니다.
     private fun moveToMatchingRoom(target: String) {
-        // 만약 기존에 보셨던 IndepPttActivity처럼
-        // MatchingRoom을 전용으로 띄우는 액티비티가 있다면 거기로 인텐트를 보내는 것이 가장 안정적입니다.
-        // 예시:
-        // val intent = Intent(this, MatchingRoomActivity::class.java).apply { putExtra("ROOM_ID", target) }
-        // startActivity(intent)
+        Toast.makeText(this, "[$target] 아지트 방으로 진입합니다.", Toast.LENGTH_SHORT).show()
 
-        Toast.makeText(this, "방 번호 [$target] 연결 시도 중...", Toast.LENGTH_SHORT).show()
+        // 화면 전체를 MatchingRoomScreen Composable로 교체
+        binding.root.post {
+            androidx.activity.compose.setContent(this) {
+                // ViewModel은 각자 프로젝트 구조에 맞게 주입 또는 생성
+                val viewModel: MatchingRoomViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+
+                MatchingRoomScreen(
+                    roomId = target,
+                    order = null, // 🔥 오더가 없는 개인 아지트 모드이므로 null 안전하게 처리됨!
+                    viewModel = viewModel,
+                    onBackClick = {
+                        // 뒤로가기 누르면 다시 원래 라우터 화면으로 돌아오거나 finish() 처리
+                        finish()
+                    }
+                )
+            }
+        }
     }
 
     override fun onDestroy() {
