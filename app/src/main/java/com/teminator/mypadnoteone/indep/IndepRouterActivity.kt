@@ -4,6 +4,11 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.teminator.mypadnoteone.databinding.ActivityAerorouterEntryBinding
+import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
+import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
+
 
 // 💡 프로젝트에 맞는 테마 임포트로 변경 (예: com.teminator.mypadnoteone.ui.theme 등 확인 필요)
 // 만약 테마 임포트가 헷갈린다면 아래처럼 액티비티 내부에서 XML 레이아웃과 Compose를 분리하는 것이 안전합니다.
@@ -56,18 +61,16 @@ class IndepRouterActivity : AppCompatActivity() {
     private fun moveToMatchingRoom(target: String) {
         Toast.makeText(this, "[$target] 아지트 방으로 진입합니다.", Toast.LENGTH_SHORT).show()
 
-        // 화면 전체를 MatchingRoomScreen Composable로 교체
-        binding.root.post {
-            androidx.activity.compose.setContent(this) {
-                // ViewModel은 각자 프로젝트 구조에 맞게 주입 또는 생성
+        // 💡 XML 액티비티에서 컴포즈를 덮어씌울 때 사용하는 정확한 문법입니다.
+        setContent {
+            MaterialTheme {
                 val viewModel: MatchingRoomViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 
                 MatchingRoomScreen(
                     roomId = target,
-                    order = null, // 🔥 오더가 없는 개인 아지트 모드이므로 null 안전하게 처리됨!
+                    order = null,
                     viewModel = viewModel,
                     onBackClick = {
-                        // 뒤로가기 누르면 다시 원래 라우터 화면으로 돌아오거나 finish() 처리
                         finish()
                     }
                 )
