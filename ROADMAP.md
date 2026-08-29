@@ -1,3 +1,7 @@
+
+//   git remote add origin https://github.com/1253senorita/wiki-router-v8.git
+//    git checkout dominant
+//    git remote rm origin
 # 🚀 WIKI-ROUTER Clean Architecture & Hilt RoadMap
 
 ## 🎯 Target Architecture & Strategy

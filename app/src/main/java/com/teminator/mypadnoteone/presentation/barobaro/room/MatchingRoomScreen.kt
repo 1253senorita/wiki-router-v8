@@ -82,7 +82,7 @@ fun MatchingRoomScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "WIKI-ROUTER HYBRID CALL",
+                        text = "Matching--RoomScreen CALL",
                         style = MaterialTheme.typography.titleMedium,
                         color = Color.White
                     )
