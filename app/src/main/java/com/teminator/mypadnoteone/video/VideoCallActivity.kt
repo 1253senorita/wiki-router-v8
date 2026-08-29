@@ -1,4 +1,4 @@
-package com.teminator.mypadnoteone.video // 혹은 현재 프로젝트의 정확한 패키지명
+package com.teminator.mypadnoteone.video
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -10,23 +10,22 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.teminator.mypadnoteone.indep.IndepStreamManager
+import com.teminator.mypadnoteone.video.IndepStreamManager
 import dagger.hilt.android.AndroidEntryPoint
 import org.webrtc.*
 import com.teminator.mypadnoteone.R
 
-
 @AndroidEntryPoint
 class VideoCallActivity : AppCompatActivity() {
-    // ... 기존 코드 동일 ...
 
     private lateinit var streamManager: IndepStreamManager
+    private lateinit var blackBoxManager: BlackBoxRecorderManager
 
     // WebRTC 컴포넌트
     private lateinit var rootEglBase: EglBase
     private var peerConnectionFactory: PeerConnectionFactory? = null
     private var localVideoTrack: VideoTrack? = null
-    private var localAudioTrack: AudioTrack? = null // 🔥 패키지 명확히 지정
+    private var localAudioTrack: AudioTrack? = null
     private var videoCapturer: CameraVideoCapturer? = null
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
 
@@ -36,6 +35,8 @@ class VideoCallActivity : AppCompatActivity() {
 
     private var isMicOn = true
     private var isVideoOn = true
+    private var currentBlackBoxMode = BlackBoxRecorderManager.RecordMode.VIDEO_AND_AUDIO
+    private var peerConnection: PeerConnection? = null
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -46,7 +47,7 @@ class VideoCallActivity : AppCompatActivity() {
         if (cameraGranted && audioGranted) {
             initWebRtcEngine()
         } else {
-            Toast.makeText(this, "화상 통화를 위해 카메라와 마이크 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "화상 통화 및 블랙박스 녹화를 위해 카메라와 마이크 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -55,6 +56,7 @@ class VideoCallActivity : AppCompatActivity() {
         setContentView(R.layout.activity_video_call)
 
         streamManager = IndepStreamManager()
+        blackBoxManager = BlackBoxRecorderManager(this)
 
         localVideoView = findViewById(R.id.localVideoView)
         remoteVideoView = findViewById(R.id.remoteVideoView)
@@ -68,14 +70,8 @@ class VideoCallActivity : AppCompatActivity() {
         checkPermissionsAndStart()
         setupEventListeners()
 
-        streamManager.connect(
-            onConnected = {
-                runOnUiThread { Toast.makeText(this, "서버 연결 성공", Toast.LENGTH_SHORT).show() }
-            },
-            onError = { err ->
-                runOnUiThread { Toast.makeText(this, "서버 연결 오류: $err", Toast.LENGTH_SHORT).show() }
-            }
-        )
+        // 🔌 서버 소켓 및 시그널링 매니저 연결
+        initStreamManagerCallbacks()
     }
 
     private fun checkPermissionsAndStart() {
@@ -96,14 +92,14 @@ class VideoCallActivity : AppCompatActivity() {
                 .createInitializationOptions()
         )
 
+        val options = PeerConnectionFactory.Options()
         peerConnectionFactory = PeerConnectionFactory.builder()
-            .setOptions(PeerConnectionFactory.Options())
+            .setOptions(options)
             .createPeerConnectionFactory()
 
         val audioSource = peerConnectionFactory?.createAudioSource(MediaConstraints())
         localAudioTrack = peerConnectionFactory?.createAudioTrack("ARDAMs0", audioSource)
 
-        // 🔥 카메라 캡처러 안전하게 생성 (Unresolved reference 'CaptureFacing' 방지)
         videoCapturer = createCameraCapturer()
         if (videoCapturer != null) {
             surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", rootEglBase.eglBaseContext)
@@ -115,18 +111,53 @@ class VideoCallActivity : AppCompatActivity() {
             localVideoTrack = peerConnectionFactory?.createVideoTrack("ARDVSs0", videoSource)
             localVideoTrack?.addSink(localVideoView)
         }
+
+        // 💡 WebRTC 엔진 준비 완료 후 피어 커넥션 생성
+        createPeerConnection()
     }
 
+    private fun createPeerConnection() {
+        // 💡 createIceServer() 호출 및 listOf 타입 명시
+        val iceServers: List<PeerConnection.IceServer> = listOf(
+            PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer()
+        )
+
+        val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
+
+        peerConnection = peerConnectionFactory?.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
+            override fun onSignalingChange(p0: PeerConnection.SignalingState?) {}
+            override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {}
+            override fun onIceConnectionReceivingChange(p0: Boolean) {}
+            override fun onIceGatheringChange(p0: PeerConnection.IceGatheringState?) {}
+            override fun onIceCandidate(candidate: IceCandidate?) {
+                // TODO: 생성된 ICE Candidate 서버 전송 로직 구현
+            }
+            override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {}
+
+            override fun onAddStream(stream: MediaStream) {
+                if (stream.videoTracks.isNotEmpty()) {
+                    val remoteVideoTrack = stream.videoTracks[0]
+                    streamManager.onRemoteStream?.invoke(remoteVideoTrack)
+                }
+            }
+
+            override fun onRemoveStream(stream: MediaStream) {}
+            override fun onDataChannel(p0: DataChannel?) {}
+            override fun onRenegotiationNeeded() {}
+            override fun onAddTrack(p0: RtpReceiver?, p0_1: Array<out MediaStream?>?) {}
+        })
+
+        localVideoTrack?.let { peerConnection?.addTrack(it, listOf("stream_stream_id")) }
+        localAudioTrack?.let { peerConnection?.addTrack(it, listOf("stream_stream_id")) }
+    }
     private fun createCameraCapturer(): CameraVideoCapturer? {
         val enumerator = Camera2Enumerator(this)
-        // 전면 카메라를 우선적으로 탐색
         for (deviceName in enumerator.deviceNames) {
             if (enumerator.isFrontFacing(deviceName)) {
                 val capturer = enumerator.createCapturer(deviceName, null)
                 if (capturer != null) return capturer
             }
         }
-        // 전면 카메라가 없다면 후면 등 다른 카메라 탐색
         for (deviceName in enumerator.deviceNames) {
             val capturer = enumerator.createCapturer(deviceName, null)
             if (capturer != null) return capturer
@@ -134,15 +165,42 @@ class VideoCallActivity : AppCompatActivity() {
         return null
     }
 
+    private fun initStreamManagerCallbacks() {
+        streamManager.connect(
+            onConnected = {
+                runOnUiThread {
+                    Toast.makeText(this, "서버 연결 성공", Toast.LENGTH_SHORT).show()
+                    tvRemoteWait.visibility = View.VISIBLE
+                    tvRemoteWait.text = "상대방을 기다리는 중..."
+                }
+            },
+            onError = { err ->
+                runOnUiThread { Toast.makeText(this, "서버 연결 오류: $err", Toast.LENGTH_SHORT).show() }
+            }
+        )
+
+        streamManager.onPeerJoined = { peerId ->
+            runOnUiThread {
+                tvRemoteWait.visibility = View.GONE
+                Toast.makeText(this, "상대방이 입장했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        streamManager.onRemoteStream = { remoteVideoTrack ->
+            runOnUiThread {
+                tvRemoteWait.visibility = View.GONE
+                remoteVideoTrack.addSink(remoteVideoView)
+            }
+        }
+    }
+
     private fun setupEventListeners() {
-        // 🎤 마이크 음소거 토글 (setEnabled 메서드 사용)
         findViewById<Button>(R.id.btnToggleMic)?.setOnClickListener {
             isMicOn = !isMicOn
             localAudioTrack?.setEnabled(isMicOn)
             Toast.makeText(this, if (isMicOn) "마이크 켜짐" else "마이크 꺼짐", Toast.LENGTH_SHORT).show()
         }
 
-        // 📹 비디오 켜기/끄기 토글 (setEnabled 메서드 사용)
         findViewById<Button>(R.id.btnToggleVideo)?.setOnClickListener {
             isVideoOn = !isVideoOn
             localVideoTrack?.setEnabled(isVideoOn)
@@ -150,7 +208,45 @@ class VideoCallActivity : AppCompatActivity() {
             Toast.makeText(this, if (isVideoOn) "카메라 켜짐" else "카메라 꺼짐", Toast.LENGTH_SHORT).show()
         }
 
+        findViewById<Button>(R.id.btnToggleBlackBox)?.setOnClickListener {
+            if (blackBoxManager.isRecording) {
+                val path = blackBoxManager.stopRecording()
+                Toast.makeText(this, "블랙박스 녹화 종료 저장됨:\n$path", Toast.LENGTH_LONG).show()
+                it.isSelected = false
+                (it as? Button)?.text = "⚫ 블랙박스 시작"
+            } else {
+                val path = blackBoxManager.startRecording(currentBlackBoxMode)
+                if (path != null) {
+                    Toast.makeText(this, "🔴 블랙박스 녹화 시작됨!", Toast.LENGTH_SHORT).show()
+                    it.isSelected = true
+                    (it as? Button)?.text = "⏹️ 녹화 중지"
+                } else {
+                    Toast.makeText(this, "녹화 시작 실패", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        findViewById<Button>(R.id.btnChangeRecordMode)?.setOnClickListener {
+            if (blackBoxManager.isRecording) {
+                Toast.makeText(this, "녹화 중에는 모드를 변경할 수 없습니다. 녹화를 중지해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            currentBlackBoxMode = if (currentBlackBoxMode == BlackBoxRecorderManager.RecordMode.VIDEO_AND_AUDIO) {
+                BlackBoxRecorderManager.RecordMode.AUDIO_ONLY
+            } else {
+                BlackBoxRecorderManager.RecordMode.VIDEO_AND_AUDIO
+            }
+
+            val modeText = if (currentBlackBoxMode == BlackBoxRecorderManager.RecordMode.VIDEO_AND_AUDIO) "영상+음성 모드" else "음성 전용 모드"
+            Toast.makeText(this, "블랙박스 모드 변경: $modeText", Toast.LENGTH_SHORT).show()
+            (it as? Button)?.text = modeText
+        }
+
         findViewById<Button>(R.id.btnEndCall)?.setOnClickListener {
+            if (blackBoxManager.isRecording) {
+                blackBoxManager.stopRecording()
+            }
             Toast.makeText(this, "영상 통화를 종료합니다.", Toast.LENGTH_SHORT).show()
             finish()
         }
@@ -159,6 +255,9 @@ class VideoCallActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         try {
+            if (blackBoxManager.isRecording) {
+                blackBoxManager.stopRecording()
+            }
             videoCapturer?.stopCapture()
             videoCapturer?.dispose()
             surfaceTextureHelper?.dispose()

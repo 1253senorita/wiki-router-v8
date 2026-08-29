@@ -49,11 +49,6 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- 독립 테스트 버튼 -->
-
-
-
-        <!-- 고객(클라이언트) 페이지 진입 버튼 -->
         <Button
             android:id="@+id/btnOpenClient"
             android:layout_width="wrap_content"
@@ -64,7 +59,6 @@
             android:textColor="#6200EE"
             android:layout_marginEnd="6dp"/>
 
-        <!-- 기존 로그아웃 버튼 -->
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="wrap_content"
@@ -93,7 +87,6 @@
             android:gravity="center_vertical"
             android:paddingHorizontal="12dp">
 
-            <!-- 영상 통화 이동 버튼 -->
             <Button
                 android:id="@+id/btnOpenPtt"
                 android:layout_width="90dp"
@@ -104,7 +97,6 @@
                 android:textColor="#03A9F4"
                 android:layout_marginEnd="8dp"/>
 
-            <!-- 세컨드룸 이동 버튼 -->
             <Button
                 android:id="@+id/btnOpenMatchingRoom"
                 android:layout_width="90dp"
@@ -115,7 +107,6 @@
                 android:textColor="#FFFFFF"
                 android:textSize="14sp" />
 
-            <!-- 독립 테스트 버튼 -->
             <Button
                 android:id="@+id/btnOpenIndep"
                 android:layout_width="90dp"
@@ -126,7 +117,6 @@
                 android:textColor="#FFFFFF"
                 android:layout_marginEnd="8dp"/>
 
-            <!-- BJ 스타일 다중 화면 통합 회의/방송 모드 진입 버튼 -->
             <Button
                 android:id="@+id/btnOpenMultiStream"
                 android:layout_width="90dp"
@@ -136,8 +126,6 @@
                 android:backgroundTint="#6200EE"
                 android:textColor="#FFFFFF"
                 android:layout_marginEnd="8dp"/>
-
-
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -163,7 +151,6 @@
             android:textColor="#333333" />
     </LinearLayout>
 
-    <!-- 구분선 -->
     <View
         android:id="@+id/divider_top"
         android:layout_width="0dp"
@@ -198,176 +185,266 @@
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="#333333"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="12dp"/>
 
-            <!-- 서비스 바로가기 카드 5 (AI 보미 / 위키 라우터 관제 센터) -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardWikiRouterClient"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                android:clickable="true"
-                android:focusable="true">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="#E8F5E9"
-                    android:padding="8dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🤖 AI 보미 위키 라우터 관제"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:textColor="#2E7D32"
-                        android:layout_marginBottom="4dp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="오더 필터링 및 소켓 통신 확인"
-                        android:textSize="12sp"
-                        android:textColor="#666666"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- 서비스 바로가기 카드 4 (바로바로 화물 배차) -->
+            <!-- 🚚 🚚🚚🚚🚚[메가 멀티 대시보드 카드] 이것저것 다 넣은 확장형 관제 위젯 -->
+            <!-- 🚚 [프리미엄 관제 대시보드 카드] 실시간 상태 지표 포함 버전 -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardBaroBaroBOTT"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
+                android:layout_height="175dp"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:background="#E6F2FF"
+                    android:padding="16dp">
+
+                    <!-- 상단: 타이틀 및 라이브 뱃지 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="🚚 바로바로 화물 배차 관제센터"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#0044AA"/>
+
+                        <TextView
+                            android:id="@+id/tvLiveBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="● LIVE 5건 대기"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:background="#FF3300"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="3dp"/>
+                    </LinearLayout>
+
+                    <!-- 중단: 현재 실시간 상태 요약 -->
+                    <TextView
+                        android:id="@+id/tvCardSubInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="[진행중] 실시간 화물 콜 대기 목록 및 상세 배차 관리"
+                        android:textSize="12sp"
+                        android:textColor="#444444"
+                        android:layout_marginBottom="10dp"/>
+
+                    <!-- 📊 상태 지표 패널 (소켓 연결 및 오늘 처리 건수) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="#D6E9FF"
+                        android:padding="8dp"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:id="@+id/tvSocketStatus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="🔌 소켓: 연결됨 (OK)"
+                            android:textSize="11sp"
+                            android:textColor="#2E7D32"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/tvTodayCompleted"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="오늘 완료: 12건"
+                            android:textSize="11sp"
+                            android:textColor="#0044AA"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+
+                    <!-- 하단: 이동 유도 텍스트 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="end|center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="배차 관리실 바로가기 ➔"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#0044AA"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <!-- 🚚 🚚🚚카🚚🚚드들 (컴팩트하게 축소: 높이 75dp) -->
+
+
+
+
+            <!-- 보조 카드 1 (AI 보미 관제) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardWikiRouterClient"
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="1dp"
                 android:clickable="true"
                 android:focusable="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="#F0F8FF">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="#E8F5E9"
+                    android:paddingHorizontal="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🚚 바로바로 화물 배차 서비스"
-                        android:textSize="16sp"
+                        android:text="🤖 AI 보미 관제"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:textColor="#0066CC"
-                        android:layout_marginBottom="4dp"/>
+                        android:textColor="#2E7D32"/>
+
+                    <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="실시간 화물 콜 대기 목록 및 상세 배차 관리"
-                        android:textSize="12sp"
+                        android:text="소켓 통신 확인"
+                        android:textSize="11sp"
                         android:textColor="#666666"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- 서비스 바로가기 카드 1 (영상 통화 서비스) -->
+            <!-- 보조 카드 2 (실시간 영상 통화) -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                android:layout_height="75dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="1dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="#FFFFFF">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="#FFFFFF"
+                    android:paddingHorizontal="16dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📹 실시간 영상 통화 서비스"
-                        android:textSize="16sp"
+                        android:text="📹 영상 통화 서비스"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
-                        android:layout_marginBottom="4dp"/>
+                        android:textColor="#000000"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="WebRTC 기반 고화질 영상 통신 화면으로 이동합니다."
-                        android:textSize="12sp"
+                        android:text="고화질 영상 통신"
+                        android:textSize="11sp"
                         android:textColor="#666666"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-            <!-- 서비스 바로가기 카드 2 (화물 오더 등록 바로가기) -->
+            <!-- 보조 카드 3 (새 화물 오더 직접 등록) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardRegisterOrder"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
+                android:layout_height="75dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="1dp"
                 android:clickable="true"
                 android:focusable="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="#F9F5FF">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="#F9F5FF"
+                    android:paddingHorizontal="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📝 새 화물 오더 직접 등록"
-                        android:textSize="16sp"
+                        android:text="📝 새 화물 등록"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:textColor="#6200EE"
-                        android:layout_marginBottom="4dp"/>
+                        android:textColor="#6200EE"/>
+
+                    <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="신규 화물 배차 오더를 간편하게 등록합니다."
-                        android:textSize="12sp"
+                        android:text="신규 배차 등록"
+                        android:textSize="11sp"
                         android:textColor="#666666"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- 서비스 바로가기 카드 3 (파이어베이스 다운로드 및 호스팅 안내) -->
+            <!-- 보조 카드 4 (파이어베이스 다운로드 및 호스팅) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardFirebaseDownload"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
+                android:layout_height="75dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="1dp"
                 android:clickable="true"
                 android:focusable="true">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="#FFF8F8">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="#FFF8F8"
+                    android:paddingHorizontal="16dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📦 파이어베이스 다운로드 및 호스팅"
-                        android:textSize="16sp"
+                        android:text="📦 파이어베이스 호스팅"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:textColor="#FF0000"
-                        android:layout_marginBottom="4dp"/>
+                        android:textColor="#FF0000"/>
+                    <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="최신 빌드 파일 다운로드 및 안내 페이지 열기"
-                        android:textSize="12sp"
+                        android:text="최신 빌드 다운로드"
+                        android:textSize="11sp"
                         android:textColor="#666666"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

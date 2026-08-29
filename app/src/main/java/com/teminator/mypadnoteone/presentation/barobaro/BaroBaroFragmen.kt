@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,15 +19,32 @@ import com.teminator.mypadnoteone.presentation.barobaro.detail.BaroBaroDetailScr
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
 import dagger.hilt.android.AndroidEntryPoint
-//import com.teminator.mypadnoteone.data.repository.loadOrders
-
-
 
 @AndroidEntryPoint
 class BaroBaroFragment : Fragment() {
 
     private val viewModel: BaroBaroViewModel by viewModels()
     private val roomViewModel: MatchingRoomViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // 💡 [시스템 백스택 연동] 하드웨어 뒤로가기 버튼이나 제스처백을 눌렀을 때의 흐름 제어
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            when {
+                viewModel.mockMatchingRoomId != null -> {
+                    viewModel.clearMockRoomId()
+                }
+                viewModel.selectedOrder != null -> {
+                    viewModel.selectOrder(null)
+                }
+                else -> {
+                    isEnabled = false
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,7 +82,6 @@ class BaroBaroFragment : Fragment() {
                             var editingOrder by remember { mutableStateOf<DispatchOrder?>(null) }
 
                             if (activeRoomId != null) {
-                                // 💡 [정리 완료] 뷰모델에 있는 selectedOrder(수락된 오더)를 안전하게 전달
                                 MatchingRoomScreen(
                                     roomId = activeRoomId,
                                     order = selectedOrder,
@@ -78,14 +95,11 @@ class BaroBaroFragment : Fragment() {
                                     if (isRegisterMode || editingOrder != null) {
                                         BaroBaroRegisterScreen(
                                             initialOrder = editingOrder,
-                                            // 💡 1. 람다 인자에 shipperPhone을 추가해 줍니다. (총 5개)
                                             onRegister = { route: String, cargo: String, price: String, desc: String, shipperPhone: String ->
                                                 val targetEdit = editingOrder
                                                 if (targetEdit != null) {
-                                                    // 💡 2. 뷰모델의 updateOrder에 전화번호까지 전달 (함수 시그니처에 맞게 파라미터 추가 필요)
                                                     viewModel.updateOrder(targetEdit.id, route, cargo, price, desc, shipperPhone)
                                                 } else {
-                                                    // 💡 3. 뷰모델의 addOrder에 전화번호까지 전달 (함수 시그니처에 맞게 파라미터 추가 필요)
                                                     viewModel.addOrder(route, cargo, price, desc, shipperPhone)
                                                 }
 
@@ -95,7 +109,7 @@ class BaroBaroFragment : Fragment() {
                                                     viewModel.loadOrders()
                                                 }
                                             },
-                                            onCancel = {
+                                            onBack = {
                                                 if (editingOrder != null) {
                                                     editingOrder = null
                                                 } else if (arguments?.containsKey("IS_REGISTER_MODE") == true) {
@@ -141,15 +155,10 @@ class BaroBaroFragment : Fragment() {
                                             )
                                         } else {
                                             BaroBaroDetailScreen(
-                                                order = selectedOrder,
+                                                dispporderins = selectedOrder,
                                                 onAccept = {
-                                                    // 💡 [수정 완료] 테스트용 드라이버 ID나 실제 기사 고유값을 함께 전달합니다!
-                                                    val testDriverId =
-                                                        "driver_kim_${System.currentTimeMillis()}"
-                                                    viewModel.acceptOrder(
-                                                        selectedOrder.id,
-                                                        testDriverId
-                                                    )
+                                                    val testDriverId = "driver_kim_${System.currentTimeMillis()}"
+                                                    viewModel.acceptOrder(selectedOrder.id, testDriverId)
                                                     viewModel.forceCreateTestMatchRoom(selectedOrder.id)
                                                 },
                                                 onEdit = {

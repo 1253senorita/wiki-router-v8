@@ -121,7 +121,7 @@ dependencies {
     implementation("com.google.ai.edge.litert:litert-support:1.0.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     implementation("io.getstream:stream-webrtc-android:1.3.9")
-
+    implementation("androidx.cardview:cardview:1.0.0")
 
 
 

@@ -73,19 +73,34 @@ fun MatchingRoomScreen(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             // ==========================================
-            // 1. 상단 타이틀 영역
+            // 1. 상단 타이틀 및 표준 뒤로가기 헤더 영역
             // ==========================================
             Column(modifier = Modifier.fillMaxWidth()) {
+                // 💡 [뒤로가기 버튼 추가] 상세/등록 화면과 동일한 규격의 뒤로가기 버튼 헤더 장착
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    OutlinedButton(
+                        onClick = onBackClick, // 👉 누르면 viewModel.clearMockRoomId() 등이 실행되어 이전 화면으로 백스택 복귀!
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                        modifier = Modifier.height(34.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                    ) {
+                        Text("⬅ 뒤로", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
                     Text(
-                        text = "Matching--RoomScreen CALL",
+                        text = "Matching Room CALL",
                         style = MaterialTheme.typography.titleMedium,
                         color = Color.White
                     )
+
+                    Spacer(modifier = Modifier.weight(1f))
 
                     Button(
                         onClick = onBackClick,
@@ -125,7 +140,6 @@ fun MatchingRoomScreen(
                                 Text(text = "연락처: ${order.shipperPhone}", style = MaterialTheme.typography.bodySmall, color = Color(0xFF81C784))
                             }
 
-                            // 📞 [수정] 오더에 등록된 실제 화주 전화번호 연결
                             Spacer(modifier = Modifier.height(8.dp))
                             Button(
                                 onClick = {

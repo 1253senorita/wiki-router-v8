@@ -1,17 +1,27 @@
-package com.teminator.mypadnoteone.indep
+package com.teminator.mypadnoteone.video
 
 import android.util.Log
+import com.teminator.mypadnoteone.indep.IndepConfig
 import io.socket.client.Ack
 import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONArray
 import org.json.JSONObject
+import org.webrtc.VideoTrack
 import java.net.URISyntaxException
 
 class IndepStreamManager {
     companion object {
         private var socket: Socket? = null
     }
+
+    // 💡 화상 통화(WebRTC)용 이벤트 콜백 프로퍼티 추가
+
+
+    var onRemoteStream: ((VideoTrack) -> Unit)? = null
+    var onPeerJoined: ((String) -> Unit)? = null
+    var onPeerLeft: ((String) -> Unit)? = null
+    var onSignalReceived: ((String, JSONObject) -> Unit)? = null
 
     fun connect(onConnected: () -> Unit, onError: (String) -> Unit) {
         try {
@@ -38,10 +48,60 @@ class IndepStreamManager {
                 onError(errorMsg)
             }
 
+            // 💡 서버로부터 WebRTC 시그널링 이벤트 수신 매핑
+            registerSignalingEvents()
+
             socket?.connect()
         } catch (e: URISyntaxException) {
             Log.e(IndepConfig.TAG, "URI Syntax Exception: ${e.message}")
             onError(e.message ?: "Invalid URL")
+        }
+    }
+
+    private fun registerSignalingEvents() {
+        socket?.off("peer-joined")
+        socket?.on("peer-joined") { args ->
+            if (args.isNotEmpty()) {
+                val peerId = args[0].toString()
+                Log.d(IndepConfig.TAG, "👥 상대방 입장: $peerId")
+                onPeerJoined?.invoke(peerId)
+            }
+        }
+
+        socket?.off("peer-left")
+        socket?.on("peer-left") { args ->
+            if (args.isNotEmpty()) {
+                val peerId = args[0].toString()
+                Log.d(IndepConfig.TAG, "👋 상대방 퇴장: $peerId")
+                onPeerLeft?.invoke(peerId)
+            }
+        }
+
+        socket?.off("signal")
+        socket?.on("signal") { args ->
+            if (args.isNotEmpty()) {
+                try {
+                    val data = args[0] as? JSONObject
+                    val senderId = data?.optString("senderId") ?: ""
+                    val payload = data?.optJSONObject("payload") ?: JSONObject()
+                    onSignalReceived?.invoke(senderId, payload)
+                } catch (e: Exception) {
+                    Log.e(IndepConfig.TAG, "❌ 시그널 데이터 파싱 실패", e)
+                }
+            }
+        }
+    }
+
+    // 💡 WebRTC 시그널(Offer/Answer/ICE) 서버로 전송
+    fun sendSignal(targetId: String, payload: JSONObject) {
+        try {
+            val data = JSONObject().apply {
+                put("targetId", targetId)
+                put("payload", payload)
+            }
+            socket?.emit("signal", data)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -171,6 +231,13 @@ class IndepStreamManager {
             }
         }
     }
+
+
+
+
+
+
+
 
     fun disconnect() {
         socket?.disconnect()

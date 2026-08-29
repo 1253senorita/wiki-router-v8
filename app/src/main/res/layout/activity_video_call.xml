@@ -48,45 +48,79 @@
     </androidx.cardview.widget.CardView>
 
     <!-- 3. 하단 컨트롤 버튼 바 (음소거, 통화 종료, 영상 켜기/끄기) -->
+    <!-- 3. 하단 컨트롤 버튼 바 (2단 구조로 깔끔하게 정리) -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:gravity="center"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- 마이크 음소거 버튼 -->
-        <Button
-            android:id="@+id/btnToggleMic"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginEnd="24dp"
-            android:backgroundTint="#444444"
-            android:text="🎤"
-            app:cornerRadius="30dp" />
+        <!-- 1단: 블랙박스 및 모드 설정 버튼들 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-        <!-- 통화 종료 버튼 (빨간색) -->
-        <Button
-            android:id="@+id/btnEndCall"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:backgroundTint="#E53935"
-            android:text="📞"
-            app:cornerRadius="35dp" />
+            <Button
+                android:id="@+id/btnToggleBlackBox"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="#333333"
+                android:textSize="12sp"
+                android:text="⚫ 블랙박스 시작" />
 
-        <!-- 비디오 켜기/끄기 버튼 -->
-        <Button
-            android:id="@+id/btnToggleVideo"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="24dp"
-            android:backgroundTint="#444444"
-            android:text="📷"
-            app:cornerRadius="30dp" />
+            <Button
+                android:id="@+id/btnChangeRecordMode"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:backgroundTint="#333333"
+                android:textSize="12sp"
+                android:text="영상+음성 모드" />
+        </LinearLayout>
+
+        <!-- 2단: 핵심 통화 제어 버튼들 (마이크, 통화종료, 비디오) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- 마이크 음소거 버튼 -->
+            <Button
+                android:id="@+id/btnToggleMic"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginEnd="24dp"
+                android:backgroundTint="#444444"
+                android:text="🎤"
+                app:cornerRadius="30dp" />
+
+            <!-- 통화 종료 버튼 (빨간색) -->
+            <Button
+                android:id="@+id/btnEndCall"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:backgroundTint="#E53935"
+                android:text="📞"
+                app:cornerRadius="35dp" />
+
+            <!-- 비디오 켜기/끄기 버튼 -->
+            <Button
+                android:id="@+id/btnToggleVideo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="24dp"
+                android:backgroundTint="#444444"
+                android:text="📷"
+                app:cornerRadius="30dp" />
+        </LinearLayout>
 
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

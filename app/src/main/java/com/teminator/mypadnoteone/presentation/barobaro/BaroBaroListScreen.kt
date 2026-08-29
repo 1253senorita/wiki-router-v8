@@ -13,7 +13,6 @@ import com.teminator.mypadnoteone.domain.model.DispatchOrder
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-
 @Composable
 fun BaroBaroListScreen(
     orderList: List<DispatchOrder>,
@@ -26,24 +25,31 @@ fun BaroBaroListScreen(
             .padding(horizontal = 9.dp),
         contentPadding = PaddingValues(vertical = 10.dp)
     ) {
+        // 💡 [상단 안내 및 타이틀 헤더] 목록 화면 타이틀과 설명 영역
         item {
-            Text(
-                text = " 프레그먼트와 컨태이너가  쩍  이고  그  위에  인포트로  가져온  컴포져믈 상테  한수에  추가  하는  갓  컴포저블(Composable 함수)일 뿐입니다 그래서  컴포져블이 샅태를  버군  다  라는  계념 으로바뀐 ui 를  보여준다  ! .BaroBaroFragment  setContent { ... }selectedOrder ",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 6.dp)
-            )
+            Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                Text(
+                    text = "실시간 배차 오더 목록",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "프래그먼트와 컨테이너 위에 인포트로 가져온 컴포져블 상태 함수에 추가하는 갓 컴포저블! 상태 변경에 따라 실시간 UI가 갱신됩니다.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+            HorizontalDivider(modifier = Modifier.padding(bottom = 6.dp))
         }
 
-
-
-
-
+        // 💡 [수정 완료] 뷰모델의 filteredOrderList를 바라보도록 변경하여 검색 필터 즉시 반영
         items(viewModel.filteredOrderList) { order ->
             OrderCardItem(
                 order = order,
                 onItemClick = { onItemClick(order) },
                 onAcceptClick = {
-                    // 💡 [수정 완료] 리스트 화면에서도 수락 시 드라이버 ID를 함께 전달합니다!
                     val testDriverId = "driver_kim_${System.currentTimeMillis()}"
                     viewModel.acceptOrder(order.id, testDriverId)
                 }
@@ -51,7 +57,6 @@ fun BaroBaroListScreen(
         }
     }
 }
-
 
 @Composable
 fun OrderCardItem(
@@ -66,16 +71,15 @@ fun OrderCardItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp), // 카드 간격 최소화
+            .padding(vertical = 2.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = onItemClick
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 6.dp) // 내부 상하 패딩 최소화
+                .padding(horizontal = 12.dp, vertical = 6.dp)
         ) {
-            // 1. 기본 식별 및 구간 정보
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -95,7 +99,6 @@ fun OrderCardItem(
                 )
             }
 
-            // 2. 출발지 / 도착지 구간 정보 (Spacer 제거 및 표면 내부 여백 최소화)
             Spacer(modifier = Modifier.height(1.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -138,7 +141,6 @@ fun OrderCardItem(
                 }
             }
 
-            // 3. 화물 정보 및 운임 비용
             Spacer(modifier = Modifier.height(1.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -161,7 +163,6 @@ fun OrderCardItem(
                 )
             }
 
-            // 4. 비고란
             if (order.description.isNotBlank()) {
                 Spacer(modifier = Modifier.height(1.dp))
                 Text(
@@ -173,7 +174,6 @@ fun OrderCardItem(
                 )
             }
 
-            // 5. 상태별 액션 버튼
             if (order.status == "대기중") {
                 Spacer(modifier = Modifier.height(2.dp))
                 Row(
@@ -183,7 +183,7 @@ fun OrderCardItem(
                     Button(
                         onClick = onAcceptClick,
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
-                        modifier = Modifier.height(28.dp) // 버튼 높이도 최대한 슬림하게 압축
+                        modifier = Modifier.height(28.dp)
                     ) {
                         Text("오더 수락", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }

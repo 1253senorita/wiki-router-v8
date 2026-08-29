@@ -1,5 +1,6 @@
 package com.teminator.mypadnoteone.di
 
+import com.teminator.mypadnoteone.indep.IndepConfig // 💡 IndepConfig 임포트 추가!
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,9 +18,8 @@ object NetworkModule {
     @Singleton
     fun provideSocket(): Socket {
         return try {
-            // TODO: 실제 연결할 서버 URL과 포트로 변경해 주세요.
-            // 예시: "http://10.0.2.2:3000" (에뮬레이터 로컬 서버 접근 시)
-            IO.socket("http://your-server-url:port")
+            // 💡 "http://your-server-url:port" 대신 IndepConfig.SERVER_URL을 사용합니다!
+            IO.socket(IndepConfig.SERVER_URL)
         } catch (e: URISyntaxException) {
             throw RuntimeException(e)
         }
