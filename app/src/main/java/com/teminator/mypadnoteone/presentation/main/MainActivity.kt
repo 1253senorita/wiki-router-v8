@@ -55,17 +55,12 @@ class MainActivity : AppCompatActivity() {
      * UI 컴포넌트의 리스너 및 클릭 이벤트를 초기화합니다.
      */
     private fun setupUI() {
-        // 🔥 [변경] 기존 무전기 버튼(btnOpenPtt) 자리에 영상 통화 액티비티 진입 연결
-        // (만약 레이아웃 XML의 버튼 아이디가 다르다면 binding.btnOpenVideoCall 등으로 맞춰주세요)
-
         // 🌟 [추가] indep 패키지의 독립 테스트 액티비티로 이동
         binding.btnOpenIndep.setOnClickListener {
             val intent = Intent(this, IndepRouterActivity::class.java)
             startActivity(intent)
             Toast.makeText(this, "독립 테스트 모듈로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
-
-
 
         binding.btnOpenPtt.setOnClickListener {
             val intent = Intent(this, VideoCallActivity::class.java)
@@ -84,11 +79,6 @@ class MainActivity : AppCompatActivity() {
             openMultiStreamRoom("MULTI_STREAM_GLOBAL_ROOM")
             Toast.makeText(this, "다중 화면 통합 회의 모드로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
-
-
-
-
-
 
         // 로그아웃 버튼 클릭 시 ViewModel을 통해 로그아웃 처리 요청
         binding.btnLogout.setOnClickListener {
@@ -117,8 +107,6 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "화물 오더 등록 화면으로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 
-
-
         // 🔥 상단바 고객 페이지 버튼 -> 뚜껑 닫고 ClientFragment 진입
         binding.btnOpenClient.setOnClickListener {
             navigator.navigateToClientAI("CLIENT_MODE")
@@ -134,31 +122,18 @@ class MainActivity : AppCompatActivity() {
         setupOnBackPressed()
     }
 
-    /**
-     * 🔥 실시간 세컨드 룸 화면을 컨테이너에 띄우는 함수 (상단 앱바 진입용)
-     */
     private fun openMatchingRoom(roomId: String) {
         navigator.navigateToMatchingRoom(roomId)
     }
 
-    /**
-     * 🔥 다중 화면 통합 회의/방송 모드 프래그먼트를 띄우는 함수
-     */
     private fun openMultiStreamRoom(roomId: String) {
         navigator.navigateToMultiStreamRoom(roomId)
     }
 
-
-    /**
-     * 뚜껑을 열고(메인 대시보드 UI 복구), 원래 대시보드 화면을 다시 보여줍니다.
-     */
     fun restoreMainUI() {
         navigator.restoreMainUI()
     }
 
-    /**
-     * ViewModel의 UI 이벤트(상태 변화)를 감지하고 처리합니다.
-     */
     private fun setupObserve() {
         lifecycleScope.launch {
             viewModel.uiEvent
@@ -177,9 +152,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 영상/음성 통화 기능 사용을 위한 마이크 권한을 확인합니다.
-     */
     private fun checkAudioPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
             != PackageManager.PERMISSION_GRANTED
@@ -192,9 +164,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 권한 요청 결과에 따른 처리를 수행합니다.
-     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -210,10 +179,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 뒤로가기 버튼(HW Back Button) 동작을 정의합니다.
-     * 프래그먼트가 백스택에 쌓여있다면 프래그먼트를 닫고 메인 UI를 복구합니다.
-     */
     private fun setupOnBackPressed() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

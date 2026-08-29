@@ -29,8 +29,8 @@ class WikiActivity : AppCompatActivity() {
         setupWikiWebView()
         setupWikiOnBackPressed()
 
-        // 메인 웹뷰 서비스 주소(10.0.2.2:8080) 또는 위키 전용 주소 로드
-        binding.webViewWiki.loadUrl("https://192.168.0.5:8080")
+        // 🚀 에뮬레이터 환경 서버 주소 (포트 3000) 연동
+        binding.webViewWiki.loadUrl("http://10.0.2.2:3000")
     }
 
     private fun setupWikiWebView() {
@@ -50,7 +50,6 @@ class WikiActivity : AppCompatActivity() {
             }
         }
 
-        // 다운로드 리스너 추가 (필요시 조건문 수정 가능)
         binding.webViewWiki.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             if (url.endsWith(".zip") || url.contains("download")) {
                 try {

@@ -1,4 +1,4 @@
-package com.teminator.mypadnoteone.video // 혹은 현재 프로젝트의 정확한 패키지명
+package com.teminator.mypadnoteone.video
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -15,10 +15,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.webrtc.*
 import com.teminator.mypadnoteone.R
 
-
 @AndroidEntryPoint
 class VideoCallActivity : AppCompatActivity() {
-    // ... 기존 코드 동일 ...
 
     private lateinit var streamManager: IndepStreamManager
 
@@ -26,7 +24,7 @@ class VideoCallActivity : AppCompatActivity() {
     private lateinit var rootEglBase: EglBase
     private var peerConnectionFactory: PeerConnectionFactory? = null
     private var localVideoTrack: VideoTrack? = null
-    private var localAudioTrack: AudioTrack? = null // 🔥 패키지 명확히 지정
+    private var localAudioTrack: org.webrtc.AudioTrack? = null
     private var videoCapturer: CameraVideoCapturer? = null
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
 
@@ -66,23 +64,13 @@ class VideoCallActivity : AppCompatActivity() {
         localVideoView.setMirror(true)
 
         checkPermissionsAndStart()
-        setupEventListeners()
-
-        streamManager.connect(
-            onConnected = {
-                runOnUiThread { Toast.makeText(this, "서버 연결 성공", Toast.LENGTH_SHORT).show() }
-            },
-            onError = { err ->
-                runOnUiThread { Toast.makeText(this, "서버 연결 오류: $err", Toast.LENGTH_SHORT).show() }
-            }
-        )
     }
 
     private fun checkPermissionsAndStart() {
-        val cam = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-        val mic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+        val cameraCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        val audioCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
 
-        if (cam == PackageManager.PERMISSION_GRANTED && mic == PackageManager.PERMISSION_GRANTED) {
+        if (cameraCheck == PackageManager.PERMISSION_GRANTED && audioCheck == PackageManager.PERMISSION_GRANTED) {
             initWebRtcEngine()
         } else {
             permissionLauncher.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
@@ -90,85 +78,29 @@ class VideoCallActivity : AppCompatActivity() {
     }
 
     private fun initWebRtcEngine() {
-        PeerConnectionFactory.initialize(
-            PeerConnectionFactory.InitializationOptions.builder(this)
-                .setEnableInternalTracer(true)
-                .createInitializationOptions()
-        )
+        // 🚀 소켓 연결 후 화상 통화 방(Room) 입장 및 WebRTC 초기화 수행
+        val roomId = intent.getStringExtra("ROOM_ID") ?: "INDEP_VIDEO_ROOM"
 
-        peerConnectionFactory = PeerConnectionFactory.builder()
-            .setOptions(PeerConnectionFactory.Options())
-            .createPeerConnectionFactory()
-
-        val audioSource = peerConnectionFactory?.createAudioSource(MediaConstraints())
-        localAudioTrack = peerConnectionFactory?.createAudioTrack("ARDAMs0", audioSource)
-
-        // 🔥 카메라 캡처러 안전하게 생성 (Unresolved reference 'CaptureFacing' 방지)
-        videoCapturer = createCameraCapturer()
-        if (videoCapturer != null) {
-            surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", rootEglBase.eglBaseContext)
-            val videoSource = peerConnectionFactory?.createVideoSource(videoCapturer!!.isScreencast)
-            videoCapturer?.initialize(surfaceTextureHelper, applicationContext, videoSource?.capturerObserver)
-
-            videoCapturer?.startCapture(1280, 720, 30)
-
-            localVideoTrack = peerConnectionFactory?.createVideoTrack("ARDVSs0", videoSource)
-            localVideoTrack?.addSink(localVideoView)
-        }
-    }
-
-    private fun createCameraCapturer(): CameraVideoCapturer? {
-        val enumerator = Camera2Enumerator(this)
-        // 전면 카메라를 우선적으로 탐색
-        for (deviceName in enumerator.deviceNames) {
-            if (enumerator.isFrontFacing(deviceName)) {
-                val capturer = enumerator.createCapturer(deviceName, null)
-                if (capturer != null) return capturer
+        streamManager.connect(
+            onConnected = {
+                runOnUiThread {
+                    Toast.makeText(this, "화상 통화 서버 연결 성공", Toast.LENGTH_SHORT).show()
+                    streamManager.joinRoom(roomId)
+                }
+            },
+            onError = { err ->
+                runOnUiThread {
+                    Toast.makeText(this, "화상 통화 연결 실패: $err", Toast.LENGTH_SHORT).show()
+                }
             }
-        }
-        // 전면 카메라가 없다면 후면 등 다른 카메라 탐색
-        for (deviceName in enumerator.deviceNames) {
-            val capturer = enumerator.createCapturer(deviceName, null)
-            if (capturer != null) return capturer
-        }
-        return null
-    }
-
-    private fun setupEventListeners() {
-        // 🎤 마이크 음소거 토글 (setEnabled 메서드 사용)
-        findViewById<Button>(R.id.btnToggleMic)?.setOnClickListener {
-            isMicOn = !isMicOn
-            localAudioTrack?.setEnabled(isMicOn)
-            Toast.makeText(this, if (isMicOn) "마이크 켜짐" else "마이크 꺼짐", Toast.LENGTH_SHORT).show()
-        }
-
-        // 📹 비디오 켜기/끄기 토글 (setEnabled 메서드 사용)
-        findViewById<Button>(R.id.btnToggleVideo)?.setOnClickListener {
-            isVideoOn = !isVideoOn
-            localVideoTrack?.setEnabled(isVideoOn)
-            localVideoView.visibility = if (isVideoOn) View.VISIBLE else View.GONE
-            Toast.makeText(this, if (isVideoOn) "카메라 켜짐" else "카메라 꺼짐", Toast.LENGTH_SHORT).show()
-        }
-
-        findViewById<Button>(R.id.btnEndCall)?.setOnClickListener {
-            Toast.makeText(this, "영상 통화를 종료합니다.", Toast.LENGTH_SHORT).show()
-            finish()
-        }
+        )
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        try {
-            videoCapturer?.stopCapture()
-            videoCapturer?.dispose()
-            surfaceTextureHelper?.dispose()
-            localVideoView.release()
-            remoteVideoView.release()
-            peerConnectionFactory?.dispose()
-            rootEglBase.release()
-            streamManager.disconnect()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        localVideoView.release()
+        remoteVideoView.release()
+        rootEglBase.release()
+        streamManager.disconnect()
     }
 }

@@ -17,9 +17,8 @@ object NetworkModule {
     @Singleton
     fun provideSocket(): Socket {
         return try {
-            // TODO: 실제 연결할 서버 URL과 포트로 변경해 주세요.
-            // 예시: "http://10.0.2.2:3000" (에뮬레이터 로컬 서버 접근 시)
-            IO.socket("http://your-server-url:port")
+            // 에뮬레이터에서 호스트 PC의 로컬 서버(포트 3000)로 직접 접근
+            IO.socket("http://10.0.2.2:3000")
         } catch (e: URISyntaxException) {
             throw RuntimeException(e)
         }

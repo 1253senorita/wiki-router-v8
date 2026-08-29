@@ -25,22 +25,43 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
+import com.teminator.mypadnoteone.indep.IndepAudioEngine
+import com.teminator.mypadnoteone.indep.IndepStreamManager
+
+data class RoomLogItem(
+    val id: String = System.currentTimeMillis().toString(),
+    val sender: String,
+    val message: String,
+    val type: LogType
+) {
+    enum class LogType { SYSTEM, MY_MESSAGE, OTHER_MESSAGE, ACTION, IMAGE }
+}
 
 @Composable
 fun MatchingRoomScreen(
     roomId: String,
     order: DispatchOrder?,
-    viewModel: MatchingRoomViewModel,
+    viewModel: MatchingRoomViewModel, // 필요한 경우 ViewModel을 포함한 단일 시그니처로 통일
     onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
 
-    val roomStatus = viewModel.roomStatus
-    val logList = viewModel.logList
-    val inputMessage = viewModel.inputMessage
+    val streamManager = remember { IndepStreamManager() }
+    val audioEngine = remember {
+        IndepAudioEngine(context) { buffer, length ->
+            val actualData = if (length == buffer.size) buffer else buffer.copyOfRange(0, length)
+            streamManager.sendVoiceData(actualData)
+        }
+    }
+
+    // 💡 상태 객체 생성 시 remember 적용 (컴포지션 경고 해결)
+    var roomStatus by remember { mutableStateOf("소켓 통신 연결 대기 중...") }
+    val logList = remember { mutableStateListOf<RoomLogItem>() }
+    var inputMessage by remember { mutableStateOf("") }
 
     var isCameraOn by remember { mutableStateOf(false) }
     var isVideoCallActive by remember { mutableStateOf(false) }
+    var isPttActive by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
 
@@ -48,7 +69,9 @@ fun MatchingRoomScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            viewModel.sendImageMessage(it.toString())
+            val uriStr = it.toString()
+            logList.add(RoomLogItem(sender = "나", message = "[사진 첨부됨: $uriStr]", type = RoomLogItem.LogType.IMAGE))
+            streamManager.sendChatMessage("[사진 전송됨]", "DriverUser") { _ -> }
         }
     }
 
@@ -59,7 +82,34 @@ fun MatchingRoomScreen(
     }
 
     LaunchedEffect(roomId) {
-        viewModel.joinMatchingRoom(roomId)
+        streamManager.connect(
+            onConnected = {
+                roomStatus = "통신 연결 완료 (매칭 방 활성화)"
+                streamManager.joinRoom(roomId)
+                logList.add(RoomLogItem(sender = "시스템", message = "[$roomId] 방에 성공적으로 입장했습니다.", type = RoomLogItem.LogType.SYSTEM))
+            },
+            onError = { err ->
+                roomStatus = "연결 실패: $err"
+                logList.add(RoomLogItem(sender = "시스템", message = "에러 발생: $err", type = RoomLogItem.LogType.SYSTEM))
+            }
+        )
+
+        streamManager.onMessageReceived { senderId, message ->
+            logList.add(RoomLogItem(sender = senderId, message = message, type = RoomLogItem.LogType.OTHER_MESSAGE))
+        }
+
+        streamManager.onAudioReceived { audioBytes ->
+            if (audioBytes.isNotEmpty()) {
+                audioEngine.playAudio(audioBytes)
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            audioEngine.release()
+            streamManager.disconnect()
+        }
     }
 
     Box(
@@ -72,9 +122,6 @@ fun MatchingRoomScreen(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // ==========================================
-            // 1. 상단 타이틀 영역
-            // ==========================================
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -88,7 +135,10 @@ fun MatchingRoomScreen(
                     )
 
                     Button(
-                        onClick = onBackClick,
+                        onClick = {
+                            streamManager.leaveRoom()
+                            onBackClick()
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF424242)),
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                         modifier = Modifier.height(32.dp)
@@ -125,7 +175,6 @@ fun MatchingRoomScreen(
                                 Text(text = "연락처: ${order.shipperPhone}", style = MaterialTheme.typography.bodySmall, color = Color(0xFF81C784))
                             }
 
-                            // 📞 [수정] 오더에 등록된 실제 화주 전화번호 연결
                             Spacer(modifier = Modifier.height(8.dp))
                             Button(
                                 onClick = {
@@ -152,9 +201,6 @@ fun MatchingRoomScreen(
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = Color.DarkGray)
             }
 
-            // ==========================================
-            // 2. 중앙 컨테이너 (채팅 및 로그 리스트 영역)
-            // ==========================================
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -179,6 +225,7 @@ fun MatchingRoomScreen(
                                     RoomLogItem.LogType.MY_MESSAGE -> Color(0xFF37474F)
                                     RoomLogItem.LogType.ACTION -> Color(0xFF4E342E)
                                     RoomLogItem.LogType.IMAGE -> Color(0xFF1B5E20)
+                                    RoomLogItem.LogType.OTHER_MESSAGE -> Color(0xFF004D40)
                                     else -> Color(0xFF2C2C2C)
                                 },
                                 shape = RoundedCornerShape(8.dp),
@@ -204,9 +251,6 @@ fun MatchingRoomScreen(
                 }
             }
 
-            // ==========================================
-            // 3. 하단 액션 및 실시간 대화 입력 바 영역
-            // ==========================================
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -232,7 +276,7 @@ fun MatchingRoomScreen(
 
                     OutlinedTextField(
                         value = inputMessage,
-                        onValueChange = { viewModel.onInputChanged(it) },
+                        onValueChange = { inputMessage = it },
                         placeholder = { Text("메시지 입력...", color = Color.Gray) },
                         modifier = Modifier
                             .weight(1f)
@@ -249,7 +293,17 @@ fun MatchingRoomScreen(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     IconButton(
-                        onClick = { viewModel.sendCurrentMessage() },
+                        onClick = {
+                            if (inputMessage.isNotBlank()) {
+                                val textToSend = inputMessage
+                                streamManager.sendChatMessage(textToSend, "OppaDriver") { success ->
+                                    if (success) {
+                                        logList.add(RoomLogItem(sender = "나", message = textToSend, type = RoomLogItem.LogType.MY_MESSAGE))
+                                        inputMessage = ""
+                                    }
+                                }
+                            }
+                        },
                         modifier = Modifier
                             .size(52.dp)
                             .background(Color(0xFFFF5722), RoundedCornerShape(8.dp))
@@ -269,7 +323,7 @@ fun MatchingRoomScreen(
                     Button(
                         onClick = {
                             isVideoCallActive = !isVideoCallActive
-                            viewModel.updateRoomAction(if (isVideoCallActive) "영상 통화 연결됨" else "영상 통화 종료됨")
+                            logList.add(RoomLogItem(sender = "시스템", message = if (isVideoCallActive) "영상 통화 연결됨" else "영상 통화 종료됨", type = RoomLogItem.LogType.ACTION))
                         },
                         modifier = Modifier
                             .weight(1f)
@@ -286,21 +340,34 @@ fun MatchingRoomScreen(
                     }
 
                     Button(
-                        onClick = { viewModel.updateRoomAction("PTT 송신 중") },
+                        onClick = {
+                            isPttActive = !isPttActive
+                            if (isPttActive) {
+                                audioEngine.startRecording()
+                                logList.add(RoomLogItem(sender = "시스템", message = "🎙️ PTT 송출 시작...", type = RoomLogItem.LogType.ACTION))
+                            } else {
+                                audioEngine.stopRecording()
+                                logList.add(RoomLogItem(sender = "시스템", message = "⏹️ PTT 송출 중지", type = RoomLogItem.LogType.ACTION))
+                            }
+                        },
                         modifier = Modifier
                             .weight(1f)
                             .height(46.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xD32F2F))
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isPttActive) Color.Green else Color(0xD32F2F)
+                        )
                     ) {
-                        Text("[누르고 말하기] PTT", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = if (isPttActive) "🔴 PTT 송출 중" else "[누르고 말하기] PTT",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
         }
 
-        // ==============================================
-        // 4. 우측 상단 PiP 내 카메라 화면 및 켜기 스위치
-        // ==============================================
         Card(
             modifier = Modifier
                 .align(Alignment.TopEnd)
