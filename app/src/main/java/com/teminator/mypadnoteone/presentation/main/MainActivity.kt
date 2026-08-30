@@ -55,40 +55,38 @@ class MainActivity : AppCompatActivity() {
      * UI 컴포넌트의 리스너 및 클릭 이벤트를 초기화합니다.
      */
     private fun setupUI() {
-        // 🔥 [변경] 기존 무전기 버튼(btnOpenPtt) 자리에 영상 통화 액티비티 진입 연결
-        // (만약 레이아웃 XML의 버튼 아이디가 다르다면 binding.btnOpenVideoCall 등으로 맞춰주세요)
-
-        // 🌟 [추가] indep 패키지의 독립 테스트 액티비티로 이동
-        binding.btnOpenIndep.setOnClickListener {
-            val intent = Intent(this, IndepRouterActivity::class.java)
-            startActivity(intent)
-            Toast.makeText(this, "독립 테스트 모듈로 진입합니다.", Toast.LENGTH_SHORT).show()
+        // 🔥 [수정] 하단 카카오톡 스타일 5탭 클릭 리스너 연결
+        binding.tabHome.setOnClickListener {
+            updateBottomTabSelection(0)
+            restoreMainUI()
+            Toast.makeText(this, "홈 화면입니다.", Toast.LENGTH_SHORT).show()
         }
 
-
-
-        binding.btnOpenPtt.setOnClickListener {
+        binding.tabVideoCall.setOnClickListener {
+            updateBottomTabSelection(1)
             val intent = Intent(this, VideoCallActivity::class.java)
             startActivity(intent)
             Toast.makeText(this, "영상 통화 모듈로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // 🔥 [신규 추가] 상단바 '세컨드룸' 버튼 -> 뚜껑 닫고 실시간 매칭 세컨드 룸으로 진입!
-        binding.btnOpenMatchingRoom.setOnClickListener {
+        binding.tabMatchRoom.setOnClickListener {
+            updateBottomTabSelection(2)
             openMatchingRoom("ROOM_TEST_GLOBAL")
             Toast.makeText(this, "실시간 매칭 세컨드 룸 파이프를 개통합니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // 🔥 [신규 추가] BJ 스타일 다중 화면 회의/방송 모드 진입 버튼 리스너
-        binding.btnOpenMultiStream.setOnClickListener {
+        binding.tabIndepTest.setOnClickListener {
+            updateBottomTabSelection(3)
+            val intent = Intent(this, IndepRouterActivity::class.java)
+            startActivity(intent)
+            Toast.makeText(this, "독립 테스트 모듈로 진입합니다.", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.tabMultiStream.setOnClickListener {
+            updateBottomTabSelection(4)
             openMultiStreamRoom("MULTI_STREAM_GLOBAL_ROOM")
             Toast.makeText(this, "다중 화면 통합 회의 모드로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
-
-
-
-
-
 
         // 로그아웃 버튼 클릭 시 ViewModel을 통해 로그아웃 처리 요청
         binding.btnLogout.setOnClickListener {
@@ -117,8 +115,6 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "화물 오더 등록 화면으로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 
-
-
         // 🔥 상단바 고객 페이지 버튼 -> 뚜껑 닫고 ClientFragment 진입
         binding.btnOpenClient.setOnClickListener {
             navigator.navigateToClientAI("CLIENT_MODE")
@@ -135,6 +131,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * 🔥 하단 5탭 선택 시 글자 색상과 굵기를 변경하여 활성화 상태를 표시하는 헬퍼 함수
+     */
+    private fun updateBottomTabSelection(selectedIndex: Int) {
+        val tabs = listOf(
+            binding.tabHome,
+            binding.tabVideoCall,
+            binding.tabMatchRoom,
+            binding.tabIndepTest,
+            binding.tabMultiStream
+        )
+        for (i in tabs.indices) {
+            if (i == selectedIndex) {
+                tabs[i].setTextColor(android.graphics.Color.parseColor("#FF0000"))
+                tabs[i].setTypeface(null, android.graphics.Typeface.BOLD)
+            } else {
+                tabs[i].setTextColor(android.graphics.Color.parseColor("#606060"))
+                tabs[i].setTypeface(null, android.graphics.Typeface.NORMAL)
+            }
+        }
+    }
+
+    /**
      * 🔥 실시간 세컨드 룸 화면을 컨테이너에 띄우는 함수 (상단 앱바 진입용)
      */
     private fun openMatchingRoom(roomId: String) {
@@ -147,7 +165,6 @@ class MainActivity : AppCompatActivity() {
     private fun openMultiStreamRoom(roomId: String) {
         navigator.navigateToMultiStreamRoom(roomId)
     }
-
 
     /**
      * 뚜껑을 열고(메인 대시보드 UI 복구), 원래 대시보드 화면을 다시 보여줍니다.

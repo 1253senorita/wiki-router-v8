@@ -103,7 +103,7 @@ class MainNavigator(
     private fun hideMainUI() {
         binding.fragmentContainer.visibility = View.VISIBLE
         binding.layoutTopBar.visibility = View.GONE
-        binding.layoutCategoryScroll.visibility = View.GONE
+        // 🔥 [삭제 완료] layoutCategoryScroll은 XML에서 제거되었으므로 호출하지 않음
         binding.layoutTestMetadata.visibility = View.GONE
         binding.dividerTop.visibility = View.GONE
         binding.scrollViewMain.visibility = View.GONE
@@ -116,7 +116,7 @@ class MainNavigator(
     fun restoreMainUI() {
         binding.fragmentContainer.visibility = View.GONE
         binding.layoutTopBar.visibility = View.VISIBLE
-        binding.layoutCategoryScroll.visibility = View.VISIBLE
+        // 🔥 [삭제 완료] layoutCategoryScroll은 XML에서 제거되었으므로 호출하지 않음
         binding.layoutTestMetadata.visibility = View.VISIBLE
         binding.dividerTop.visibility = View.VISIBLE
         binding.scrollViewMain.visibility = View.VISIBLE

@@ -69,67 +69,7 @@
             android:textColor="#333333" />
     </LinearLayout>
 
-    <!-- 2. 상단 카테고리/필터 탭 바 -->
-    <HorizontalScrollView
-        android:id="@+id/layout_category_scroll"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:scrollbars="none"
-        android:background="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@+id/layout_top_bar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="12dp">
-
-            <Button
-                android:id="@+id/btnOpenPtt"
-                android:layout_width="90dp"
-                android:layout_height="44dp"
-                android:text="영상 통화"
-                android:textSize="14sp"
-                android:backgroundTint="#000000"
-                android:textColor="#03A9F4"
-                android:layout_marginEnd="8dp"/>
-
-            <Button
-                android:id="@+id/btnOpenMatchingRoom"
-                android:layout_width="90dp"
-                android:layout_height="44dp"
-                android:layout_marginEnd="6dp"
-                android:backgroundTint="#2E7D32"
-                android:text="Match룸"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp" />
-
-            <Button
-                android:id="@+id/btnOpenIndep"
-                android:layout_width="90dp"
-                android:layout_height="44dp"
-                android:text="독립 테스트"
-                android:textSize="14sp"
-                android:backgroundTint="#00FF5D"
-                android:textColor="#FFFFFF"
-                android:layout_marginEnd="8dp"/>
-
-            <Button
-                android:id="@+id/btnOpenMultiStream"
-                android:layout_width="90dp"
-                android:layout_height="44dp"
-                android:text="멀티스트림"
-                android:textSize="14sp"
-                android:backgroundTint="#6200EE"
-                android:textColor="#FFFFFF"
-                android:layout_marginEnd="8dp"/>
-        </LinearLayout>
-    </HorizontalScrollView>
-
-    <!-- 3. 파이어베이스 자동 빌드/테스트 봇 감지용 상태 정보 패널 -->
+    <!-- 2. 파이어베이스 자동 빌드/테스트 봇 감지용 상태 정보 패널 -->
     <LinearLayout
         android:id="@+id/layout_test_metadata"
         android:layout_width="0dp"
@@ -137,7 +77,7 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:background="#EFEFEF"
-        app:layout_constraintTop_toBottomOf="@+id/layout_category_scroll"
+        app:layout_constraintTop_toBottomOf="@+id/layout_top_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -160,7 +100,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 4. 메뉴 카드들이 들어갈 대시보드 영역 (ScrollView) -->
+    <!-- 3. 메뉴 카드들이 들어갈 대시보드 영역 (ScrollView) -->
     <ScrollView
         android:id="@+id/scrollViewMain"
         android:layout_width="0dp"
@@ -187,11 +127,7 @@
                 android:textColor="#333333"
                 android:layout_marginBottom="12dp"/>
 
-
-
-
-            <!-- 🚚 🚚🚚🚚🚚[메가 멀티 대시보드 카드] 이것저것 다 넣은 확장형 관제 위젯 -->
-            <!-- 🚚 [프리미엄 관제 대시보드 카드] 실시간 상태 지표 포함 버전 -->
+            <!-- 🚚 [프리미엄 관제 대시보드 카드] -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardBaroBaroBOTT"
                 android:layout_width="match_parent"
@@ -210,7 +146,6 @@
                     android:background="#E6F2FF"
                     android:padding="16dp">
 
-                    <!-- 상단: 타이틀 및 라이브 뱃지 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -240,7 +175,6 @@
                             android:paddingVertical="3dp"/>
                     </LinearLayout>
 
-                    <!-- 중단: 현재 실시간 상태 요약 -->
                     <TextView
                         android:id="@+id/tvCardSubInfo"
                         android:layout_width="match_parent"
@@ -250,7 +184,6 @@
                         android:textColor="#444444"
                         android:layout_marginBottom="10dp"/>
 
-                    <!-- 📊 상태 지표 패널 (소켓 연결 및 오늘 처리 건수) -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -279,7 +212,6 @@
                             android:textStyle="bold"/>
                     </LinearLayout>
 
-                    <!-- 하단: 이동 유도 텍스트 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -297,10 +229,6 @@
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-            <!-- 🚚 🚚🚚카🚚🚚드들 (컴팩트하게 축소: 높이 75dp) -->
-
-
-
 
             <!-- 보조 카드 1 (AI 보미 관제) -->
             <androidx.cardview.widget.CardView
@@ -340,44 +268,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- 보조 카드 2 (실시간 영상 통화) -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="75dp"
-                android:layout_marginBottom="8dp"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="#FFFFFF"
-                    android:paddingHorizontal="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📹 영상 통화 서비스"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000"/>
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="고화질 영상 통신"
-                        android:textSize="11sp"
-                        android:textColor="#666666"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-            <!-- 보조 카드 3 (새 화물 오더 직접 등록) -->
+            <!-- 보조 카드 2 (새 화물 오더 직접 등록) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardRegisterOrder"
                 android:layout_width="match_parent"
@@ -415,7 +306,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- 보조 카드 4 (파이어베이스 다운로드 및 호스팅) -->
+            <!-- 보조 카드 3 (파이어베이스 다운로드 및 호스팅) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardFirebaseDownload"
                 android:layout_width="match_parent"
@@ -452,7 +343,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- 5. 하단 네비게이션 바 -->
+    <!-- 4. 하단 네비게이션 바 (카카오톡 스타일 5탭 고정: 홈 + 핵심 기능 4개) -->
     <LinearLayout
         android:id="@+id/layout_bottom_nav"
         android:layout_width="0dp"
@@ -465,6 +356,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
+            android:id="@+id/tabHome"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -472,34 +364,62 @@
             android:gravity="center"
             android:textSize="11sp"
             android:textColor="#FF0000"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"/>
 
         <TextView
+            android:id="@+id/tabVideoCall"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="다운로드/안내"
+            android:text="영상통화"
             android:gravity="center"
             android:textSize="11sp"
-            android:textColor="#606060"/>
+            android:textColor="#606060"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"/>
 
         <TextView
+            android:id="@+id/tabMatchRoom"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="추가탭"
+            android:text="Match룸"
             android:gravity="center"
             android:textSize="11sp"
-            android:textColor="#606060"/>
+            android:textColor="#606060"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"/>
 
         <TextView
+            android:id="@+id/tabIndepTest"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="보관함"
-            android:gravity="center"
+            android:text="독립테스트"
             android:textSize="11sp"
-            android:textColor="#606060"/>
+            android:gravity="center"
+            android:textColor="#606060"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"/>
+
+        <TextView
+            android:id="@+id/tabMultiStream"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="멀티스트림"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:textColor="#606060"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"/>
 
     </LinearLayout>
 
