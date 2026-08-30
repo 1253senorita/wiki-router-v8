@@ -16,7 +16,7 @@ data class RoomLogItem(
     val message: String,    // 내용
     val type: LogType       // 타입에 따라 UI 색상 구분 가능
 ) {
-    enum class LogType { SYSTEM, MY_MESSAGE, OTHER_MESSAGE, ACTION, IMAGE }
+    enum class LogType { SYSTEM, MY_MESSAGE, OTHER_MESSAGE, ACTION, IMAGE, CONTROL_MATRIX }
 }
 
 @HiltViewModel
@@ -57,6 +57,24 @@ class MatchingRoomViewModel @Inject constructor() : ViewModel() {
     // 에러 상태 변수
     var errorMessage by mutableStateOf<String?>(null)
         private set
+
+    // 🛠️ [공구박스 추가] 마스터 관제 제어를 위한 현재 단계 상태 (1~10단계)
+    var currentMatrixStep by mutableStateOf(1)
+        private set
+
+    // 🛠️ [공구박스 추가] 단계 변경 함수 (망치로 뚝딱뚝딱 단계를 조절하는 로직)
+    fun updateMatrixStep(newStep: Int) {
+        if (newStep in 1..10) {
+            currentMatrixStep = newStep
+            _logList.add(
+                RoomLogItem(
+                    sender = "시스템(공구박스)",
+                    message = "🛠️ 관제 매트릭스 단계가 [$newStep 단계]로 조정되었습니다.",
+                    type = RoomLogItem.LogType.CONTROL_MATRIX
+                )
+            )
+        }
+    }
 
     fun onInputChanged(newText: String) {
         inputMessage = newText

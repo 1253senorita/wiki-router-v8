@@ -35,6 +35,7 @@ fun MatchingRoomScreen(
     roomId: String,
     order: DispatchOrder?,
     viewModel: MatchingRoomViewModel,
+    isMasterUser: Boolean = false, // 👑 방장(마스터) 여부 플래그 추가
     onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
@@ -141,15 +142,83 @@ fun MatchingRoomScreen(
                     }
                 }
 
-                Text(
-                    text = "현재 룸 ID: $roomId\n상태: $roomStatus",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFFE1F5FE),
-                    modifier = Modifier.padding(end = 155.dp),
-                    maxLines = 2
-                )
+                // 🛠️ [방장 전용 관제 제어 패널] 마스터 권한이 있는 경우에만 전체 제어 스테퍼 노출
+                if (isMasterUser) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 6.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "👑 [MASTER BROADCAST & ROUTER CONTROL]",
+                                color = Color(0xFFFF5722),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "현재 룸 ID: $roomId | 상태: $roomStatus",
+                                color = Color(0xFFE1F5FE),
+                                fontSize = 10.sp,
+                                maxLines = 1
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
 
-                Spacer(modifier = Modifier.height(6.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Button(
+                                    onClick = {
+                                        val current = viewModel.currentMatrixStep
+                                        if (current > 1) viewModel.updateMatrixStep(current - 1)
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(30.dp),
+                                    contentPadding = PaddingValues(2.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0277BD))
+                                ) {
+                                    Text("◀ 단계 내림", fontSize = 10.sp, color = Color.White)
+                                }
+
+                                Spacer(modifier = Modifier.width(6.dp))
+
+                                Text(
+                                    text = "⚡ ${viewModel.currentMatrixStep}단계",
+                                    color = Color(0xFFFFCC80),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+
+                                Spacer(modifier = Modifier.width(6.dp))
+
+                                Button(
+                                    onClick = {
+                                        val current = viewModel.currentMatrixStep
+                                        if (current < 10) viewModel.updateMatrixStep(current + 1)
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(30.dp),
+                                    contentPadding = PaddingValues(2.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0277BD))
+                                ) {
+                                    Text("단계 올림 ▶", fontSize = 10.sp, color = Color.White)
+                                }
+                            }
+                        }
+                    }
+                }
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -212,7 +281,6 @@ fun MatchingRoomScreen(
                         HorizontalDivider(color = Color(0xFF0288D1), thickness = 1.dp)
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        // 회원 등급 및 통화 크레딧 필터 상태 표시 줄
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -267,14 +335,13 @@ fun MatchingRoomScreen(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         // ==========================================
-                        // [핵심 버튼 영역] PTT 모드 vs CALL 모드(1분 통화 제한 필터 적용) 분기 제어
+                        // [개별 통신 버튼 영역] PTT 및 통화 모드 (참가자 자율 조작)
                         // ==========================================
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // 1. 영상 통화 버튼 (왼쪽)
                             Button(
                                 onClick = {
                                     isVideoCallActive = !isVideoCallActive
@@ -304,7 +371,6 @@ fun MatchingRoomScreen(
                                 }
                             }
 
-                            // 2. 핵심 PTT / 전화 다이얼 통화 버튼 (가운데)
                             Box(
                                 modifier = Modifier
                                     .weight(2.2f)
@@ -321,7 +387,6 @@ fun MatchingRoomScreen(
                                                 if (!isCommunicationReady) return@detectTapGestures
 
                                                 if (!isCallMode) {
-                                                    // 🐰 [PTT 무전 모드] 기존 방식: 누를 때 송신, 떼면 대기
                                                     isPttTransmitting = true
                                                     viewModel.updateRoomAction("🐰 📢 [무전 송신 중...]")
                                                     try {
@@ -331,7 +396,6 @@ fun MatchingRoomScreen(
                                                         viewModel.updateRoomAction("🐰 [무전 대기 중]")
                                                     }
                                                 } else {
-                                                    // 📞 [CALL 다이얼 통화 모드] 1분(60초) 통화 연결 유지 필터 작동
                                                     if (!isPttTransmitting) {
                                                         isPttTransmitting = true
                                                         isCallTimerRunning = true
@@ -407,7 +471,6 @@ fun MatchingRoomScreen(
                                 }
                             }
 
-                            // 3. 채널 연결 버튼 (오른쪽)
                             Button(
                                 onClick = {
                                     viewModel.connectWebCommunication()
@@ -497,13 +560,14 @@ fun MatchingRoomScreen(
                                     RoomLogItem.LogType.MY_MESSAGE -> Color(0xFF0288D1)
                                     RoomLogItem.LogType.ACTION -> Color(0xFF014361)
                                     RoomLogItem.LogType.IMAGE -> Color(0xFF1B5E20)
+                                    RoomLogItem.LogType.CONTROL_MATRIX -> Color(0xFF4A148C)
                                     else -> Color(0xFF0277BD)
                                 },
                                 shape = RoundedCornerShape(8.dp),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        if (logItem.sender.isNotBlank() && logItem.sender != "시스템") {
+                                        if (logItem.sender.isNotBlank() && logItem.sender != "시스템" && logItem.sender != "시스템(공구박스)") {
                                             viewModel.updateTargetPeerId(logItem.sender)
                                             viewModel.connectWebCommunication()
                                             isCommunicationReady = true
@@ -514,7 +578,7 @@ fun MatchingRoomScreen(
                             ) {
                                 Column(modifier = Modifier.padding(8.dp)) {
                                     Text(
-                                        text = "[${logItem.sender}] (터치하여 1:1 연결)",
+                                        text = "[${logItem.sender}]" + if (logItem.sender.contains("시스템")) "" else " (터치하여 1:1 연결)",
                                         fontSize = 10.sp,
                                         color = Color(0xFFFFCC80),
                                         fontWeight = FontWeight.Bold
@@ -530,162 +594,6 @@ fun MatchingRoomScreen(
                         }
                     }
                 }
-            }
-
-            // ==========================================
-            // 3. 하단 액션 및 실시간 대화 입력 바 영역
-            // ==========================================
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .imePadding()
-                    .navigationBarsPadding(),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { galleryLauncher.launch("image/*") },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .background(Color(0xFF01579B), RoundedCornerShape(8.dp))
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "사진 첨부",
-                            tint = Color(0xFF81D4FA)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    OutlinedTextField(
-                        value = inputMessage,
-                        onValueChange = { viewModel.onInputChanged(it) },
-                        placeholder = { Text("메시지를 입력하세요...", color = Color(0xFFB3E5FC), fontSize = 13.sp) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        maxLines = 1,
-                        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = Color.White),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF81D4FA),
-                            unfocusedBorderColor = Color(0xFF01579B),
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            cursorColor = Color(0xFF81D4FA),
-                            focusedContainerColor = Color(0xFF014361),
-                            unfocusedContainerColor = Color(0xFF014361)
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    IconButton(
-                        onClick = { viewModel.sendCurrentMessage() },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .background(Color(0xFF0288D1), RoundedCornerShape(8.dp))
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "전송",
-                            tint = Color.White
-                        )
-                    }
-                }
-            }
-        }
-
-        // ==============================================
-        // 4. 우측 상단 대형 슬라이딩 토글형 엔티티 & 모드 전환 컴포넌트
-        // ==============================================
-        Card(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 2.dp, end = 2.dp)
-                .width(145.dp)
-                .clickable {
-                    isCallMode = !isCallMode
-                    isPttTransmitting = false
-                    isCallTimerRunning = false
-                    Toast.makeText(
-                        context,
-                        if (isCallMode) "📞 [전화 다이얼 통화 모드]로 전환됨 (1분 제한)" else "🐰 [무전기 PTT 모드]로 전환됨",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                },
-            colors = CardDefaults.cardColors(containerColor = Color(0xEE013A52)),
-            shape = RoundedCornerShape(10.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(26.dp)
-                        .background(Color(0xFF012836), RoundedCornerShape(6.dp))
-                        .padding(2.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(if (!isCallMode) Color(0xFF2E7D32) else Color.Transparent),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "🐰 PTT",
-                            color = if (!isCallMode) Color.White else Color(0xFF78909C),
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(if (isCallMode) Color(0xFF1565C0) else Color.Transparent),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "📞 CALL",
-                            color = if (isCallMode) Color.White else Color(0xFF78909C),
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = viewModel.virtualNumber.ifBlank { "🐱 WIKI-SEC" },
-                    color = Color.White,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    maxLines = 1
-                )
-
-                Spacer(modifier = Modifier.height(1.dp))
-
-                Text(
-                    text = if (isCallMode) "📞 1분 통화 모드" else "🐰 누르고 말하기",
-                    color = if (isCallMode) Color(0xFF81D4FA) else Color(0xFFFFCC80),
-                    fontSize = 7.sp,
-                    maxLines = 1
-                )
             }
         }
     }
