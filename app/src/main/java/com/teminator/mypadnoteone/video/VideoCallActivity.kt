@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.teminator.mypadnoteone.video.IndepStreamManager
+import com.teminator.mypadnoteone.indep.IndepStreamManager
 import dagger.hilt.android.AndroidEntryPoint
 import org.webrtc.*
 import com.teminator.mypadnoteone.R

@@ -1,7 +1,6 @@
-package com.teminator.mypadnoteone.video
+package com.teminator.mypadnoteone.indep
 
 import android.util.Log
-import com.teminator.mypadnoteone.indep.IndepConfig
 import io.socket.client.Ack
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -14,9 +13,6 @@ class IndepStreamManager {
     companion object {
         private var socket: Socket? = null
     }
-
-    // 💡 화상 통화(WebRTC)용 이벤트 콜백 프로퍼티 추가
-
 
     var onRemoteStream: ((VideoTrack) -> Unit)? = null
     var onPeerJoined: ((String) -> Unit)? = null
@@ -48,7 +44,6 @@ class IndepStreamManager {
                 onError(errorMsg)
             }
 
-            // 💡 서버로부터 WebRTC 시그널링 이벤트 수신 매핑
             registerSignalingEvents()
 
             socket?.connect()
@@ -92,7 +87,6 @@ class IndepStreamManager {
         }
     }
 
-    // 💡 WebRTC 시그널(Offer/Answer/ICE) 서버로 전송
     fun sendSignal(targetId: String, payload: JSONObject) {
         try {
             val data = JSONObject().apply {
@@ -124,7 +118,6 @@ class IndepStreamManager {
         socket?.emit("leave-room")
     }
 
-    // 💬 카톡 스타일 텍스트 메시지 전송
     fun sendChatMessage(message: String, senderId: String, callback: (Boolean) -> Unit) {
         try {
             val data = JSONObject().apply {
@@ -158,7 +151,6 @@ class IndepStreamManager {
         }
     }
 
-    // 🖼️ 이미지 + 캡션(텍스트) 전송
     fun sendImageMessage(imageBytes: ByteArray, senderId: String, caption: String = "", callback: (Boolean) -> Unit) {
         try {
             val data = JSONObject().apply {
@@ -199,7 +191,6 @@ class IndepStreamManager {
         }
     }
 
-    // 🎙️ 오디오 스트림 데이터 전송 (Aero 스타일 적용)
     fun sendVoiceData(audioByteArray: ByteArray) {
         try {
             val data = JSONObject().apply {
@@ -231,13 +222,6 @@ class IndepStreamManager {
             }
         }
     }
-
-
-
-
-
-
-
 
     fun disconnect() {
         socket?.disconnect()

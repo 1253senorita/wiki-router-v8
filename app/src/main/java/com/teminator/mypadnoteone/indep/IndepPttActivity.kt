@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
 import com.teminator.mypadnoteone.indep.IndepAudioEngine
 //import com.teminator.mypadnoteone.indep.IndepStreamManager
-import com.teminator.mypadnoteone.video.IndepStreamManager
+import com.teminator.mypadnoteone.indep.IndepStreamManager
 
 @Composable
 fun MatchingRoomScreen(

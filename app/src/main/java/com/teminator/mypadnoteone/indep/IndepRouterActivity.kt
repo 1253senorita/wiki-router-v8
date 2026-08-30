@@ -8,7 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomScreen
 import com.teminator.mypadnoteone.presentation.barobaro.room.MatchingRoomViewModel
-import com.teminator.mypadnoteone.video.IndepStreamManager
+import com.teminator.mypadnoteone.indep.IndepStreamManager
 
 
 // 💡 프로젝트에 맞는 테마 임포트로 변경 (예: com.teminator.mypadnoteone.ui.theme 등 확인 필요)
