@@ -16,23 +16,42 @@ data class RoomLogItem(
     val message: String,    // 내용
     val type: LogType       // 타입에 따라 UI 색상 구분 가능
 ) {
-    // 💡 여기에 IMAGE를 추가합니다. 뷰모델 안쪽에는 enum을 선언하지 마세요!
     enum class LogType { SYSTEM, MY_MESSAGE, OTHER_MESSAGE, ACTION, IMAGE }
 }
 
 @HiltViewModel
 class MatchingRoomViewModel @Inject constructor() : ViewModel() {
 
+    // 💡 [신규 추가] 대화방 참여 인원 수 상태 변수
+    var roomUserCount by mutableStateOf(0)
+        private set
+
+    fun updateRoomUserCount(count: Int) {
+        roomUserCount = count
+    }
+
+    // 상대방 통신 ID 상태 변수
+    var targetPeerId by mutableStateOf("")
+        private set
+
+    fun updateTargetPeerId(newId: String) {
+        targetPeerId = newId
+    }
+
     // 현재 방의 연결 및 매칭 상태
     var roomStatus by mutableStateOf("연결 대기 중")
         private set
 
-    // 🚀 로그와 메시지들이 차곡차곡 쌓이는 리스트 상태
+    // 로그와 메시지들이 차곡차곡 쌓이는 리스트 상태
     private val _logList = mutableStateListOf<RoomLogItem>()
     val logList: List<RoomLogItem> get() = _logList
 
-    // 🚀 화면에서 입력하던 텍스트 상태를 뷰모델로 이관
+    // 화면에서 입력하던 텍스트 상태를 뷰모델로 이관
     var inputMessage by mutableStateOf("")
+        private set
+
+    // 사용자가 지정한 커스텀 가상 번호 (텍스트 ID 등)
+    var virtualNumber by mutableStateOf("VIRTUAL_USER_999")
         private set
 
     // 에러 상태 변수
@@ -41,6 +60,10 @@ class MatchingRoomViewModel @Inject constructor() : ViewModel() {
 
     fun onInputChanged(newText: String) {
         inputMessage = newText
+    }
+
+    fun updateVirtualNumber(newNumber: String) {
+        virtualNumber = newNumber
     }
 
     /**
@@ -52,11 +75,39 @@ class MatchingRoomViewModel @Inject constructor() : ViewModel() {
                 roomStatus = "소켓 통신 파이프 연결 시도 중... ($roomId)"
                 roomStatus = "통신 연결 완료 (매칭 방 활성화)"
 
+                // 💡 방 입장 시 기본 대화방 인원수 1명 설정
+                roomUserCount = 1
+
                 _logList.add(
                     RoomLogItem(sender = "시스템", message = "[$roomId] 방에 성공적으로 입장했습니다.", type = RoomLogItem.LogType.SYSTEM)
                 )
             } catch (e: Exception) {
                 errorMessage = "방 접속 실패: ${e.localizedMessage}"
+                roomStatus = "연결 실패"
+            }
+        }
+    }
+
+    /**
+     * 웹 통신 / 가상 통신 연결 시뮬레이션 함수
+     */
+    fun connectWebCommunication() {
+        viewModelScope.launch {
+            try {
+                roomStatus = "웹 통신(가상 파이프) 연결 중... ($virtualNumber)"
+                _logList.add(
+                    RoomLogItem(
+                        sender = "시스템",
+                        message = "가상 번호 [$virtualNumber]를 통해 웹 통신 파이프가 개설되었습니다.",
+                        type = RoomLogItem.LogType.ACTION
+                    )
+                )
+                roomStatus = "웹 통신 연결 완료 (가상 ID: $virtualNumber)"
+
+                // 💡 통신 연결 성공 시 파트너가 들어온 상태로 가정하여 인원수 2명으로 확장 가능
+                roomUserCount = 2
+            } catch (e: Exception) {
+                errorMessage = "웹 통신 연결 실패: ${e.localizedMessage}"
                 roomStatus = "연결 실패"
             }
         }
@@ -88,14 +139,13 @@ class MatchingRoomViewModel @Inject constructor() : ViewModel() {
                 _logList.add(
                     RoomLogItem(sender = "나", message = messageToSend, type = RoomLogItem.LogType.MY_MESSAGE)
                 )
-                inputMessage = "" // 전송 직후 뷰모델에서 클리어
+                inputMessage = ""
             } catch (e: Exception) {
                 errorMessage = "메시지 전송 실패: ${e.localizedMessage}"
             }
         }
     }
 
-    // 💡 이미지 전송 메시지 로그 추가 함수
     fun sendImageMessage(imageUri: String) {
         viewModelScope.launch {
             try {
