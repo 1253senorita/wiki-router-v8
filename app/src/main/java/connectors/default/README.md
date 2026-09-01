@@ -1,5 +1,10 @@
 # Package connectors.default
 
+
+//정확해! 힐트가 알아서 연쇄적으로 조립(Chain Reaction)해 주는 거야.
+
+
+
 This Kotlin package provides a type-safe library
 for the Firebase Data Connect connector named `default`,
 with service ID `mypadnoteone`
