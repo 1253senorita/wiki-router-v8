@@ -24,7 +24,14 @@ class PhoneDialerFragment : Fragment() {
 
         tvInputNumber = view.findViewById(R.id.tvInputNumber)
         val btnCall = view.findViewById<FloatingActionButton>(R.id.btnCall)
+
+        // 기존에 있는 버튼 바인딩 부분 아래에 추가 또는 수정
         val btnDelete = view.findViewById<ImageButton>(R.id.btnDelete)
+        val btnBack = view.findViewById<ImageButton>(R.id.btnBack) // 백스택(뒤로가기) 버튼 바인딩
+        val tvInputNumber = view.findViewById<TextView>(R.id.tvInputNumber)
+
+
+
 
         // 다이얼 버튼 ID 매핑
         val dialButtons = mapOf(
@@ -66,6 +73,25 @@ class PhoneDialerFragment : Fragment() {
                 Toast.makeText(requireContext(), "전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
             }
         }
+
+
+
+        // 🔥 뒤로가기 버튼 클릭 시 이전 화면(메인 화면 등)으로 복귀
+        btnBack.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
+        // 🔥 지우기(백스페이스) 버튼 클릭 시 마지막 글자 제거
+        btnDelete.setOnClickListener {
+            val currentText = tvInputNumber.text.toString()
+            if (currentText.isNotEmpty()) {
+                tvInputNumber.text = currentText.dropLast(1)
+            }
+        }
+
+
+
+
 
         return view
     }
