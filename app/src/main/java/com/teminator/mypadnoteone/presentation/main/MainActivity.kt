@@ -17,7 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.teminator.mypadnoteone.databinding.ActivityMainBinding
 import com.teminator.mypadnoteone.indep.IndepRouterActivity
 import com.teminator.mypadnoteone.presentation.auth.AuthActivity
-import com.teminator.mypadnoteone.video.VideoCallActivity
+import com.teminator.mypadnoteone.presentation.phone.PhoneActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.tabVideoCall.setOnClickListener {
             updateBottomTabSelection(1)
-            val intent = Intent(this, VideoCallActivity::class.java)
+            val intent = Intent(this, PhoneActivity::class.java)
             startActivity(intent)
             Toast.makeText(this, "영상 통화 모듈로 진입합니다.", Toast.LENGTH_SHORT).show()
         }

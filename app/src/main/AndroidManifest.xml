@@ -56,8 +56,9 @@
 
         <!-- 비디오 통화 액티비티 -->
         <activity
-            android:name=".video.VideoCallActivity"
-            android:exported="false" />
+            android:name=".presentation.phone.PhoneActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <!-- 💡 독립 라우터 액티비티 (indep 패키지 격리 완료) -->
         <activity
