@@ -9,8 +9,10 @@ class WikiRouterRepositoryImpl @Inject constructor(
 ) : WikiRouterRepository {
 
     override fun startRouterConnection(roomKey: String) {
-        // 전달받은 roomKey로 소켓 데이터 소스 연결
-        socketDataSource.connectRouter(roomKey)
+        // 전달받은 roomKey와 함께 임시 사용자 ID 및 피어 ID를 전달하여 소켓 연결
+        val defaultUserId = "User_${System.currentTimeMillis()}"
+        val defaultPeerId = "Peer_${System.currentTimeMillis()}"
+        socketDataSource.connectRouter(roomKey, defaultUserId, defaultPeerId)
     }
 
     override fun observeIncomingMessages(onResult: (Boolean, String) -> Unit) {
