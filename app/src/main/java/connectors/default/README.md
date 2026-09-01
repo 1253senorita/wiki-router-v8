@@ -13,11 +13,7 @@ hosted in `us-central1`.
 To use this package, it is typical to add the following imports
 to each Kotlin source file that uses the connector:
 
-```kotlin
-import com.google.firebase.*
-import com.google.firebase.dataconnect.*
-import connectors.default.*
-```
+
 
 All code samples below assume that these imports are present
 in the containing file.
