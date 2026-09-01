@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
 
         // 🔥 AI 보미 관제 카드 -> 뚜껑 닫고 진짜 AI 보미 프래그먼트(AiFragment) 진입
         binding.cardWikiRouterClient.setOnClickListener {
-            navigator.navigateToClientUnified("AI_BOMI_MONITOR")
+            navigator.navigateToClientUnified("MONITOR")
             Toast.makeText(this, "AI 보미 관제 페이지로 진입합니다.", Toast.LENGTH_SHORT).show()
         }
 

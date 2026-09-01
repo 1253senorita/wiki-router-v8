@@ -122,7 +122,7 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     implementation("io.getstream:stream-webrtc-android:1.3.9")
     implementation("androidx.cardview:cardview:1.0.0")
-
+    implementation("androidx.gridlayout:gridlayout:1.0.0")
 
 
 }
