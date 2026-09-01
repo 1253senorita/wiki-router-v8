@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -81,6 +82,9 @@ class BaroBaroFragment : Fragment() {
                             var isRegisterMode by remember { mutableStateOf(initialRegisterMode) }
                             var editingOrder by remember { mutableStateOf<DispatchOrder?>(null) }
 
+                            // 💡 [추가] 상단 탭 상태 관리 (0: 실시간 오더, 1: 예약 오더 & 캘린더)
+                            var selectedTab by remember { mutableStateOf(0) }
+
                             if (activeRoomId != null) {
                                 MatchingRoomScreen(
                                     roomId = activeRoomId,
@@ -95,7 +99,6 @@ class BaroBaroFragment : Fragment() {
                                     if (isRegisterMode || editingOrder != null) {
                                         BaroBaroRegisterScreen(
                                             initialOrder = editingOrder,
-                                            // 💡 [수정] 5개 파라미터에서 8개 파라미터(예약, 시간, 알림옵션 포함)로 확장
                                             onRegister = { route: String, cargo: String, price: String, desc: String, shipperPhone: String, isReserved: Boolean, reservationTime: String, notificationOption: String ->
                                                 val targetEdit = editingOrder
                                                 if (targetEdit != null) {
@@ -128,6 +131,20 @@ class BaroBaroFragment : Fragment() {
                                         )
                                     } else {
                                         if (selectedOrder == null) {
+                                            // 💡 [상단 탭 레이아웃 추가] 실시간 오더와 예약 오더 영역 분리
+                                            TabRow(selectedTabIndex = selectedTab) {
+                                                Tab(
+                                                    selected = selectedTab == 0,
+                                                    onClick = { selectedTab = 0 },
+                                                    text = { Text("⚡ 실시간 오더", fontWeight = FontWeight.Bold) }
+                                                )
+                                                Tab(
+                                                    selected = selectedTab == 1,
+                                                    onClick = { selectedTab = 1 },
+                                                    text = { Text("📅 예약 오더 & 캘린더", fontWeight = FontWeight.Bold) }
+                                                )
+                                            }
+
                                             Row(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
@@ -155,11 +172,27 @@ class BaroBaroFragment : Fragment() {
                                                 }
                                             }
 
-                                            BaroBaroListScreen(
-                                                orderList = viewModel.filteredOrderList,
-                                                onItemClick = { viewModel.selectOrder(it) },
-                                                viewModel = viewModel
-                                            )
+                                            // 💡 [탭 분기 처리] 선택된 탭에 따라 실시간 리스트 혹은 예약 캘린더 화면 출력
+                                            when (selectedTab) {
+                                                0 -> {
+                                                    // 실시간 오더만 필터링 (isReserved == false)
+                                                    val realTimeOrders = viewModel.filteredOrderList.filter { !it.isReserved }
+                                                    BaroBaroListScreen(
+                                                        orderList = realTimeOrders,
+                                                        onItemClick = { viewModel.selectOrder(it) },
+                                                        viewModel = viewModel
+                                                    )
+                                                }
+                                                1 -> {
+                                                    // 예약 오더만 필터링 (isReserved == true)
+                                                    val reservedOrders = viewModel.filteredOrderList.filter { it.isReserved }
+                                                    BaroBaroReservationScreen(
+                                                        reservedOrderList = reservedOrders,
+                                                        onItemClick = { viewModel.selectOrder(it) },
+                                                        viewModel = viewModel
+                                                    )
+                                                }
+                                            }
                                         } else {
                                             BaroBaroDetailScreen(
                                                 dispporderins = selectedOrder,
