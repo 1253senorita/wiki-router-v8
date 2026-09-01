@@ -112,7 +112,10 @@ class BaroBaroViewModel @Inject constructor(
                                 price = price,
                                 status = "대기중",
                                 description = "기본 테스트용 샘플 오더 데이터입니다 (#$i)",
-                                shipperPhone = "010-1234-56${i % 10}" // 더미 전화번호 추가
+                                shipperPhone = "010-1234-56${i % 10}",
+                                isReserved = (i % 3 == 0), // 3개 중 하나는 샘플 예약 오더로 지정
+                                reservationTime = if (i % 3 == 0) "2026-09-03 14:00" else "",
+                                notificationOption = "정시 울림"
                             )
                         )
                     }
@@ -139,10 +142,23 @@ class BaroBaroViewModel @Inject constructor(
         errorMessage = null
     }
 
-    // 💡 [수정됨] addOrder에 shipperPhone 파라미터 추가
-    fun addOrder(route: String, cargo: String, price: String, description: String, shipperPhone: String) {
+    // 💡 [확장] 예약 관련 필드(isReserved, reservationTime, notificationOption)가 포함된 addOrder
+    fun addOrder(
+        route: String,
+        cargo: String,
+        price: String,
+        description: String,
+        shipperPhone: String,
+        isReserved: Boolean = false,
+        reservationTime: String = "",
+        notificationOption: String = "정시 울림"
+    ) {
         if (route.isBlank() || cargo.isBlank() || price.isBlank()) {
             errorMessage = "필수 항목을 모두 입력해주세요!"
+            return
+        }
+        if (isReserved && reservationTime.isBlank()) {
+            errorMessage = "예약 오더인 경우 예약 일시를 입력해주세요!"
             return
         }
 
@@ -157,19 +173,33 @@ class BaroBaroViewModel @Inject constructor(
                     price = price,
                     status = "대기중",
                     description = description,
-                    shipperPhone = shipperPhone // 📞 전화번호 바인딩
+                    shipperPhone = shipperPhone,
+                    isReserved = isReserved,
+                    reservationTime = reservationTime,
+                    notificationOption = notificationOption
                 )
                 repository.addOrder(newOrder)
                 cacheManager.addOrUpdateOrder(newOrder)
                 errorMessage = null
+                memoryToastMessage = if (isReserved) "⏰ 예약 오더가 등록되었습니다." else "⚡ 즉시 오더가 등록되었습니다."
             } catch (e: Exception) {
                 errorMessage = "오더 등록 실패: ${e.localizedMessage}"
             }
         }
     }
 
-    // 💡 [수정됨] updateOrder에 shipperPhone 파라미터 추가
-    fun updateOrder(orderId: String, route: String, cargo: String, price: String, description: String, shipperPhone: String) {
+    // 💡 [확장] 예약 관련 필드가 포함된 updateOrder
+    fun updateOrder(
+        orderId: String,
+        route: String,
+        cargo: String,
+        price: String,
+        description: String,
+        shipperPhone: String,
+        isReserved: Boolean = false,
+        reservationTime: String = "",
+        notificationOption: String = "정시 울림"
+    ) {
         if (route.isBlank() || cargo.isBlank() || price.isBlank()) {
             errorMessage = "필수 항목을 모두 입력해주세요!"
             return
@@ -177,6 +207,7 @@ class BaroBaroViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
+                // 💡 수정 후 (올바른 코드)
                 val existing = cacheManager.cachedOrders.find { it.id == orderId }
                 if (existing != null) {
                     val updatedOrder = existing.copy(
@@ -184,7 +215,10 @@ class BaroBaroViewModel @Inject constructor(
                         cargoInfo = cargo,
                         price = price,
                         description = description,
-                        shipperPhone = shipperPhone // 📞 수정된 전화번호 반영
+                        shipperPhone = shipperPhone,
+                        isReserved = isReserved,
+                        reservationTime = reservationTime,
+                        notificationOption = notificationOption
                     )
 
                     repository.updateOrder(updatedOrder)
@@ -194,6 +228,7 @@ class BaroBaroViewModel @Inject constructor(
                         selectedOrder = updatedOrder
                     }
                     errorMessage = null
+                    memoryToastMessage = "✏️ 오더 정보가 수정되었습니다."
                 } else {
                     errorMessage = "수정할 오더를 찾을 수 없습니다."
                 }
@@ -202,6 +237,86 @@ class BaroBaroViewModel @Inject constructor(
             }
         }
     }
+
+    // ==========================================
+    // ⏰ [신규 추가] 휴대폰 알람 스누즈 및 예약 제어 기능들
+    // ==========================================
+
+    // 1. 예약 취소 (예약 상태 해제 및 대기 상태로 전환 또는 취소 처리)
+    fun cancelReservation(orderId: String) {
+        viewModelScope.launch {
+            try {
+                val existing = cacheManager.cachedOrders.find { it.id == orderId } ?: return@launch
+                val updated = existing.copy(
+                    isReserved = false,
+                    reservationTime = "",
+                    notificationOption = "예약 취소됨"
+                )
+                repository.updateOrder(updated)
+                cacheManager.addOrUpdateOrder(updated)
+                if (selectedOrder?.id == orderId) {
+                    selectedOrder = updated
+                }
+                memoryToastMessage = "🚫 예약이 취소되었습니다."
+            } catch (e: Exception) {
+                errorMessage = "예약 취소 실패: ${e.localizedMessage}"
+            }
+        }
+    }
+
+    // 2. 예약 무시하고 지금 바로 진행 (즉시 배차 상태로 전환)
+    fun proceedOrderNow(orderId: String) {
+        viewModelScope.launch {
+            try {
+                val existing = cacheManager.cachedOrders.find { it.id == orderId } ?: return@launch
+                val updated = existing.copy(
+                    isReserved = false,
+                    reservationTime = "",
+                    notificationOption = "즉시 전환됨"
+                )
+                repository.updateOrder(updated)
+                cacheManager.addOrUpdateOrder(updated)
+                if (selectedOrder?.id == orderId) {
+                    selectedOrder = updated
+                }
+                memoryToastMessage = "🚀 즉시 진행 오더로 전환되었습니다!"
+            } catch (e: Exception) {
+                errorMessage = "즉시 진행 전환 실패: ${e.localizedMessage}"
+            }
+        }
+    }
+
+    // 3. 시간 앞당김 또는 뒤로 연기 (스누즈 / 타임 컨트롤 개념)
+    fun postponeOrAdvanceReservation(orderId: String, actionType: String) {
+        viewModelScope.launch {
+            try {
+                val existing = cacheManager.cachedOrders.find { it.id == orderId } ?: return@launch
+
+                // 간단한 문자열 조합 제어 또는 시간 가감 처리
+                val currentTime = existing.reservationTime.ifBlank { "2026-09-03 14:00" }
+                val modifiedTimeTag = when {
+                    actionType.contains("앞당김") -> "$currentTime (10분 앞당겨짐)"
+                    actionType.contains("연기") -> "$currentTime (30분 연기됨)"
+                    else -> currentTime
+                }
+
+                val updated = existing.copy(
+                    reservationTime = modifiedTimeTag,
+                    notificationOption = actionType
+                )
+                repository.updateOrder(updated)
+                cacheManager.addOrUpdateOrder(updated)
+                if (selectedOrder?.id == orderId) {
+                    selectedOrder = updated
+                }
+                memoryToastMessage = "⏰ 예약 시간이 조정되었습니다: $actionType"
+            } catch (e: Exception) {
+                errorMessage = "예약 시간 조정 실패: ${e.localizedMessage}"
+            }
+        }
+    }
+
+    // ==========================================
 
     fun acceptOrder(orderId: String, currentDriverId: String) {
         viewModelScope.launch {

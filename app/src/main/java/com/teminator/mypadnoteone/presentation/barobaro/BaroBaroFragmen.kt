@@ -95,12 +95,19 @@ class BaroBaroFragment : Fragment() {
                                     if (isRegisterMode || editingOrder != null) {
                                         BaroBaroRegisterScreen(
                                             initialOrder = editingOrder,
-                                            onRegister = { route: String, cargo: String, price: String, desc: String, shipperPhone: String ->
+                                            // 💡 [수정] 5개 파라미터에서 8개 파라미터(예약, 시간, 알림옵션 포함)로 확장
+                                            onRegister = { route: String, cargo: String, price: String, desc: String, shipperPhone: String, isReserved: Boolean, reservationTime: String, notificationOption: String ->
                                                 val targetEdit = editingOrder
                                                 if (targetEdit != null) {
-                                                    viewModel.updateOrder(targetEdit.id, route, cargo, price, desc, shipperPhone)
+                                                    viewModel.updateOrder(
+                                                        targetEdit.id, route, cargo, price, desc, shipperPhone,
+                                                        isReserved, reservationTime, notificationOption
+                                                    )
                                                 } else {
-                                                    viewModel.addOrder(route, cargo, price, desc, shipperPhone)
+                                                    viewModel.addOrder(
+                                                        route, cargo, price, desc, shipperPhone,
+                                                        isReserved, reservationTime, notificationOption
+                                                    )
                                                 }
 
                                                 if (viewModel.errorMessage == null) {

@@ -1,4 +1,3 @@
-
 package com.teminator.mypadnoteone.presentation.barobaro
 
 import androidx.compose.foundation.layout.*
@@ -11,10 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.teminator.mypadnoteone.domain.model.DispatchOrder
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BaroBaroRegisterScreen(
     initialOrder: DispatchOrder? = null, // 수정할 때 기존 오더 데이터 전달 (등록일 때는 null)
-    onRegister: (String, String, String, String, String) -> Unit, // 📞 콜백에 전화번호 포함 (route, cargo, price, description, shipperPhone)
+    // 📞 [수정] 콜백에 예약 여부(Boolean), 예약 일시(String), 알림/스누즈 옵션(String) 추가
+    onRegister: (String, String, String, String, String, Boolean, String, String) -> Unit,
     onBack: () -> Unit
 ) {
     val initialRouteParts = initialOrder?.route?.split(" ➔ ") ?: listOf("", "")
@@ -30,6 +31,15 @@ fun BaroBaroRegisterScreen(
 
     // 📞 화주 전화번호 상태값
     var shipperPhone by remember { mutableStateOf(initialOrder?.shipperPhone ?: "") }
+
+    // ⏰ [추가] 즉시/예약 오더 상태 및 스누즈 관련 상태 값
+    var isReserved by remember { mutableStateOf(initialOrder?.isReserved ?: false) }
+    var reservationTime by remember { mutableStateOf(initialOrder?.reservationTime ?: "") }
+    var notificationOption by remember { mutableStateOf(initialOrder?.notificationOption ?: "정시 울림") }
+
+    // 알림 옵션 드롭다운 메뉴 제어 상태
+    var expandedNotificationMenu by remember { mutableStateOf(false) }
+    val notificationOptions = listOf("정시 울림", "10분 전 알림", "30분 전 알림", "1시간 전 알림", "스누즈(10분 간격 반복)")
 
     val isEditMode = initialOrder != null
     val scrollState = rememberScrollState()
@@ -83,6 +93,86 @@ fun BaroBaroRegisterScreen(
                 color = MaterialTheme.colorScheme.secondary
             )
             Spacer(modifier = Modifier.height(4.dp))
+
+            // ⏰ [추가] 즉시 / 예약 배차 선택 필터 칩
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = !isReserved,
+                    onClick = { isReserved = false },
+                    label = { Text("⚡ 즉시 오더") },
+                    modifier = Modifier.weight(1f)
+                )
+                FilterChip(
+                    selected = isReserved,
+                    onClick = { isReserved = true },
+                    label = { Text("⏰ 예약 오더") },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // ⏰ [조건부 노출] 예약 오더일 때만 표시되는 예약 시간 및 스누즈 설정 카드 영역
+            if (isReserved) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "예약 및 스누즈 알람 설정",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        // 1. 예약 일시 입력 필드
+                        OutlinedTextField(
+                            value = reservationTime,
+                            onValueChange = { reservationTime = it },
+                            label = { Text("예약 일시 (예: 2026-09-03 14:00)") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+
+                        // 2. 알람 스누즈 설정 드롭다운
+                        ExposedDropdownMenuBox(
+                            expanded = expandedNotificationMenu,
+                            onExpandedChange = { expandedNotificationMenu = !expandedNotificationMenu }
+                        ) {
+                            OutlinedTextField(
+                                value = notificationOption,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("알림 상태 (스누즈 설정)") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                singleLine = true
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expandedNotificationMenu,
+                                onDismissRequest = { expandedNotificationMenu = false }
+                            ) {
+                                notificationOptions.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option) },
+                                        onClick = {
+                                            notificationOption = option
+                                            expandedNotificationMenu = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             // 1. 출발지 입력창
             OutlinedTextField(
@@ -145,8 +235,20 @@ fun BaroBaroRegisterScreen(
                 Button(
                     onClick = {
                         if (departure.isNotBlank() && destination.isNotBlank() && cargo.isNotBlank() && priceStr.isNotBlank() && shipperPhone.isNotBlank()) {
-                            val combinedRoute = "$departure ➔ $destination"
-                            onRegister(combinedRoute, cargo, priceStr, description, shipperPhone)
+                            // 예약 오더인 경우 예약 일시가 비어있지 않은지 검증
+                            if (!isReserved || (isReserved && reservationTime.isNotBlank())) {
+                                val combinedRoute = "$departure ➔ $destination"
+                                onRegister(
+                                    combinedRoute,
+                                    cargo,
+                                    priceStr,
+                                    description,
+                                    shipperPhone,
+                                    isReserved,
+                                    reservationTime,
+                                    notificationOption
+                                )
+                            }
                         }
                     },
                     modifier = Modifier
