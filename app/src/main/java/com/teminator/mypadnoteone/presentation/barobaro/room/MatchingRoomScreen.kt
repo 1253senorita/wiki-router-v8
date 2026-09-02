@@ -53,7 +53,7 @@ fun MatchingRoomScreen(
 
     // 회원 등급 및 1분 통화 제한을 위한 잔여 크레딧 / 타이머 상태 필터
     var userMembershipTier by remember { mutableStateOf("GENERAL") } // GENERAL 또는 VIP
-    var remainingCallSeconds by remember { mutableStateOf(10) }      // 기본 통화 시간 1분 (초)
+    var remainingCallSeconds by remember { mutableStateOf(10) }      // 기본 통화 시간 설정
     var isCallTimerRunning by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
@@ -505,87 +505,57 @@ fun MatchingRoomScreen(
                         }
                     }
                 }
-
-                if (order != null) {
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF01579B))
-                    ) {
-                        Column(modifier = Modifier.padding(10.dp)) {
-                            Text(
-                                text = "📦 매칭된 화물 정보 (#${order.id})",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFFCC80)
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(text = "경로: ${order.route}", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = Color.White)
-                            Text(text = "화물: ${order.cargoInfo} | 요금: ${order.price}", style = MaterialTheme.typography.labelSmall, color = Color(0xFFB3E5FC))
-
-                            if (order.shipperPhone.isNotBlank()) {
-                                Text(text = "등록 연락처: ${order.shipperPhone}", style = MaterialTheme.typography.labelSmall, color = Color(0xFFC8E6C9))
-                            }
-                        }
-                    }
-                }
-
-                HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp), color = Color(0xFF01579B))
             }
 
+            Spacer(modifier = Modifier.height(4.dp))
+
             // ==========================================
-            // 2. 중앙 컨테이너 (채팅 및 로그 리스트 영역)
+            // 2. 중간 로그 및 메시지 출력 영역
             // ==========================================
-            Box(
+            Card(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
-                    .padding(vertical = 2.dp)
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF014361))
             ) {
-                Card(
-                    modifier = Modifier.fillMaxSize(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF01579B)),
-                    shape = RoundedCornerShape(12.dp)
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        items(logList) { logItem ->
+                    items(logList) { item ->
+                        val isMyMessage = item.type == RoomLogItem.LogType.MY_MESSAGE
+                        val isSystem = item.type == RoomLogItem.LogType.SYSTEM
+                        val isAction = item.type == RoomLogItem.LogType.ACTION
+                        val isControl = item.type == RoomLogItem.LogType.CONTROL_MATRIX
+
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = if (isMyMessage) Alignment.CenterEnd else Alignment.CenterStart
+                        ) {
                             Surface(
-                                color = when (logItem.type) {
-                                    RoomLogItem.LogType.MY_MESSAGE -> Color(0xFF0288D1)
-                                    RoomLogItem.LogType.ACTION -> Color(0xFF014361)
-                                    RoomLogItem.LogType.IMAGE -> Color(0xFF1B5E20)
-                                    RoomLogItem.LogType.CONTROL_MATRIX -> Color(0xFF4A148C)
-                                    else -> Color(0xFF0277BD)
+                                color = when {
+                                    isControl -> Color(0xFF37474F)
+                                    isSystem -> Color(0xFF01579B)
+                                    isAction -> Color(0xFF00695C)
+                                    isMyMessage -> Color(0xFF0277BD)
+                                    else -> Color(0xFF263238)
                                 },
                                 shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        if (logItem.sender.isNotBlank() && logItem.sender != "시스템" && logItem.sender != "시스템(공구박스)") {
-                                            viewModel.updateTargetPeerId(logItem.sender)
-                                            viewModel.connectWebCommunication()
-                                            isCommunicationReady = true
-                                            viewModel.updateRoomUserCount(2)
-                                            Toast.makeText(context, "🎯 [${logItem.sender}]님과 1:1 회선 및 무전기 연동", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
+                                modifier = Modifier.widthIn(max = 280.dp)
                             ) {
                                 Column(modifier = Modifier.padding(8.dp)) {
                                     Text(
-                                        text = "[${logItem.sender}]" + if (logItem.sender.contains("시스템")) "" else " (터치하여 1:1 연결)",
+                                        text = item.sender,
                                         fontSize = 10.sp,
                                         color = Color(0xFFFFCC80),
                                         fontWeight = FontWeight.Bold
                                     )
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = logItem.message,
+                                        text = item.message,
                                         fontSize = 12.sp,
                                         color = Color.White
                                     )
@@ -593,6 +563,59 @@ fun MatchingRoomScreen(
                             }
                         }
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // ==========================================
+            // 3. 하단 입력 및 전송 제어 영역
+            // ==========================================
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = { galleryLauncher.launch("image/*") },
+                    modifier = Modifier
+                        .size(44.dp)
+                        .background(Color(0xFF01579B), RoundedCornerShape(8.dp))
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "사진 첨부", tint = Color.White)
+                }
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                OutlinedTextField(
+                    value = inputMessage,
+                    onValueChange = { viewModel.onInputChanged(it) },
+                    placeholder = { Text("메시지를 입력하세요...", fontSize = 11.sp, color = Color(0xFFB3E5FC)) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    singleLine = true,
+                    textStyle = LocalTextStyle.current.copy(fontSize = 12.sp, color = Color.White),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF81D4FA),
+                        unfocusedBorderColor = Color(0xFF01579B),
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedContainerColor = Color(0xFF014361),
+                        unfocusedContainerColor = Color(0xFF014361)
+                    )
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                Button(
+                    onClick = { viewModel.sendCurrentMessage() },
+                    modifier = Modifier
+                        .height(48.dp)
+                        .width(60.dp),
+                    contentPadding = PaddingValues(0.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00695C))
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "전송", tint = Color.White)
                 }
             }
         }

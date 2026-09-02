@@ -8,10 +8,16 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.teminator.mypadnoteone.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PhoneDialerFragment : Fragment() {
+
+    // 🔥 Hilt를 통해 PhoneViewModel 주입 완료
+    private val phoneViewModel: PhoneViewModel by viewModels()
 
     private lateinit var tvInputNumber: TextView
     private val currentNumber = StringBuilder()
@@ -24,14 +30,8 @@ class PhoneDialerFragment : Fragment() {
 
         tvInputNumber = view.findViewById(R.id.tvInputNumber)
         val btnCall = view.findViewById<FloatingActionButton>(R.id.btnCall)
-
-        // 기존에 있는 버튼 바인딩 부분 아래에 추가 또는 수정
         val btnDelete = view.findViewById<ImageButton>(R.id.btnDelete)
-        val btnBack = view.findViewById<ImageButton>(R.id.btnBack) // 백스택(뒤로가기) 버튼 바인딩
-        val tvInputNumber = view.findViewById<TextView>(R.id.tvInputNumber)
-
-
-
+        val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
 
         // 다이얼 버튼 ID 매핑
         val dialButtons = mapOf(
@@ -46,14 +46,16 @@ class PhoneDialerFragment : Fragment() {
             view.findViewById<View>(id)?.setOnClickListener {
                 currentNumber.append(value)
                 tvInputNumber.text = currentNumber.toString()
+                phoneViewModel.updateDialNumber(currentNumber.toString())
             }
         }
 
-        // 백스페이스(지우기) 버튼 동작
+        // 백스페이스(지우기) 단건 클릭
         btnDelete.setOnClickListener {
             if (currentNumber.isNotEmpty()) {
                 currentNumber.deleteCharAt(currentNumber.length - 1)
                 tvInputNumber.text = currentNumber.toString()
+                phoneViewModel.updateDialNumber(currentNumber.toString())
             }
         }
 
@@ -61,37 +63,28 @@ class PhoneDialerFragment : Fragment() {
         btnDelete.setOnLongClickListener {
             currentNumber.clear()
             tvInputNumber.text = ""
+            phoneViewModel.updateDialNumber("")
             true
         }
 
-        // 통화 버튼 클릭 동작
+        // 📞 통화 버튼 클릭 동작 -> PhoneViewModel의 WebRTC 및 소켓 파이프 호출로 직결
         btnCall.setOnClickListener {
             val number = currentNumber.toString()
             if (number.isNotEmpty()) {
-                Toast.makeText(requireContext(), "$number 번으로 통화 연결 중...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "[$number] 통화 및 WebRTC 파이프 연결 시작...", Toast.LENGTH_SHORT).show()
+
+                // 🔥 뷰모델의 통화 연결 함수 호출
+                phoneViewModel.startPhoneCall(number)
+
             } else {
                 Toast.makeText(requireContext(), "전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
             }
         }
 
-
-
-        // 🔥 뒤로가기 버튼 클릭 시 이전 화면(메인 화면 등)으로 복귀
+        // 뒤로가기 버튼 클릭 시 이전 화면으로 복귀
         btnBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-
-        // 🔥 지우기(백스페이스) 버튼 클릭 시 마지막 글자 제거
-        btnDelete.setOnClickListener {
-            val currentText = tvInputNumber.text.toString()
-            if (currentText.isNotEmpty()) {
-                tvInputNumber.text = currentText.dropLast(1)
-            }
-        }
-
-
-
-
 
         return view
     }
