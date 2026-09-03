@@ -74,7 +74,7 @@ app.post('/api/ai-process', async (req, res) => {
 const rooms = {}; 
 const roomTimers = {}; // 방별 비활동 자동 종료 타이머 보관함
 const peerList = new Set(); // 🐻 [BEAR-MOD] 전역 피어 리스트 저장소
-const INACTIVE_TIMEOUT = 3 * 60 * 1000; // 통신이 없을 경우 종료할 제한 시간 (3분)
+const INACTIVE_TIMEOUT = 120 * 60 * 1000; // 통신이 없을 경우 종료할 제한 시간 (120분)
 
 // 🌐 [IO 전역 함수] 특정 방 전체에 유저 리스트 전송
 function emitUserList(roomId) {
@@ -109,20 +109,20 @@ function checkAndClearEmptyRoom(roomId) {
     }
 }
 
-/* --- [Socket.io & OI 통신 허브] --- */
+/* --- [Socket.io & 통신 허브 - 중복 제거 및 단일화] --- */
 io.on('connection', (socket) => {
     console.log(`🔗 [Socket] Client Connected: ${socket.id}`);
 
     let currentPeerId = null;
 
-    // 1️⃣ [BEAR-MOD] 피어 ID 등록
+    // 1️⃣ [BEAR-MOD / PENG-MOD 통합] 피어 ID 등록
     socket.on('register-peer', (id) => {
         currentPeerId = id;
         peerList.add(id);
-        console.log(`📡 [BEAR-MOD] Peer Registered: ${id}`);
+        console.log(`📡 [MOD-REG] Peer Registered: ${id}`);
     });
 
-    // 2️⃣ [BEAR-MOD] 접속자 목록 요청 시 전달
+    // 2️⃣ [BEAR-MOD / PENG-MOD 통합] 접속자 목록 요청 시 전달
     socket.on('get-peers', () => {
         socket.emit('peer-list', Array.from(peerList));
     });
@@ -189,10 +189,10 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log(`❌ [Socket] Client Disconnected: ${socket.id}`);
 
-        // BEAR-MOD 피어 리스트 정리
+        // 피어 리스트 정리
         if (currentPeerId) {
             peerList.delete(currentPeerId);
-            console.log(`❌ [BEAR-MOD] Peer Removed: ${currentPeerId}`);
+            console.log(`❌ [MOD-DISCONNECT] Peer Removed: ${currentPeerId}`);
         }
 
         // WebRTC 방 멤버들에게 퇴장 신호 전송
