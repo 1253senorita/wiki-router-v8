@@ -1,6 +1,7 @@
 package com.teminator.mypadnoteone.data.datasource.remote
 
 import android.util.Log
+import com.teminator.mypadnoteone.indep.IndepConfig // 💡 IndepConfig 임포트 추가
 import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONObject
@@ -18,8 +19,8 @@ class WikiRouterSocketDataSource @Inject constructor() {
     fun connectRouter(roomId: String, userId: String, peerId: String) {
         if (socket == null) {
             try {
-                // 에뮬레이터 기준 로컬 서버 주소 (실제 기기 테스트 시 컴퓨터 IP로 변경)
-                socket = IO.socket("http://10.0.2.2:3000")
+                // 💡 하드코딩된 주소 대신 IndepConfig.SERVER_URL 사용
+                socket = IO.socket(IndepConfig.SERVER_URL)
 
                 // 서버 연결 성공 이벤트
                 socket?.on(Socket.EVENT_CONNECT) {
@@ -56,14 +57,11 @@ class WikiRouterSocketDataSource @Inject constructor() {
     fun interceptAndFilterMessage(rawMessage: String, onBomiFiltered: (Boolean, String) -> Unit) {
         Log.d(TAG, "AI 보미 인터셉트 작동: $rawMessage")
 
-        // 1차 필터링 로직 (예: 스팸 콜, 불필요한 단가 필터링, 단골 여부 체크)
         val isTrustedCustomer = rawMessage.contains("VIP") || rawMessage.contains("단골")
 
         if (isTrustedCustomer) {
-            // 단골이거나 검증된 콜인 경우: 하이패스 통과 (즉시 연결)
             onBomiFiltered(true, "[보미 비서] 단골 고객 order입니다. 즉시 연결합니다!")
         } else {
-            // 일반 콜인 경우: AI 보미가 1차 상담 및 임시 홀드 처리
             onBomiFiltered(false, "[보미 비서] 1차 상담 진행 중: 임시 홀드(Tentative Hold)를 겁니다.")
         }
     }
